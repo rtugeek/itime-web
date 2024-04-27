@@ -2,16 +2,12 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'HomeView',
+  name: 'HistoryTodoView',
 })
 </script>
 
 <template>
-  <RouterLink to="/todo/add">
-    <nut-button>
-      Add
-    </nut-button>
-  </RouterLink>
+  <div />
 </template>
 
 <style scoped>

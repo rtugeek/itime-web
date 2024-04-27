@@ -1,10 +1,12 @@
 * {
     margin: 0;
+    user-select: none;
 }
 
 :root {
     --nut-primary-color: #478EF2;
     --nut-primary-color-end: #496AF2;
+    --nut-navbar-title-font-weight: 700
 }
 
 body {

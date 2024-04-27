@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BaseView: typeof import('./src/components/BaseView.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
@@ -14,16 +15,15 @@ declare module 'vue' {
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     NutButton: typeof import('@nutui/nutui')['Button']
+    NutDatePicker: typeof import('@nutui/nutui')['DatePicker']
     NutForm: typeof import('@nutui/nutui')['Form']
     NutFormItem: typeof import('@nutui/nutui')['FormItem']
     NutInput: typeof import('@nutui/nutui')['Input']
     NutNavbar: typeof import('@nutui/nutui')['Navbar']
+    NutPopup: typeof import('@nutui/nutui')['Popup']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TButton: typeof import('tdesign-mobile-vue')['Button']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
-    TInput: typeof import('tdesign-mobile-vue')['Input']
-    TNavbar: typeof import('tdesign-mobile-vue')['Navbar']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
 }

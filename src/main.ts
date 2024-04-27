@@ -1,10 +1,11 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
+import '@nutui/touch-emulator'
+import { ConfigProvider } from '@nutui/nutui'
 import App from './App.vue'
 import router from './router'
-import { ConfigProvider } from '@nutui/nutui'
-import "@nutui/nutui/dist/style.css";
+
+import '@nutui/nutui/dist/style.css'
 import './assets/main.css'
 import 'virtual:uno.css'
 

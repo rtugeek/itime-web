@@ -1,4 +1,5 @@
-import { fileURLToPath, URL } from 'node:url'
+import { URL, fileURLToPath } from 'node:url'
+import widget from '@widget-js/vite-plugin-widget'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
@@ -9,6 +10,7 @@ import NutUIResolver from '@nutui/auto-import-resolver'
 export default defineConfig({
   plugins: [
     vue(),
+    widget(),
     Components({
       resolvers: [NutUIResolver()],
     }),
@@ -16,7 +18,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
 })

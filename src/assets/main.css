@@ -1,0 +1,12 @@
+* {
+    margin: 0;
+}
+
+:root {
+    --nut-primary-color: #478EF2;
+    --nut-primary-color-end: #496AF2;
+}
+
+body {
+    background-color: rgb(241 245 249);
+}

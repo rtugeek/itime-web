@@ -41,14 +41,14 @@ export const useTodoStore = defineStore('todo-store', () => {
 
   function finishTodo(todo: Todo) {
     todos.splice(todos.indexOf(todo), 1)
-    todo.dueDateTime = new Date().toISOString()
+    todo.completedDateTime = new Date()
     finishedTodos.splice(0, 0, todo)
     dueStorage.setItem(`${todo.id}`, JSON.stringify(todo))
     todoListStorage.removeItem(`${todo.id}`)
   }
 
   function reTodo(todo: Todo) {
-    todo.dueDateTime = undefined
+    todo.completedDateTime = undefined
     todo.order = 0
     finishedTodos.splice(finishedTodos.indexOf(todo), 1)
     todos.splice(0, 0, todo)

@@ -1,84 +1,114 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import dayjs from 'dayjs'
+import { AlarmClock, Calendar, CloseOne, Flag, PlayCycle } from '@icon-park/vue-next'
 import { Todo } from '@/data/Todo'
 import BaseView from '@/components/BaseView.vue'
+import { RRuleUtils } from '@/utils/RRuleUtils'
+import NutRecurrentPicker from '@/components/NutRecurrentPicker.vue'
+import DateTimePicker from '@/components/DateTimePicker.vue'
 
 const route = useRoute()
 const showDatePicker = ref(false)
-
+const showReminderDatePicker = ref(false)
+const showRRulePicker = ref(false)
 const id = route.query.id
 const title = ref('代办事项')
-const todo = ref(new Todo(''))
+let todo = reactive(new Todo(''))
+
 if (id) {
   title.value = '编辑代办事项'
-  todo.value = new Todo('')
+  todo = reactive(new Todo(''))
 }
 
-const now = ref(new Date())
-const reminderDateTime = computed({
-  get: () => todo.value.reminderDateTime ? dayjs(todo.value.reminderDateTime).toDate() : new Date(),
-  set: (val: Date) => {
-    todo.value.reminderDateTime = val.toISOString()
-  },
-})
-const max = new Date(2035, 10, 1)
-const alertTimeTxt = computed(() => {
-  if (reminderDateTime.value) {
-    return dayjs(reminderDateTime.value).format('YYYY年MM月DD日 HH时mm分')
+const dueDateTimeText = computed(() => {
+  if (todo.dueDateTime) {
+    return dayjs(todo.dueDateTime).format('YYYY年MM月DD日 HH时mm分')
   }
   return ''
 })
 
-function formatter(type: string, option: any) {
-  switch (type) {
-    case 'year':
-      option.text += '年'
-      break
-    case 'month':
-      option.text += '月'
-      break
-    case 'day':
-      option.text += '日'
-      break
-    case 'hour':
-      option.text += '时'
-      break
-    case 'minute':
-      option.text += '分'
-      break
-    default:
-      option.text += ''
+const reminderDateTimeText = computed(() => {
+  if (todo.reminderDateTime) {
+    return dayjs(todo.reminderDateTime).format('YYYY年MM月DD日 HH时mm分')
   }
-  return option
-}
+  return ''
+})
+
+const rruleTxt = computed({
+  get: () => {
+    return RRuleUtils.toString(todo.recurrence)
+  },
+  set: (val: string) => {
+    todo.recurrence = val
+  },
+})
 </script>
 
 <template>
   <BaseView :title="title">
     <div class="flex flex-col mt-2 p-4">
       <nut-form>
-        <nut-form-item label="代办事项" label-align="center">
-          <nut-input v-model="todo.title" placeholder="请输入内容" />
+        <nut-form-item :label-width="30" label-align="center">
+          <template #label>
+            <Flag />
+          </template>
+          <nut-input v-model="todo.title" placeholder="代办内容" />
         </nut-form-item>
-        <nut-form-item label="提醒时间" label-align="center" @click="showDatePicker = true">
-          <nut-input v-model="alertTimeTxt" readonly class="w-full cursor-pointer" placeholder="可选项" @click="showDatePicker = true" />
-        </nut-form-item>
-        <nut-popup v-model:visible="showDatePicker" position="bottom">
-          <nut-date-picker
-            v-model="reminderDateTime"
-            :min-date="now"
-            type="datetime"
-            :max-date="max"
-            :formatter="formatter"
-            :three-dimensional="false"
-            @confirm="showDatePicker = false"
-            @cancel="showDatePicker = false"
+        <nut-form-item :label-width="30" label-align="center" @click="showRRulePicker = true">
+          <template #label>
+            <PlayCycle />
+          </template>
+          <nut-input
+            v-model="rruleTxt" readonly class="w-full cursor-pointer" placeholder="重复设置"
+            @click="showRRulePicker = true"
           />
-        </nut-popup>
+        </nut-form-item>
+        <nut-form-item :label-width="30" label-align="center" @click="showDatePicker = true">
+          <template #label>
+            <div class="flex items-center justify-center content-center h-full">
+              <Calendar />
+            </div>
+          </template>
+          <nut-input
+            v-model="dueDateTimeText" readonly class="w-full cursor-pointer" placeholder="时间"
+            @click="showDatePicker = true"
+          >
+            <template #right>
+              <div
+                class="w-6 h-6 flex items-center cursor-pointer text-center"
+                @click.stop="todo.dueDateTime = undefined"
+              >
+                <CloseOne v-if="todo.dueDateTime" />
+              </div>
+            </template>
+          </nut-input>
+        </nut-form-item>
+        <nut-form-item v-show="todo.dueDateTime" :label-width="30" label-align="center">
+          <template #label>
+            <div class="flex items-center justify-center content-center h-full">
+              <AlarmClock :size="14" />
+            </div>
+          </template>
+          <nut-input
+            v-model="reminderDateTimeText" readonly class="w-full cursor-pointer" placeholder="提醒"
+            @click="showDatePicker = true"
+          >
+            <template #right>
+              <div
+                class="w-6 h-6 flex items-center cursor-pointer text-center"
+                @click.stop="todo.reminderDateTime = undefined"
+              >
+                <CloseOne v-if="todo.reminderDateTime" />
+              </div>
+            </template>
+          </nut-input>
+        </nut-form-item>
       </nut-form>
-
+      <NutRecurrentPicker v-model="showRRulePicker" v-model:rrule="todo.recurrence" />
+      <DateTimePicker v-model="showDatePicker" v-model:date-time="todo.dueDateTime" />
+      <DateTimePicker v-model="showReminderDatePicker" v-model:date-time="todo.reminderDateTime" />
       <nut-button class="mt-4" block type="primary">
         保存
       </nut-button>

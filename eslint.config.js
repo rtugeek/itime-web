@@ -26,8 +26,8 @@ export default antfu({
     'import/no-named-as-default': 'off',
     'import/no-named-as-default-member': 'off',
     'curly': ['error', 'multi-line'],
-    'max-statements-per-line': ['error', {
-      max: 1,
+    'style/max-statements-per-line': ['error', {
+      max: 2,
     }],
   },
 }, {

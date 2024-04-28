@@ -13,15 +13,20 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@icon-park/vue-next": "^1.4.2",
     "@nutui/nutui": "^4.3.6",
     "@nutui/touch-emulator": "^1.0.0",
+    "@vueuse/core": "^10.9.0",
+    "@vueuse/integrations": "^10.9.0",
     "@widget-js/core": "24.1.1-beta.4",
     "@widget-js/vue3": "^24.1.1-beta.4",
+    "consola": "^3.2.3",
     "dayjs": "^1.11.10",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^5.0.7",
     "pinia": "^2.1.7",
+    "rrule": "^2.8.1",
     "sortablejs": "^1.15.2",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

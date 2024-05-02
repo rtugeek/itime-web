@@ -8,27 +8,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseView: typeof import('./src/components/BaseView.vue')['default']
-    DatePicker: typeof import('./src/components/DatePicker.vue')['default']
     DateTimePicker: typeof import('./src/components/DateTimePicker.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
-    IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
-    IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
-    IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
-    IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
-    IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     NutButton: typeof import('@nutui/nutui')['Button']
-    NutDatePicker: typeof import('@nutui/nutui')['DatePicker']
-    NutForm: typeof import('@nutui/nutui')['Form']
-    NutFormItem: typeof import('@nutui/nutui')['FormItem']
-    NutInput: typeof import('@nutui/nutui')['Input']
-    NutNavbar: typeof import('@nutui/nutui')['Navbar']
-    NutPicker: typeof import('@nutui/nutui')['Picker']
-    NutPopup: typeof import('@nutui/nutui')['Popup']
     NutRecurrentPicker: typeof import('./src/components/NutRecurrentPicker.vue')['default']
-    NutRRulePicker: typeof import('./src/components/NutRRulePicker.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
-    WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
 }

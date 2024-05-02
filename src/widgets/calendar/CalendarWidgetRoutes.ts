@@ -1,14 +1,14 @@
-import type { RouteRecordRaw } from 'vue-router';
-import CalendarWidget from './Calendar.widget';
+import type { RouteRecordRaw } from 'vue-router'
+import CalendarWidget from './Calendar.widget'
 
-const path = CalendarWidget.path;
-const name = CalendarWidget.name;
+const path = CalendarWidget.path
+const name = CalendarWidget.name
 
-const configPagePath = CalendarWidget.configPagePath!;
+const configPagePath = CalendarWidget.configPagePath!
 
 const CalendarWidgetRoutes: RouteRecordRaw[] = [
   {
-    path: path,
+    path,
     name: `${name}`,
     component: () =>
       import(
@@ -23,6 +23,6 @@ const CalendarWidgetRoutes: RouteRecordRaw[] = [
         /* webpackChunkName: "com.wisdom.itime.calendar.config" */ './CalendarConfigView.vue'
       ),
   },
-];
+]
 
-export default CalendarWidgetRoutes;
+export default CalendarWidgetRoutes

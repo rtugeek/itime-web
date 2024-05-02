@@ -9,8 +9,12 @@
   "description": {
     "zh-CN": "修改成你的组件描述"
   },
-  "entry": "index.html",
-  "hash": false,
+  "entry": "",
+  "remote": {
+    "base": "/itime",
+    "hostname": "widgetjs.cn"
+  },
+  "hash": true,
   "url": "",
   "widgets": [
     {
@@ -59,8 +63,8 @@
       "security": false,
       "permissions": [],
       "lang": "zh-CN",
-      "width": 6,
-      "height": 6,
+      "width": 4,
+      "height": 4,
       "maxWidth": 6,
       "webviewTag": false,
       "maxHeight": 6,

@@ -1,12 +1,13 @@
-import { Widget, WidgetKeyword } from '@widget-js/core';
+import { Widget, WidgetKeyword } from '@widget-js/core'
+
 const CalendarWidget = new Widget({
   name: 'com.wisdom.itime.calendar',
   title: { 'zh-CN': '日历' },
   description: { 'zh-CN': '简单的日历，支持节假日显示' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
-  width: 6,
-  height: 6,
+  width: 4,
+  height: 4,
   minWidth: 4,
   maxWidth: 6,
   minHeight: 4,
@@ -14,6 +15,6 @@ const CalendarWidget = new Widget({
   previewImage: '修改为组件预览图地址',
   path: '/widget/calendar',
   configPagePath: '/widget/config/calendar',
-});
+})
 
-export default CalendarWidget;
+export default CalendarWidget

@@ -5,8 +5,12 @@ export default new WidgetPackage({
   description: {
     'zh-CN': '修改成你的组件描述',
   },
-  entry: 'index.html',
-  hash: false,
+  entry: '',
+  hash: true,
+  remote: {
+    base: '/itime',
+    hostname: 'widgetjs.cn',
+  },
   homepage: '',
   name: 'com.wisdom.itime',
   title: {
@@ -15,5 +19,7 @@ export default new WidgetPackage({
   version: '1.0.0',
   devOptions: {
     folder: './src/widgets/',
+    devUrl: 'http://localhost:5173/itime',
+    remoteEntry: 'http://localhost:5173/itime',
   },
 })

@@ -8,6 +8,7 @@ import NutUIResolver from '@nutui/auto-import-resolver'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/itime',
   plugins: [
     vue(),
     widget(),

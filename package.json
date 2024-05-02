@@ -26,6 +26,7 @@
     "dayjs": "^1.11.10",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
+    "lunar-typescript": "^1.7.5",
     "nanoid": "^5.0.7",
     "pinia": "^2.1.7",
     "rrule": "^2.8.1",

@@ -12,7 +12,7 @@ const CalendarWidget = new Widget({
   maxWidth: 6,
   minHeight: 4,
   maxHeight: 6,
-  previewImage: '修改为组件预览图地址',
+  previewImage: '/images/preview_calendar.png',
   path: '/widget/calendar',
   configPagePath: '/widget/config/calendar',
 })

@@ -72,6 +72,9 @@ const previous = ()=>{
 </template>
 
 <style lang="scss">
+html{
+  font-size: var(--widget-font-size);
+}
 body{
   background-color: transparent;
 }
@@ -79,7 +82,6 @@ body{
 .root{
   color: var(--widget-color);
   border-radius: var(--widget-border-radius);
-  font-size: 16px;
   background-color:var(--widget-background-color);
 }
 

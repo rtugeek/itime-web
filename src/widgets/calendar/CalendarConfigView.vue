@@ -6,11 +6,13 @@ const { widgetData, widgetParams, save } = useWidget(WidgetData)
 
 // 修改成需要设置组件参数配置
 const widgetConfigOption = new WidgetConfigOption({
+  custom: false,
   theme: {
     backgroundColor: true,
     borderRadius: true,
     color: true,
-    primaryColor:true
+    primaryColor:true,
+    fontSize: [10,40]
   },
 })
 </script>

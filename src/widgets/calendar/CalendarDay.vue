@@ -36,7 +36,7 @@ const festivals = computed(() => {
       <span v-if="festivals.length > 0" class="festival">
         {{ festivals[0] }}
       </span>
-      <span class="calendar-lunar" :class="{'today':!isToday}">
+      <span v-else class="calendar-lunar" :class="{'today':!isToday}">
         {{ day.getLunar().getDayInChinese() }}
       </span>
     </div>
@@ -46,7 +46,6 @@ const festivals = computed(() => {
 <style scoped lang="scss">
 .calendar-day {
   color: var(--widget-color);
-
   &.today {
     background-color: var(--widget-primary-color);
     color: white

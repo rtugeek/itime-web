@@ -7,7 +7,7 @@ const props = defineProps({
   day: {
     type: Object as PropType<Solar>,
     required: true,
-  },
+  }
 })
 
 const isToday = computed(() => {
@@ -25,25 +25,42 @@ const festivals = computed(() => {
 
 <template>
   <div
-    class="flex flex-col items-center content-center rounded-full  size-10" :class="{
-      'bg-blue-400': isToday,
-      'text-white': isToday
+      class="calendar-day flex flex-col items-center content-center rounded-full  size-10" :class="{
+      'today': isToday,
     }"
   >
     <div class="font-bold">
       {{ day.getDay() }}
     </div>
     <div style="font-size: 10px" class="text-xs text-center">
-      <span v-if="festivals.length > 0" class="text-blue-400">
+      <span v-if="festivals.length > 0" class="festival">
         {{ festivals[0] }}
       </span>
-      <span v-else class="opacity-50">
+      <span class="calendar-lunar" :class="{'today':!isToday}">
         {{ day.getLunar().getDayInChinese() }}
       </span>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.calendar-day {
+  color: var(--widget-color);
 
+  &.today {
+    background-color: var(--widget-primary-color);
+    color: white
+  }
+
+  .calendar-lunar {
+    &:not(.active) {
+      opacity: 50;
+    }
+  }
+
+  .festival {
+    color: var(--widget-primary-color);
+  }
+
+}
 </style>

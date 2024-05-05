@@ -10,6 +10,12 @@ import '@nutui/nutui/dist/style.css'
 import './assets/main.css'
 import '@widget-js/vue3/dist/style.css'
 import 'virtual:uno.css'
+import dayjs from "dayjs";
+import isToday from 'dayjs/plugin/isToday'
+import isoWeek from 'dayjs/plugin/isoWeek'
+
+dayjs.extend(isoWeek)
+dayjs.extend(isToday)
 
 const app = createApp(App)
 

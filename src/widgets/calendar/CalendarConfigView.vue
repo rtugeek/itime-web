@@ -10,6 +10,7 @@ const widgetConfigOption = new WidgetConfigOption({
     backgroundColor: true,
     borderRadius: true,
     color: true,
+    primaryColor:true
   },
 })
 </script>
@@ -24,4 +25,8 @@ const widgetConfigOption = new WidgetConfigOption({
   />
 </template>
 
-<style scoped></style>
+<style>
+body{
+  background-color: transparent;
+}
+</style>

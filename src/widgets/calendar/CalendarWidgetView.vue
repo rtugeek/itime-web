@@ -1,19 +1,32 @@
 <script lang="ts" setup>
 import { SolarMonth } from 'lunar-typescript'
 import dayjs from 'dayjs'
-import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { ref } from 'vue'
 import { useWidget } from '@widget-js/vue3'
 import { WidgetData } from '@widget-js/core'
 import { Left, Right } from '@icon-park/vue-next'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
 
-dayjs.extend(weekOfYear)
-const now = dayjs()
-const currentMonth = ref(now.month() + 1)
-const solarMonth = SolarMonth.fromYm(now.year(), now.month() + 1)
-const weeks = ref(solarMonth.getWeeks(0))
+const today = dayjs()
+const currentMonth = ref(dayjs())
+const currentMonthIndex = ref(today.month())
+const solarMonth = ref(SolarMonth.fromYm(today.year(), today.month() + 1))
+const weeks = ref(solarMonth.value.getWeeks(0))
 useWidget(WidgetData)
+
+const next = ()=>{
+  solarMonth.value = solarMonth.value.next(1)
+  weeks.value = solarMonth.value.getWeeks(0)
+  currentMonth.value = currentMonth.value.add(1,'month')
+  currentMonthIndex.value = currentMonth.value.month()
+}
+
+const previous = ()=>{
+  solarMonth.value =  solarMonth.value.next(-1)
+  weeks.value = solarMonth.value.getWeeks(0)
+  currentMonth.value = currentMonth.value.subtract(1,'month')
+  currentMonthIndex.value = currentMonth.value.month()
+}
 </script>
 
 <template>
@@ -21,14 +34,18 @@ useWidget(WidgetData)
     <div class="root flex flex-col">
       <div class="flex items-baseline gap-2 py-3 px-4">
         <div class="text-xl font-bold">
-          {{ now.format('YYYY年MM月') }}
+          {{ currentMonth.format('YYYY年MM月') }}
         </div>
-        <div class="text-xs">
-          第{{ now.week() }}周
+        <div class="text-xs" v-if="currentMonthIndex == today.month()">
+          第{{ currentMonth.isoWeek() }}周
         </div>
-        <div class="ml-auto">
-          <Left />
-          <Right />
+        <div class="ml-auto flex gap-1 btn-group text-center">
+          <div class="btn-next flex items-center rounded-full size-7 cursor-pointer justify-center" @click="previous">
+            <Left :size="20"/>
+          </div>
+          <div class="btn-previous flex items-center rounded-full size-7 cursor-pointer justify-center" @click="next">
+            <Right :size="20"/>
+          </div>
         </div>
       </div>
       <div class="flex justify-around px-2 text-xs opacity-70">
@@ -44,7 +61,7 @@ useWidget(WidgetData)
         <div v-for="week in weeks" :key="`week-${week.getIndex()}`" class="flex w-full justify-around">
           <div
             v-for="day in week.getDays()" :key="day.getDay()" class="flex w-full flex-col items-center content-center"
-            :class="{ 'opacity-40': day.getMonth() != currentMonth }"
+            :class="{ 'opacity-40': day.getMonth() != currentMonthIndex + 1 }"
           >
             <CalendarDay :day="day" />
           </div>
@@ -60,8 +77,16 @@ body{
 }
 
 .root{
+  color: var(--widget-color);
   border-radius: var(--widget-border-radius);
   font-size: 16px;
-  background-color:#fff;
+  background-color:var(--widget-background-color);
+}
+
+.btn-group{
+  div:hover{
+    background-color: rgba(0, 0, 0, 0.35);
+    color:white;
+  }
 }
 </style>

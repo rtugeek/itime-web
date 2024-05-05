@@ -7,7 +7,7 @@ const props = defineProps({
   day: {
     type: Object as PropType<Solar>,
     required: true,
-  }
+  },
 })
 
 const isToday = computed(() => {
@@ -25,8 +25,8 @@ const festivals = computed(() => {
 
 <template>
   <div
-      class="calendar-day flex flex-col items-center content-center rounded-full  size-10" :class="{
-      'today': isToday,
+    class="calendar-day flex flex-col items-center content-center rounded-full  size-10" :class="{
+      today: isToday,
     }"
   >
     <div class="font-bold">
@@ -36,7 +36,7 @@ const festivals = computed(() => {
       <span v-if="festivals.length > 0" class="festival">
         {{ festivals[0] }}
       </span>
-      <span v-else class="calendar-lunar" :class="{'today':!isToday}">
+      <span v-else class="calendar-lunar" :class="{ today: !isToday }">
         {{ day.getLunar().getDayInChinese() }}
       </span>
     </div>

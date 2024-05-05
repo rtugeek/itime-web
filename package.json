@@ -1,6 +1,6 @@
 {
   "name": "itime-web",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,6 +10,7 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
+    "release": "widget release -t ftp",
     "remote": "widget dependencies -t remote",
     "local": "widget dependencies -t local",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
@@ -20,8 +21,8 @@
     "@nutui/touch-emulator": "^1.0.0",
     "@vueuse/core": "^10.9.0",
     "@vueuse/integrations": "^10.9.0",
-    "@widget-js/core": "^24.1.1-beta.5",
-    "@widget-js/vue3": "^24.1.1-beta.5",
+    "@widget-js/core": "workspace:*",
+    "@widget-js/vue3": "workspace:*",
     "consola": "^3.2.3",
     "dayjs": "^1.11.10",
     "localforage": "^1.10.0",
@@ -46,7 +47,7 @@
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/test-utils": "^2.4.5",
     "@vue/tsconfig": "^0.5.1",
-    "@widget-js/vite-plugin-widget": "^24.1.1-beta.5",
+    "@widget-js/vite-plugin-widget": "workspace:*",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.23.0",
     "jsdom": "^24.0.0",

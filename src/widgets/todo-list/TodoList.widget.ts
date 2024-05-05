@@ -4,7 +4,7 @@ import {
 } from '@widget-js/core'
 
 const TodoListWidget = new Widget({
-  name: 'com.wisdom.itime.todo_list',
+  name: 'itime.fun.todo_list',
   title: { 'zh-CN': '待办事项' },
   description: { 'zh-CN': 'TODO待办事项' },
   keywords: [WidgetKeyword.RECOMMEND],
@@ -13,6 +13,7 @@ const TodoListWidget = new Widget({
   width: 4,
   height: 4,
   minWidth: 3,
+  disabled: true,
   maxWidth: 6,
   minHeight: 3,
   maxHeight: 6,

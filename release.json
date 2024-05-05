@@ -1,0 +1,11 @@
+{
+  "fileMap": [
+    {
+      "src": "./dist/",
+      "dest": "/www/wwwroot/itime.fun/web"
+    }
+  ],
+  "ftpConfig": {
+    "host": ["mine"]
+  }
+}

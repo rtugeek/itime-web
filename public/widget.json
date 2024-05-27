@@ -21,6 +21,38 @@
   "url": "",
   "widgets": [
     {
+      "name": "itime.fun.pomodoro",
+      "title": {
+        "zh-CN": "番茄钟"
+      },
+      "description": {
+        "zh-CN": ""
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 2,
+      "height": 2,
+      "maxWidth": 4,
+      "webviewTag": false,
+      "maxHeight": 4,
+      "minWidth": 2,
+      "minHeight": 2,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/pomodoro",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "修改为组件预览图地址",
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/pomodoro",
+      "routes": []
+    },
+    {
       "name": "itime.fun.calendar",
       "title": {
         "zh-CN": "日历"

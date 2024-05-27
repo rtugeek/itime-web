@@ -1,14 +1,19 @@
 * {
-    margin: 0;
-    user-select: none;
+  margin: 0;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 :root {
-    --nut-primary-color: #478EF2;
-    --nut-primary-color-end: #496AF2;
-    --nut-navbar-title-font-weight: 700
+  --nut-primary-color: #478EF2;
+  --nut-primary-color-end: #496AF2;
+  --nut-navbar-title-font-weight: 700;
+  --nut-navbar-title-font-color: #0e1b2c;
 }
 
-body {
-    background-color: rgb(241 245 249);
+.nut-button--plain:not([disabled]):hover {
+  background: var(--nut-button-plain-background-color, var(--nut-white, #fff));
+  background-origin: border-box;
 }
+
+

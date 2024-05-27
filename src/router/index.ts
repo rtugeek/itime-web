@@ -14,17 +14,16 @@ const router = createRouter({
     {
       path: '/todo/add',
       name: 'AddTodoView',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/todo/AddTodoView.vue'),
+    },
+    {
+      path: '/pomodoro/add',
+      name: 'AddPomodoroSceneView',
+      component: () => import('../views/pomodoro/AddPomodoroSceneView.vue'),
     },
     {
       path: '/widget/todo/list',
       name: 'WidgetTodoList',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/todo/AddTodoView.vue'),
     },
   ],

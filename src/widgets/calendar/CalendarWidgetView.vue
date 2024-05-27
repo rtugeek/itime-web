@@ -1,39 +1,20 @@
 <script lang="ts" setup>
-import { SolarMonth } from 'lunar-typescript'
+import { type Solar, SolarMonth } from 'lunar-typescript'
 import dayjs from 'dayjs'
 import { ref } from 'vue'
 import { useWidget } from '@widget-js/vue3'
-import { DeployMode, WidgetData } from '@widget-js/core'
+import { WidgetData } from '@widget-js/core'
 import { Left, Right } from '@icon-park/vue-next'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
-import { useMenu } from '@widget-js/vue3'
+import { type Almanac, PublicEventApi } from '@/api/PublicEventApi'
 
 const today = dayjs()
 const currentMonth = ref(dayjs())
 const currentMonthIndex = ref(today.month())
 const solarMonth = ref(SolarMonth.fromYm(today.year(), today.month() + 1))
 const weeks = ref(solarMonth.value.getWeeks(0))
-const { widgetParams } = useWidget(WidgetData)
+useWidget(WidgetData)
 
-if (widgetParams.mode == DeployMode.OVERLAP) {
-  useMenu({
-    menus: [
-      { label: '悬浮设置',
-        id: 'overlap_setting',
-        submenu:[
-          {label:'置顶',id:'overlap_always_top',type:'checkbox',checked:false},
-          {label:'自动贴边',id:'overlap_stick_to_edge',type:'checkbox',checked:false},
-        ]
-      }
-    ],
-    onMenuCheckChanged(menu, checked) {
-        console.log(menu, checked)
-    },
-    onMenuClick(menu) {
-        console.log(menu)
-    },
-  })
-}
 const next = () => {
   solarMonth.value = solarMonth.value.next(1)
   weeks.value = solarMonth.value.getWeeks(0)
@@ -46,6 +27,17 @@ const previous = () => {
   weeks.value = solarMonth.value.getWeeks(0)
   currentMonth.value = currentMonth.value.subtract(1, 'month')
   currentMonthIndex.value = currentMonth.value.month()
+}
+
+const almanac = ref<Almanac[]>([])
+PublicEventApi.getCalendar().then(it => {
+  almanac.value = it
+})
+
+const findAlmanac = (solar: Solar) => {
+  return almanac.value.find(it => {
+    return it.year == solar.getYear() && it.month == solar.getMonth() && it.dayOfMonth == solar.getDay()
+  })
 }
 </script>
 
@@ -83,7 +75,7 @@ const previous = () => {
             v-for="day in week.getDays()" :key="day.getDay()" class="flex w-full flex-col items-center content-center"
             :class="{ 'opacity-40': day.getMonth() != currentMonthIndex + 1 }"
           >
-            <CalendarDay :day="day"/>
+            <CalendarDay :day="day" :almanac="findAlmanac(day)"/>
           </div>
         </div>
       </div>

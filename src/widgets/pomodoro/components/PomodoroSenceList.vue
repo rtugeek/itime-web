@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import dayjs from 'dayjs'
 import type { PomodoroScene } from '@/data/PomodoroScene'
-import { usePomodoroSceneStore } from '@/stores/pomodoroSceneStore'
+import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 
 const router = useRouter()
 const pomodoroSceneStore = usePomodoroSceneStore()
@@ -10,14 +11,18 @@ const { scenes } = storeToRefs(pomodoroSceneStore)
 function goEdit(scene: PomodoroScene) {
   router.push({ name: 'AddPomodoroSceneView', query: { id: scene.id } })
 }
+pomodoroSceneStore.reload()
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div v-for="scene in scenes" :key="scene.id" class="scene" @click="goEdit(scene)">
+    <div v-for="scene in scenes" :key="scene.id" class="scene flex" @click="goEdit(scene)">
       <div class="flex gap-2">
         <div>{{ scene.icon }}</div>
         <div>{{ scene.name }}</div>
+      </div>
+      <div class="ml-auto">
+        {{ dayjs.duration(scene.duration ?? 0, 'second').get('m') }}分钟
       </div>
     </div>
   </div>

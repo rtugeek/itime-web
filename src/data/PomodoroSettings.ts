@@ -27,6 +27,6 @@ export function getDefaultPomodoroSettings(): PomodoroSettings {
     shortBreakTime: 5,
     longBeakTime: 15,
     longBreakSpan: 4,
-    isAutoNext: false,
+    isAutoNext: true,
   }
 }

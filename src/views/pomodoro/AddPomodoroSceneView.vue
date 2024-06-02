@@ -7,12 +7,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { showNotify } from '@nutui/nutui'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
+import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 
 BrowserWindowApi.setAlwaysOnTop(true)
 const router = useRouter()
 const route = useRoute()
 const id = route.query.id as string
 
+const sceneStore = usePomodoroSceneStore()
 const title = computed(
   () => id ? '编辑场景' : '添加场景',
 )
@@ -21,6 +23,7 @@ const sence = reactive<PomodoroScene>({
   id: undefined,
   icon: '🔨',
   name: '',
+  duration: 0,
 })
 
 if (id) {
@@ -50,7 +53,7 @@ function save() {
 }
 
 function deleteScene() {
-  PomodoroSceneRepository.remove(sence.id!)
+  sceneStore.deleteScene(sence.id!)
   router.back()
 }
 </script>

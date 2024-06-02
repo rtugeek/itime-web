@@ -1,43 +1,27 @@
 <script lang="ts" setup>
-import { WidgetData } from '@widget-js/core'
-import { useWidget } from '@widget-js/vue3'
-import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import { BrowserWindowApi, MenuApi, WidgetData, type WidgetMenuItem } from '@widget-js/core'
+import { useMenuListener, useWidget } from '@widget-js/vue3'
+import { nextTick, onMounted } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { Check, Pause, PlayOne, Right } from '@icon-park/vue-next'
-import dayjs from 'dayjs'
 import { storeToRefs } from 'pinia'
-import type { PomodoroModel } from '@/widgets/pomodoro/PomodoroModel'
 import { AppConfig } from '@/common/AppConfig'
-import { type PomodoroSettings, getDefaultPomodoroSettings } from '@/data/PomodoroSettings'
 
-import 'vue-scroll-picker/lib/style.css'
-import SceneScrollPicker from '@/widgets/pomodoro/components/SceneScrollPicker.vue'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
-import { usePomodoroSceneStore } from '@/stores/pomodoroSceneStore'
+import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
+import { usePomodoroStore } from '@/stores/usePomodoroStore'
+import { usePomodoroWindowStateStore } from '@/widgets/pomodoro/usePomodoroWindowStateStore'
+import PomodoroProgressBar from '@/widgets/pomodoro/components/PomodoroProgressBar.vue'
 
-useWidget(WidgetData)
-const pomoSettings = useStorage<PomodoroSettings>(AppConfig.KEY_POMODORO_SETTINGS, getDefaultPomodoroSettings())
+useWidget(WidgetData, { defaultOverlapMenu: false })
 const sceneStore = usePomodoroSceneStore()
-const { scenes } = storeToRefs(sceneStore)
-const model = reactive<PomodoroModel>({
-  pauseDuration: 0,
-  status: 'stop',
-  startAt: new Date(),
-  finishAt: new Date(),
-  totalDuration: 0,
-})
+const pomodoro = usePomodoroStore()
+usePomodoroWindowStateStore()
 
-const isRunning = computed(() => model.status === 'running')
+const { scenes, currentSceneId, currentScene } = storeToRefs(sceneStore)
+const { remindText, isRunning, status } = storeToRefs(pomodoro)
+
 const defaultPomodoro = useStorage(AppConfig.KEY_POMODORO_INIT, false)
-function start() {
-  model.status = 'running'
-  model.startAt = new Date()
-  // model.finishAt = dayjs().add(pomoSettings.pomoTime, 'minute').toDate()
-}
-
-const showScenePicker = ref(false)
-const sceneId = useStorage(AppConfig.KEY_POMODORO_USING_SCENE, '1')
-const currentScene = computed(() => scenes.value.find(it => it.id === sceneId.value)!)
 
 sceneStore.reload()
 onMounted(async () => {
@@ -47,53 +31,163 @@ onMounted(async () => {
     defaultPomodoro.value = true
   }
 })
+
+function onSceneClick() {
+  if (isRunning.value) {
+    return
+  }
+  const menus = scenes.value.map((it) => {
+    const menu: WidgetMenuItem = {
+      id: it.id!,
+      label: `${it.icon} ${it.name}`,
+      type: 'radio',
+      checked: currentSceneId.value == it.id,
+    }
+    return menu
+  })
+  MenuApi.showMenu({
+    menuItems: menus,
+  })
+}
+
+useMenuListener((type, menu) => {
+  const scene = scenes.value.find(it => it.id == menu.id)
+  if (scene) {
+    currentSceneId.value = scene.id!
+  }
+})
+onMounted(async () => {
+  await nextTick()
+  await BrowserWindowApi.setup({
+    width: AppConfig.SIZE_POMODORO_WINDOW,
+    height: AppConfig.SIZE_POMODORO_WINDOW,
+    maxWidth: AppConfig.SIZE_POMODORO_WINDOW,
+    maxHeight: AppConfig.SIZE_POMODORO_WINDOW,
+    alwaysOnTop: true,
+    resizable: false,
+  })
+})
 </script>
 
 <template>
-  <widget-wrapper>
-    <div class="pomodoro flex flex-col gap-2 justify-center items-center">
-      <SceneScrollPicker v-if="currentScene" v-show="showScenePicker" v-model="sceneId" v-model:show="showScenePicker" class="absolute w-full h-full bg-white" />
-      <div class="scene">
-        <div v-if="currentScene" class="flex gap-1 items-center cursor-pointer" @click="showScenePicker = true">
-          <div>{{ currentScene.icon }}</div>
-          <div>{{ currentScene.name }}</div>
-          <Right />
+  <div>
+    <div
+      v-drag-window
+      class="pomodoro flex flex-col gap-2 justify-center items-center overflow-hidden" :class="{ [status]: true }"
+    >
+      <template v-if="currentScene">
+        <div class="scene">
+          <div class="flex gap-1 items-center cursor-pointer" @click="onSceneClick">
+            <div>{{ currentScene.icon }}</div>
+            <div>{{ status == 'resting' ? '休息中' : currentScene.name }}</div>
+            <Right />
+          </div>
         </div>
-      </div>
-      <div class="text-5xl">
-        {{ dayjs.duration(pomoSettings.pomoTime, 'minute').format('mm:ss') }}
-      </div>
-      <div class="flex gap-4">
-        <div v-if="!isRunning" class="btn start" @click="start">
-          <PlayOne />
+        <div v-drag-window class="text-5xl font-bold time">
+          {{ remindText }}
         </div>
-        <div v-if="isRunning" class="btn small">
-          <Pause />
+        <div class="flex gap-4 buttons">
+          <div v-if="!isRunning && status != 'waiting'" class="btn start" @click="pomodoro.start()">
+            <PlayOne />
+          </div>
+          <div v-if="isRunning && status != 'waiting'" class="btn small" @click="pomodoro.pause()">
+            <Pause />
+          </div>
+          <div v-if="isRunning || status == 'waiting' || status == 'resting'" class="btn small" @click="pomodoro.stop()">
+            <Check />
+          </div>
         </div>
-        <div v-if="isRunning" class="btn small">
-          <Check />
-        </div>
+      </template>
+      <div v-else class="flex text-center p-4">
+        请到设置页面添加专注场景
       </div>
     </div>
-  </widget-wrapper>
+    <PomodoroProgressBar />
+  </div>
 </template>
 
 <style lang="scss">
-body{
+body {
   background-color: transparent;
+  overflow: hidden;
+}
+
+@keyframes wiggle {
+  0% {
+    transform: translate(1px, 1px) rotate(0deg);
+  }
+  10% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+  20% {
+    transform: translate(-3px, 0px) rotate(1deg);
+  }
+  30% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+  40% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  50% {
+    transform: translate(-1px, 2px) rotate(-1deg);
+  }
+  60% {
+    transform: translate(-3px, 1px) rotate(0deg);
+  }
+  70% {
+    transform: translate(3px, 1px) rotate(-1deg);
+  }
+  80% {
+    transform: translate(-1px, -1px) rotate(1deg);
+  }
+  90% {
+    transform: translate(1px, 2px) rotate(0deg);
+  }
+  100% {
+    transform: translate(1px, -2px) rotate(-1deg);
+  }
 }
 
 .pomodoro {
   position: relative;
+  height: 100vh;
+  width: 100vw;
   overflow: hidden;
-  background-color: var(--widget-background-color);
-  border-radius: var(--widget-border-radius);
-  color: var(--widget-color);
+  color: rgb(0, 16, 24);
   font-size: var(--widget-font-size);
-  transition: all 0.3s ease-out;
+
+  * {
+    transition: all 0.3s ease-out;
+  }
+
+  &:hover {
+    .scene {
+      margin-top: 0;
+    }
+
+    .buttons {
+      opacity: 1;
+    }
+  }
+
+  .scene {
+    margin-top: 1rem;
+  }
+
+  .buttons {
+    opacity: 0;
+    color: white;
+  }
+
+  &.waiting {
+    .time {
+      animation: wiggle 0.5s;
+      animation-iteration-count: infinite;
+    }
+  }
 }
 
-.btn{
+.btn {
   cursor: pointer;
   background-color: var(--widget-primary-color);
   border-radius: 50%;
@@ -103,14 +197,21 @@ body{
   font-size: 1.5rem;
   justify-content: center;
   align-items: center;
-  &.small{
+
+  &.small {
     width: 2rem;
     height: 2rem;
     font-size: 1.2rem;
   }
 }
 
-.i-icon{
- line-height: 0.5rem;
+.i-icon {
+  line-height: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pomodoro {
+    color: rgb(238, 247, 255);
+  }
 }
 </style>

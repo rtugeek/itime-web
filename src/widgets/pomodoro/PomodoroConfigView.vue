@@ -35,10 +35,10 @@ BrowserWindowApi.setup({
           <nut-form-item label-width="130px" :label="`休息时长（${pomoSettings.shortBreakTime}m）`">
             <nut-input-number v-model="pomoSettings.shortBreakTime" :min="1" :max="30" type="text" />
           </nut-form-item>
+          <nut-form-item label-width="130px" label="自动开始下个番茄钟">
+            <nut-switch v-model="pomoSettings.isAutoNext" />
+          </nut-form-item>
         </nut-form>
-      </nut-tab-pane>
-      <nut-tab-pane title="主题设置" pane-key="3">
-        Content 2
       </nut-tab-pane>
     </nut-tabs>
   </base-view>

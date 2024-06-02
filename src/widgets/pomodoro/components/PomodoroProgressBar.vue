@@ -16,6 +16,9 @@ const color = computed(() => {
   else if (status.value == 'waiting') {
     return 'rgb(0, 119, 255)'
   }
+  else if (status.value == 'pause') {
+    return 'rgb(106,0,255)'
+  }
   else {
     return 'rgb(0,255,111)'
   }

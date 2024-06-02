@@ -6,7 +6,7 @@ const PomodoroWidget = new BackgroundWidget({
   description: { 'zh-CN': '' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
-  previewImage: '修改为组件预览图地址',
+  previewImage: '/images/preview_pomodoro.png',
   backgroundThrottling: false,
   path: '/widget/pomodoro',
   requiredAppVersion: '24.6.2',

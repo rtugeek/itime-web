@@ -1,8 +1,8 @@
-import { watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useStickScreenEdge } from '@widget-js/vue3'
 import { defineStore, storeToRefs } from 'pinia'
 
-import { BrowserWindowApi } from '@widget-js/core'
+import { BrowserWindowApi, delay } from '@widget-js/core'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 
 export const usePomodoroWindowStateStore = defineStore('pomodoroWindowStateStore', () => {
@@ -22,7 +22,10 @@ export const usePomodoroWindowStateStore = defineStore('pomodoroWindowStateStore
 
   BrowserWindowApi.center()
   stickScreenEdge.isAutoHide.value = true
-  stickScreenEdge.correctPosition()
+  onMounted(async () => {
+    await delay(3000)
+    stickScreenEdge.stickToEdge()
+  })
 
   return {
     stickEdge: stickScreenEdge.stickEdge,

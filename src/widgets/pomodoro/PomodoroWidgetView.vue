@@ -80,10 +80,10 @@ onMounted(async () => {
           <div class="flex gap-1 items-center cursor-pointer" @click="onSceneClick">
             <div>{{ currentScene.icon }}</div>
             <div>{{ status == 'resting' ? '休息中' : currentScene.name }}</div>
-            <Right />
+            <Right v-show="status == 'stop'" />
           </div>
         </div>
-        <div v-drag-window class="text-5xl font-bold time">
+        <div v-drag-window class="text-5xl font-bold time rubik-regular">
           {{ remindText }}
         </div>
         <div class="flex gap-4 buttons">
@@ -152,6 +152,7 @@ body {
   position: relative;
   height: 100vh;
   width: 100vw;
+  border-radius: 22px;
   overflow: hidden;
   color: rgb(0, 16, 24);
   font-size: var(--widget-font-size);

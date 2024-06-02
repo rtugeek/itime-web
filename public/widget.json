@@ -47,7 +47,7 @@
       "path": "/widget/pomodoro",
       "meta": {},
       "backgroundThrottling": false,
-      "previewImage": "修改为组件预览图地址",
+      "previewImage": "/images/preview_pomodoro.png",
       "supportDeployMode": 65536,
       "requiredAppVersion": "24.6.2",
       "configPagePath": "/widget/config/pomodoro",

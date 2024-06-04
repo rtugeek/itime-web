@@ -7,7 +7,7 @@ const PomodoroWidget = new BackgroundWidget({
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
   previewImage: '/images/preview_pomodoro.png',
-  backgroundThrottling: false,
+  categories:['productivity'],
   path: '/widget/pomodoro',
   requiredAppVersion: '24.6.2',
   configPagePath: '/widget/config/pomodoro',

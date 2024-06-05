@@ -22,7 +22,7 @@ pomodoroSceneStore.reload()
         <div>{{ scene.name }}</div>
       </div>
       <div class="ml-auto">
-        {{ dayjs.duration(scene.duration ?? 0, 'second').get('m') }}分钟
+        {{ Math.round(dayjs.duration(scene.duration ?? 0, 'second').as('minutes')) }}分钟
       </div>
     </div>
   </div>

@@ -18,7 +18,7 @@ const sceneStore = usePomodoroSceneStore()
 const pomodoro = usePomodoroStore()
 usePomodoroWindowStateStore()
 
-const { scenes, currentSceneId, currentScene } = storeToRefs(sceneStore)
+const { scenes, currentScene } = storeToRefs(sceneStore)
 const { remindText, isRunning, status } = storeToRefs(pomodoro)
 
 const defaultPomodoro = useStorage(AppConfig.KEY_POMODORO_INIT, false)
@@ -41,7 +41,7 @@ function onSceneClick() {
       id: it.id!,
       label: `${it.icon} ${it.name}`,
       type: 'radio',
-      checked: currentSceneId.value == it.id,
+      checked: sceneStore.currentSceneId == it.id,
     }
     return menu
   })
@@ -53,7 +53,7 @@ function onSceneClick() {
 useMenuListener((type, menu) => {
   const scene = scenes.value.find(it => it.id == menu.id)
   if (scene) {
-    currentSceneId.value = scene.id!
+    sceneStore.currentSceneId = scene.id!
   }
 })
 onMounted(async () => {

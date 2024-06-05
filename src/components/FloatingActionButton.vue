@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { IconPark } from '@icon-park/vue-next/es/all'
+import type { PropType } from 'vue'
+import type { ButtonType } from '@nutui/nutui'
 
 defineProps({
   icon: {
@@ -7,7 +9,7 @@ defineProps({
     default: 'Plus',
   },
   type: {
-    type: String,
+    type: String as PropType<ButtonType>,
     default: 'primary',
   },
 })

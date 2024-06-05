@@ -1,13 +1,13 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { useBroadcastChannel, useStorageAsync } from '@vueuse/core'
+import { useBroadcastChannel, useStorage } from '@vueuse/core'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { AppConfig } from '@/common/AppConfig'
 
 export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
   const scenes = ref<PomodoroScene[]>([])
-  const currentSceneId = useStorageAsync(AppConfig.KEY_POMODORO_USING_SCENE, '1')
+  const currentSceneId = useStorage(AppConfig.KEY_POMODORO_USING_SCENE, '1')
   const currentScene = computed(() => {
     const scene = scenes.value.find(it => it.id == currentSceneId.value)!
     if (scene) {

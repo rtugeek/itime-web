@@ -3,7 +3,7 @@ import { BackgroundWidget, WidgetKeyword } from '@widget-js/core'
 const PomodoroWidget = new BackgroundWidget({
   name: 'itime.fun.pomodoro',
   title: { 'zh-CN': '番茄钟' },
-  description: { 'zh-CN': '' },
+  description: { 'zh-CN': '高效管理时间，提高专注力' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
   previewImage: '/images/preview_pomodoro.png',

@@ -8,6 +8,7 @@ const CalendarWidget = new Widget({
   lang: 'zh-CN',
   width: 4,
   height: 4,
+  categories: ['calendar'],
   minWidth: 4,
   maxWidth: 6,
   minHeight: 4,

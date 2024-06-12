@@ -95,6 +95,8 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   }
 
   function stop() {
+    pomodoroInterval.pause()
+    resetInterval.pause()
     if (model.value.duration < 60) {
       NotificationApi.warning('专注时间少于1分钟，不作记录')
       reset()
@@ -128,7 +130,6 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
       model.value.restDuration = 0
       resetInterval.resume()
     }
-    pomodoroInterval.pause()
   }
 
   function pause() {

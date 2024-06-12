@@ -48,6 +48,9 @@
       "meta": {},
       "backgroundThrottling": false,
       "previewImage": "/images/preview_pomodoro.png",
+      "categories": [
+        "productivity"
+      ],
       "supportDeployMode": 65536,
       "requiredAppVersion": "24.6.2",
       "configPagePath": "/widget/config/pomodoro",
@@ -87,6 +90,9 @@
       "meta": {},
       "backgroundThrottling": true,
       "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/calendar",
       "routes": []

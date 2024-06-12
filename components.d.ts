@@ -12,6 +12,7 @@ declare module 'vue' {
     FloatingActionButton: typeof import('./src/components/FloatingActionButton.vue')['default']
     NutAvatar: typeof import('@nutui/nutui')['Avatar']
     NutButton: typeof import('@nutui/nutui')['Button']
+    NutCell: typeof import('@nutui/nutui')['Cell']
     NutDatePicker: typeof import('@nutui/nutui')['DatePicker']
     NutForm: typeof import('@nutui/nutui')['Form']
     NutFormItem: typeof import('@nutui/nutui')['FormItem']

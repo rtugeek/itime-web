@@ -13,7 +13,6 @@ declare module 'vue' {
     NutAvatar: typeof import('@nutui/nutui')['Avatar']
     NutButton: typeof import('@nutui/nutui')['Button']
     NutCell: typeof import('@nutui/nutui')['Cell']
-    NutCellTitle: typeof import('@nutui/nutui')['CellTitle']
     NutDatePicker: typeof import('@nutui/nutui')['DatePicker']
     NutForm: typeof import('@nutui/nutui')['Form']
     NutFormItem: typeof import('@nutui/nutui')['FormItem']

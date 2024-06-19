@@ -35,9 +35,20 @@ const router = createRouter({
       component: () => import('../views/todo/AddTodoView.vue'),
     },
     {
-      path: '/pomodoro/add',
-      name: 'AddPomodoroSceneView',
-      component: () => import('../views/pomodoro/AddPomodoroSceneView.vue'),
+      path: '/pomodoro',
+      name: 'Pomodoro',
+      children: [
+        {
+          path: 'add',
+          name: 'AddPomodoroSceneView',
+          component: () => import('../views/pomodoro/AddPomodoroSceneView.vue'),
+        },
+        {
+          path: 'detail',
+          name: 'PomodoroDetail',
+          component: () => import('../views/pomodoro/PomodoroDetailView.vue'),
+        },
+      ],
     },
     {
       path: '/widget/todo/list',

@@ -8,15 +8,15 @@ import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 const router = useRouter()
 const pomodoroSceneStore = usePomodoroSceneStore()
 const { scenes } = storeToRefs(pomodoroSceneStore)
-function goEdit(scene: PomodoroScene) {
-  router.push({ name: 'AddPomodoroSceneView', query: { id: scene.id } })
+function goDetail(scene: PomodoroScene) {
+  router.push({ name: 'PomodoroDetail', query: { id: scene.id } })
 }
 pomodoroSceneStore.reload()
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div v-for="scene in scenes" :key="scene.id" class="scene flex" @click="goEdit(scene)">
+    <div v-for="scene in scenes" :key="scene.id" class="scene flex" @click="goDetail(scene)">
       <div class="flex gap-2">
         <div>{{ scene.icon }}</div>
         <div>{{ scene.name }}</div>
@@ -34,7 +34,6 @@ pomodoroSceneStore.reload()
   border-radius: 5px;
   cursor: pointer;
   padding: 16px 8px;
-
   &:hover {
     background-color: #f0f0f0;
   }

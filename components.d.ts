@@ -12,6 +12,8 @@ declare module 'vue' {
     FloatingActionButton: typeof import('./src/components/FloatingActionButton.vue')['default']
     NutAvatar: typeof import('@nutui/nutui')['Avatar']
     NutButton: typeof import('@nutui/nutui')['Button']
+    NutCell: typeof import('@nutui/nutui')['Cell']
+    NutCellTitle: typeof import('@nutui/nutui')['CellTitle']
     NutDatePicker: typeof import('@nutui/nutui')['DatePicker']
     NutForm: typeof import('@nutui/nutui')['Form']
     NutFormItem: typeof import('@nutui/nutui')['FormItem']
@@ -22,10 +24,11 @@ declare module 'vue' {
     NutPopup: typeof import('@nutui/nutui')['Popup']
     NutRecurrentPicker: typeof import('./src/components/NutRecurrentPicker.vue')['default']
     NutSwitch: typeof import('@nutui/nutui')['Switch']
-    NutTabPane: typeof import('@nutui/nutui')['TabPane']
-    NutTabs: typeof import('@nutui/nutui')['Tabs']
+    NutTabbar: typeof import('@nutui/nutui')['Tabbar']
+    NutTabbarItem: typeof import('@nutui/nutui')['TabbarItem']
     ProgressBar: typeof import('./src/components/ProgressBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SmsCodeButton: typeof import('./src/components/form/SmsCodeButton.vue')['default']
   }
 }

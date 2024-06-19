@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@icon-park/vue-next": "^1.4.2",
-    "@nutui/nutui": "^4.3.8",
+    "@nutui/nutui": "^4.3.9",
     "@nutui/touch-emulator": "^1.0.0",
     "@vueuse/core": "^10.9.0",
     "@vueuse/integrations": "^10.9.0",

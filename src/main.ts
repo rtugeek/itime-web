@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import '@nutui/touch-emulator'
-import { ConfigProvider } from '@nutui/nutui'
+import { ConfigProvider, Toast } from '@nutui/nutui'
 import { WidgetJsPlugin } from '@widget-js/vue3'
 
 import '@nutui/nutui/dist/style.css'
@@ -22,6 +22,7 @@ dayjs.extend(duration)
 const app = createApp(App)
 
 app.use(createPinia())
+app.use(Toast)
 app.use(router)
 app.use(WidgetJsPlugin)
 app.use(ConfigProvider)

@@ -6,7 +6,6 @@ import { type PomodoroSettings, getDefaultPomodoroSettings } from '@/data/Pomodo
 import { AppConfig } from '@/common/AppConfig'
 import PomodoroSenceList from '@/widgets/pomodoro/components/PomodoroSenceList.vue'
 
-const pomoSettings = useStorage<PomodoroSettings>(AppConfig.KEY_POMODORO_SETTINGS, getDefaultPomodoroSettings())
 
 const selectTab = ref('1')
 
@@ -28,17 +27,7 @@ BrowserWindowApi.setup({
         </div>
       </nut-tab-pane>
       <nut-tab-pane title="番茄钟设置" pane-key="2">
-        <nut-form>
-          <nut-form-item label-width="130px" :label="`番茄时长（${pomoSettings.pomoTime}m）`">
-            <nut-input-number v-model="pomoSettings.pomoTime" :min="5" :max="60" type="text" />
-          </nut-form-item>
-          <nut-form-item label-width="130px" :label="`休息时长（${pomoSettings.shortBreakTime}m）`">
-            <nut-input-number v-model="pomoSettings.shortBreakTime" :min="1" :max="30" type="text" />
-          </nut-form-item>
-          <nut-form-item label-width="130px" label="自动开始下个番茄钟">
-            <nut-switch v-model="pomoSettings.isAutoNext" />
-          </nut-form-item>
-        </nut-form>
+        <PomodoroSettings/>
       </nut-tab-pane>
     </nut-tabs>
   </base-view>

@@ -21,45 +21,6 @@
   "url": "",
   "widgets": [
     {
-      "name": "itime.fun.pomodoro",
-      "title": {
-        "zh-CN": "番茄钟"
-      },
-      "description": {
-        "zh-CN": "高效管理时间，提高专注力"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 1,
-      "height": 1,
-      "maxWidth": 1,
-      "webviewTag": false,
-      "maxHeight": 1,
-      "minWidth": 1,
-      "minHeight": 1,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/pomodoro",
-      "meta": {},
-      "backgroundThrottling": false,
-      "previewImage": "/images/preview_pomodoro.png",
-      "supportDeployMode": 65536,
-      "requiredAppVersion": "24.6.2",
-      "configPagePath": "/widget/config/pomodoro",
-      "routes": [],
-      "browserWindowOptions": {
-        "transparent": false,
-        "frame": false,
-        "backgroundMaterial": "acrylic",
-        "backgroundThrottling": false
-      }
-    },
-    {
       "name": "itime.fun.calendar",
       "title": {
         "zh-CN": "日历"
@@ -87,9 +48,54 @@
       "meta": {},
       "backgroundThrottling": true,
       "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/calendar",
       "routes": []
+    },
+    {
+      "name": "itime.fun.pomodoro",
+      "title": {
+        "zh-CN": "番茄钟"
+      },
+      "description": {
+        "zh-CN": "高效管理时间，提高专注力"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 1,
+      "height": 1,
+      "maxWidth": 1,
+      "webviewTag": false,
+      "maxHeight": 1,
+      "minWidth": 1,
+      "minHeight": 1,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/pomodoro",
+      "meta": {},
+      "backgroundThrottling": false,
+      "previewImage": "/images/preview_pomodoro.png",
+      "categories": [
+        "productivity"
+      ],
+      "supportDeployMode": 65536,
+      "requiredAppVersion": "24.6.2",
+      "configPagePath": "/widget/config/pomodoro",
+      "routes": [],
+      "browserWindowOptions": {
+        "transparent": false,
+        "frame": false,
+        "backgroundMaterial": "acrylic",
+        "backgroundThrottling": false
+      }
     }
   ],
   "pages": []

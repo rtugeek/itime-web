@@ -21,6 +21,41 @@
   "url": "",
   "widgets": [
     {
+      "name": "itime.fun.calendar",
+      "title": {
+        "zh-CN": "日历"
+      },
+      "description": {
+        "zh-CN": "简单的日历，支持节假日显示"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 4,
+      "minHeight": 4,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar",
+      "routes": []
+    },
+    {
       "name": "itime.fun.pomodoro",
       "title": {
         "zh-CN": "番茄钟"
@@ -61,41 +96,6 @@
         "backgroundMaterial": "acrylic",
         "backgroundThrottling": false
       }
-    },
-    {
-      "name": "itime.fun.calendar",
-      "title": {
-        "zh-CN": "日历"
-      },
-      "description": {
-        "zh-CN": "简单的日历，支持节假日显示"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 4,
-      "minHeight": 4,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/calendar",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_calendar.png",
-      "categories": [
-        "calendar"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar",
-      "routes": []
     }
   ],
   "pages": []

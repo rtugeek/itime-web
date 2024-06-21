@@ -12,8 +12,11 @@ import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import duration from 'dayjs/plugin/duration'
+import BScroll from '@better-scroll/core'
+import ScrollBar from '@better-scroll/scroll-bar'
 import router from './router'
 import App from './App.vue'
+
 
 dayjs.extend(isoWeek)
 dayjs.extend(isToday)

@@ -16,6 +16,8 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@better-scroll/core": "^2.5.1",
+    "@better-scroll/scroll-bar": "^2.5.1",
     "@icon-park/vue-next": "^1.4.2",
     "@nutui/nutui": "^4.3.9",
     "@nutui/touch-emulator": "^1.0.0",

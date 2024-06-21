@@ -21,14 +21,16 @@ defineProps({
   </nut-button>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .fab-btn{
   width: 3rem;
   height: 3rem;
 }
 
-.i-icon{
+.i-icon {
   display: flex;
   height: 100%;
+  justify-content: center;
+  align-items: center;
 }
 </style>

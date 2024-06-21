@@ -8,6 +8,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseView: typeof import('./src/components/BaseView.vue')['default']
+    DateInput: typeof import('./src/components/DateInput.vue')['default']
+    DateTimeInput: typeof import('./src/components/DateTimeInput.vue')['default']
     DateTimePicker: typeof import('./src/components/DateTimePicker.vue')['default']
     FloatingActionButton: typeof import('./src/components/FloatingActionButton.vue')['default']
     NutAvatar: typeof import('@nutui/nutui')['Avatar']
@@ -18,9 +20,12 @@ declare module 'vue' {
     NutFormItem: typeof import('@nutui/nutui')['FormItem']
     NutInput: typeof import('@nutui/nutui')['Input']
     NutInputNumber: typeof import('@nutui/nutui')['InputNumber']
+    NutLunarDatePicker: typeof import('./src/components/nut/NutLunarDatePicker.vue')['default']
     NutNavbar: typeof import('@nutui/nutui')['Navbar']
     NutPicker: typeof import('@nutui/nutui')['Picker']
     NutPopup: typeof import('@nutui/nutui')['Popup']
+    NutRadio: typeof import('@nutui/nutui')['Radio']
+    NutRadioGroup: typeof import('@nutui/nutui')['RadioGroup']
     NutRecurrentPicker: typeof import('./src/components/NutRecurrentPicker.vue')['default']
     NutSwitch: typeof import('@nutui/nutui')['Switch']
     NutTabbar: typeof import('@nutui/nutui')['Tabbar']

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { BrowserWindowApi } from '@widget-js/core'
 import { Close } from '@icon-park/vue-next'
-import { useRouter } from 'vue-router'
-
+import { useRoute, useRouter } from 'vue-router'
+import {computed} from 'vue'
 const props = defineProps({
   title: String,
   leftShow: {
@@ -32,9 +32,10 @@ function close() {
 <template>
   <div class="base-view flex flex-col w-full">
     <div class="div" @mousedown="mouseDown" @mouseup="mouseUp">
-      <nut-navbar v-bind="props" @click-back="goBack">
+      <nut-navbar fixed v-bind="props" @click-back="goBack">
         <template #right>
           <div class="flex gap-2">
+            <slot name="actions"></slot>
             <nut-button plain size="small" @click="close">
               <Close />
             </nut-button>

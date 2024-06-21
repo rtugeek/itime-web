@@ -3,13 +3,15 @@ import {ref} from 'vue'
 import {HourglassNull, Stopwatch, SettingTwo,Check} from '@icon-park/vue-next'
 import PomodoroSenceList from '@/widgets/pomodoro/components/PomodoroSenceList.vue'
 import Settings from '@/views/settings/Settings.vue'
+import CountdownList from '@/views/countdown/CountdownList.vue'
 const active = ref(0)
 </script>
 
 <template>
-  <BaseView title="iTime">
+  <BaseView :left-show="false" title="iTime">
     <div class="flex flex-col h-full">
       <div class="p-4">
+        <CountdownList v-show="active == 0"/>
         <PomodoroSenceList v-show="active == 1"/>
         <Settings v-show="active == 2"/>
       </div>

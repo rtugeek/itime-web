@@ -35,6 +35,17 @@ const router = createRouter({
       component: () => import('../views/todo/AddTodoView.vue'),
     },
     {
+      path: '/countdown',
+      name: 'Countdown',
+      children:[
+        {
+          path:'add',
+          name:'CountdownAdd',
+          component: () => import('../views/countdown/AddCountdownView.vue')
+        }
+      ]
+    },
+    {
       path: '/pomodoro',
       name: 'Pomodoro',
       children: [

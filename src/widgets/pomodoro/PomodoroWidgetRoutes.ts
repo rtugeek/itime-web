@@ -4,7 +4,7 @@ import PomodoroWidget from './Pomodoro.widget'
 const path = PomodoroWidget.path
 const name = PomodoroWidget.name
 
-const configPagePath = PomodoroWidget.configPagePath!
+const configPagePath = PomodoroWidget.configPagePath!.split('?')[0]
 
 const PomodoroWidgetRoutes: RouteRecordRaw[] = [
   {

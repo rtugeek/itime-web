@@ -1,11 +1,8 @@
 <script lang="ts" setup>
 import { BrowserWindowApi } from '@widget-js/core'
 import { ref } from 'vue'
-import { useStorage } from '@vueuse/core'
-import { type PomodoroSettings, getDefaultPomodoroSettings } from '@/data/PomodoroSettings'
-import { AppConfig } from '@/common/AppConfig'
 import PomodoroSenceList from '@/widgets/pomodoro/components/PomodoroSenceList.vue'
-
+import PomodoroSettings from '@/views/settings/PomodoroSettings.vue'
 
 const selectTab = ref('1')
 
@@ -27,7 +24,7 @@ BrowserWindowApi.setup({
         </div>
       </nut-tab-pane>
       <nut-tab-pane title="番茄钟设置" pane-key="2">
-        <PomodoroSettings/>
+        <PomodoroSettings />
       </nut-tab-pane>
     </nut-tabs>
   </base-view>

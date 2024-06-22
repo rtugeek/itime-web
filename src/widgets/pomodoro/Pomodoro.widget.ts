@@ -10,7 +10,7 @@ const PomodoroWidget = new BackgroundWidget({
   categories: ['productivity'],
   path: '/widget/pomodoro',
   requiredAppVersion: '24.6.2',
-  configPagePath: '/widget/config/pomodoro',
+  configPagePath: '/widget/config/pomodoro?frame=true&transparent=false',
   browserWindowOptions: {
     transparent: false,
     frame: false,

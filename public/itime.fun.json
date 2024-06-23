@@ -53,7 +53,7 @@
       ],
       "supportDeployMode": 65536,
       "requiredAppVersion": "24.6.2",
-      "configPagePath": "/widget/config/pomodoro",
+      "configPagePath": "/widget/config/pomodoro?frame=true&transparent=false",
       "routes": [],
       "browserWindowOptions": {
         "transparent": false,

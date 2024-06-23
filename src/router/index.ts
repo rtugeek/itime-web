@@ -16,18 +16,18 @@ const router = createRouter({
     {
       path: '/user',
       name: 'User',
-      children:[
+      children: [
         {
-          path:'sign/in',
-          name:'UserSignIn',
-          component: SignIn
+          path: 'sign/in',
+          name: 'UserSignIn',
+          component: SignIn,
         },
         {
-          path:'sign/up',
-          name:'UserSignUp',
-          component: SignUp
-        }
-      ]
+          path: 'sign/up',
+          name: 'UserSignUp',
+          component: SignUp,
+        },
+      ],
     },
     {
       path: '/todo/add',
@@ -37,13 +37,13 @@ const router = createRouter({
     {
       path: '/countdown',
       name: 'Countdown',
-      children:[
+      children: [
         {
-          path:'add',
-          name:'CountdownAdd',
-          component: () => import('../views/countdown/AddCountdownView.vue')
-        }
-      ]
+          path: 'add',
+          name: 'CountdownAdd',
+          component: () => import('../views/countdown/AddCountdownView.vue'),
+        },
+      ],
     },
     {
       path: '/pomodoro',

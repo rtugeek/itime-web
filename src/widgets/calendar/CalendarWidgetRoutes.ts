@@ -4,7 +4,7 @@ import CalendarWidget from './Calendar.widget'
 const path = CalendarWidget.path
 const name = CalendarWidget.name
 
-const configPagePath = CalendarWidget.configPagePath!
+const configPagePath = CalendarWidget.configPagePath!.split('?')[0]
 
 const CalendarWidgetRoutes: RouteRecordRaw[] = [
   {

@@ -18,4 +18,16 @@ export class PomodoroRepository {
   static async clear() {
     return pomodoroRepository.clear()
   }
+
+  static async findBySceneId(sceneId: string): Promise<PomodoroHistory[]> {
+    const histories: PomodoroHistory[] = []
+    const keys = await pomodoroRepository.keys()
+    for (const key of keys) {
+      const history = await pomodoroRepository.getItem<PomodoroHistory>(key)
+      if (history && history.sceneId === sceneId) {
+        histories.push(history)
+      }
+    }
+    return histories
+  }
 }

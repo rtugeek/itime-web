@@ -13,6 +13,7 @@
     "release": "widget release -t ftp",
     "remote": "widget dependencies -t remote",
     "local": "widget dependencies -t local",
+    "publish:package": "widget publish -k kew2OhrifieMangah3WaexibohphuBah",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {

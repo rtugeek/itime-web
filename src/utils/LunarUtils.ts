@@ -1,4 +1,4 @@
-import type { Lunar } from 'lunar-typescript'
+import type { Lunar, Solar } from 'lunar-typescript'
 
 export class LunarUtils {
   private static CHINESE_NUMBER = '〇一二三四五六七八九十'
@@ -51,7 +51,10 @@ export class LunarUtils {
   }
 
   static lunarToDate(lunar: Lunar): Date {
-    const solar = lunar.getSolar()
+    return this.solarToDate(lunar.getSolar())
+  }
+
+  static solarToDate(solar: Solar): Date {
     return new Date(solar.getYear(), solar.getMonth() - 1, solar.getDay())
   }
 }

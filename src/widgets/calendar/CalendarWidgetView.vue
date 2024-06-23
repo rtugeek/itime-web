@@ -15,14 +15,14 @@ const solarMonth = ref(SolarMonth.fromYm(today.year(), today.month() + 1))
 const weeks = ref(solarMonth.value.getWeeks(0))
 useWidget(WidgetData)
 
-const next = () => {
+function next() {
   solarMonth.value = solarMonth.value.next(1)
   weeks.value = solarMonth.value.getWeeks(0)
   currentMonth.value = currentMonth.value.add(1, 'month')
   currentMonthIndex.value = currentMonth.value.month()
 }
 
-const previous = () => {
+function previous() {
   solarMonth.value = solarMonth.value.next(-1)
   weeks.value = solarMonth.value.getWeeks(0)
   currentMonth.value = currentMonth.value.subtract(1, 'month')
@@ -30,12 +30,12 @@ const previous = () => {
 }
 
 const almanac = ref<Almanac[]>([])
-PublicEventApi.getCalendar().then(it => {
+PublicEventApi.getCalendar().then((it) => {
   almanac.value = it
 })
 
-const findAlmanac = (solar: Solar) => {
-  return almanac.value.find(it => {
+function findAlmanac(solar: Solar) {
+  return almanac.value.find((it) => {
     return it.year == solar.getYear() && it.month == solar.getMonth() && it.dayOfMonth == solar.getDay()
   })
 }
@@ -48,15 +48,15 @@ const findAlmanac = (solar: Solar) => {
         <div class="text-xl font-bold">
           {{ currentMonth.format('YYYY年MM月') }}
         </div>
-        <div class="text-xs" v-if="currentMonthIndex == today.month()">
+        <div v-if="currentMonthIndex == today.month()" class="text-xs">
           第{{ currentMonth.isoWeek() }}周
         </div>
         <div class="ml-auto flex gap-1 btn-group text-center">
           <div class="btn-next flex items-center rounded-full size-7 cursor-pointer justify-center" @click="previous">
-            <Left :size="20"/>
+            <Left :size="20" />
           </div>
           <div class="btn-previous flex items-center rounded-full size-7 cursor-pointer justify-center" @click="next">
-            <Right :size="20"/>
+            <Right :size="20" />
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@ const findAlmanac = (solar: Solar) => {
             v-for="day in week.getDays()" :key="day.getDay()" class="flex w-full flex-col items-center content-center"
             :class="{ 'opacity-40': day.getMonth() != currentMonthIndex + 1 }"
           >
-            <CalendarDay :day="day" :almanac="findAlmanac(day)"/>
+            <CalendarDay :day="day" :almanac="findAlmanac(day)" />
           </div>
         </div>
       </div>

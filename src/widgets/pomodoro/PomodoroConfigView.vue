@@ -1,15 +1,9 @@
 <script lang="ts" setup>
-import { BrowserWindowApi } from '@widget-js/core'
 import { ref } from 'vue'
 import PomodoroSenceList from '@/widgets/pomodoro/components/PomodoroSenceList.vue'
 import PomodoroSettings from '@/views/settings/PomodoroSettings.vue'
 
 const selectTab = ref('1')
-
-BrowserWindowApi.setup({
-  width: 400,
-  height: 700,
-})
 </script>
 
 <template>

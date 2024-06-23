@@ -2,10 +2,11 @@ import localforage from 'localforage'
 import { nanoid } from 'nanoid'
 import dayjs from 'dayjs'
 import { CountdownEvent } from '@/data/CountdownEvent'
+import { AppConfig } from '@/common/AppConfig'
 
 const countdownEventRepository = localforage.createInstance({ name: 'countdown-event' })
 export class CountdownEventRepository {
-  static async get(key: string) {
+  static async get(key: string): Promise<CountdownEvent | null> {
     return countdownEventRepository.getItem<CountdownEvent>(key)
   }
 
@@ -37,16 +38,16 @@ export class CountdownEventRepository {
         events.push(event)
       }
     }
-    // 根据创建时间排序
-    events.sort((a, b) => {
-      return a.dateTime.getTime() - b.dateTime.getTime()
-    })
     return events
   }
 
   static async createDefaultCountdown() {
-    const newYear = dayjs().add(1, 'year').startOf('year').toDate()
-    const countdown = new CountdownEvent('新年', newYear, -3, 0)
-    await this.save(countdown)
+    const init = localStorage.getItem(AppConfig.KEY_COUNTDOWN_INIT)
+    if (init == null) {
+      const newYear = dayjs().add(1, 'year').startOf('year').toDate()
+      const countdown = new CountdownEvent('新年', newYear, -3, 0)
+      await this.save(countdown)
+    }
+    localStorage.setItem(AppConfig.KEY_COUNTDOWN_INIT, 'true')
   }
 }

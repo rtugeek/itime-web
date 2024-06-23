@@ -29,8 +29,8 @@ onMounted(async () => {
 <template>
   <div class="flex h-full">
     <div ref="bsWrapper" class="bs-wrapper w-full pos-relative overflow-hidden" style="height: calc(100vh - 100px);">
-      <div class="content flex gap-2">
-        <CountdownItem v-for="event in events" :event="event" :key="event.id" />
+      <div class="content flex flex-col">
+        <CountdownItem v-for="event in events" :key="event.id" :event="event" />
       </div>
     </div>
     <div class="pos-absolute right-6 bottom-18">

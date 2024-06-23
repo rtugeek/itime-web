@@ -8,9 +8,11 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   const events = ref<CountdownEvent[]>([])
 
   async function reload() {
-    const countdownEvents = (await CountdownEventRepository.all()).map(it=> CountdownEvent.fromObject(it))
+    const countdownEvents = (await CountdownEventRepository.all()).map(it => CountdownEvent.fromObject(it))
     events.value = countdownEvents
   }
+
+  CountdownEventRepository.createDefaultCountdown()
 
   const { post, data } = useBroadcastChannel({ name: 'countdownEventStore' })
   watch(data, () => {

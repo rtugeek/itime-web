@@ -5,13 +5,13 @@ import { BaseData } from '@/data/base/BaseData'
 export class CountdownEvent extends BaseData {
   name: string
   /**
-   * 当前公历日期
+   * 当前公历日期 ISO格式
    */
-  dateTime!: Date
+  dateTime!: string
   /**
-   * 最开始的公历日期
+   * 最开始的公历日期 ISO格式
    */
-  sourceDateTime!: Date
+  sourceDateTime!: string
   /**
    * 0-不重复
    * >0 - 按天重复
@@ -35,8 +35,8 @@ export class CountdownEvent extends BaseData {
   }
 
   setSourceDateTime(value: Date) {
-    this.sourceDateTime = value
-    this.dateTime = value
+    this.sourceDateTime = value.toISOString()
+    this.dateTime = value.toISOString()
   }
 
   static fromObject(obj: any): CountdownEvent {
@@ -47,7 +47,7 @@ export class CountdownEvent extends BaseData {
 
   getDateTimeText() {
     if (this.dateType === 1) {
-      return Lunar.fromDate(this.dateTime).toString()
+      return Lunar.fromDate(dayjs(this.dateTime).toDate()).toString()
     }
     return dayjs(this.dateTime).format('YYYY年MM月DD日')
   }

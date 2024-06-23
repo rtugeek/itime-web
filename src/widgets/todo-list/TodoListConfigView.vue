@@ -4,16 +4,10 @@ import {
   useWidget,
 } from '@widget-js/vue3'
 import {
-  BrowserWindowApi,
   WidgetData,
   WidgetDataApi,
 } from '@widget-js/core'
 
-BrowserWindowApi.setup({
-  width: 600,
-  height: 500,
-  center: true,
-})
 const {
   widgetData,
   widgetParams,

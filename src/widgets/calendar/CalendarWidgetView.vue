@@ -3,7 +3,6 @@ import { type Solar, SolarMonth } from 'lunar-typescript'
 import dayjs from 'dayjs'
 import { ref } from 'vue'
 import { useWidget } from '@widget-js/vue3'
-import { WidgetData } from '@widget-js/core'
 import { Left, Right } from '@icon-park/vue-next'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
 import { type Almanac, PublicEventApi } from '@/api/PublicEventApi'
@@ -13,7 +12,7 @@ const currentMonth = ref(dayjs())
 const currentMonthIndex = ref(today.month())
 const solarMonth = ref(SolarMonth.fromYm(today.year(), today.month() + 1))
 const weeks = ref(solarMonth.value.getWeeks(0))
-useWidget(WidgetData)
+useWidget()
 
 function next() {
   solarMonth.value = solarMonth.value.next(1)

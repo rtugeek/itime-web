@@ -3,11 +3,13 @@ import { BrowserWindowApi } from '@widget-js/core'
 import { computed, reactive, toRaw } from 'vue'
 import 'vue3-emoji-picker/css'
 import { useRoute, useRouter } from 'vue-router'
-import { showNotify } from '@nutui/nutui'
+import { showDialog, showNotify } from '@nutui/nutui'
 import { Calendar, Delete, Time } from '@icon-park/vue-next'
+import dayjs from 'dayjs'
 import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
 import { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
+import { AppUtils } from '@/utils/AppUtils'
 
 BrowserWindowApi.setAlwaysOnTop(true)
 const router = useRouter()
@@ -37,17 +39,23 @@ function save() {
     return
   }
   CountdownEventRepository.save(toRaw(event))
-  router.back()
+  AppUtils.back(router)
 }
 
 function deleteCountdown() {
-  countdownEventStore.deleteCountdown(event.id!)
-  router.back()
+  showDialog({
+    title: `确定要删除 ${event.name}?`,
+    footerDirection: 'vertical',
+    onOk: () => {
+      countdownEventStore.deleteCountdown(event.id!)
+      AppUtils.back(router)
+    },
+  })
 }
 
-const dateTimeModel = computed({
-  get: () => event.sourceDateTime,
-  set: (val) => {
+const dateTimeModel = computed<Date>({
+  get: () => dayjs(event.sourceDateTime).toDate(),
+  set: (val: Date) => {
     event.setSourceDateTime(val)
   },
 })
@@ -56,7 +64,7 @@ const dateTimeModel = computed({
 <template>
   <BaseView :title="title">
     <template #actions>
-      <nut-button v-if="event.id" size="small">
+      <nut-button v-if="event.id" size="small" @click="deleteCountdown">
         <template #icon>
           <div class="flex justify-center">
             <Delete />
@@ -83,7 +91,6 @@ const dateTimeModel = computed({
       </nut-form>
     </div>
     <div class="fixed-right-bottom gap-2 flex">
-      <FloatingActionButton v-if="id" type="danger" icon="delete" @click="deleteCountdown" />
       <FloatingActionButton icon="check" @click="save" />
     </div>
   </BaseView>

@@ -2,9 +2,10 @@
 import { nextTick, onMounted, ref } from 'vue'
 import {
   WidgetWrapper,
+  useMenuListener,
   useWidget,
 } from '@widget-js/vue3'
-import { DefaultWidgetTheme, MenuApi, type WidgetMenuItem } from '@widget-js/core'
+import { BrowserWindowApi, DefaultWidgetTheme, MenuApi, type WidgetMenuItem } from '@widget-js/core'
 import { useStorage } from '@vueuse/core'
 import CountdownComponent from '@/widgets/countdown/CountdownComponent.vue'
 import type { CountdownEvent } from '@/data/CountdownEvent'
@@ -58,6 +59,12 @@ function onSetCountdownClick() {
     ],
   })
 }
+
+useMenuListener((type, menu) => {
+  if (menu.id == 'new-countdown') {
+    BrowserWindowApi.openUrl('/countdown/add?width=400&height=700&frame=true&transparent=false')
+  }
+})
 </script>
 
 <template>

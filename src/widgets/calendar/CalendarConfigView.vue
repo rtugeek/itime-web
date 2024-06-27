@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { WidgetConfigOption, useWidget } from '@widget-js/vue3'
-import { WidgetData } from '@widget-js/core'
 
-const { widgetData, widgetParams, save } = useWidget(WidgetData)
+const { widgetParams, save } = useWidget()
 
 // 修改成需要设置组件参数配置
 const widgetConfigOption = new WidgetConfigOption({
@@ -11,15 +10,14 @@ const widgetConfigOption = new WidgetConfigOption({
     backgroundColor: true,
     borderRadius: true,
     color: true,
-    primaryColor:true,
-    fontSize: [10,40]
+    primaryColor: true,
+    fontSize: [10, 40],
   },
 })
 </script>
 
 <template>
   <widget-edit-dialog
-    v-model="widgetData"
     :widget-params="widgetParams"
     :option="widgetConfigOption"
     @apply="save()"

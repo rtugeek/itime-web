@@ -2,6 +2,7 @@
 import { BrowserWindowApi } from '@widget-js/core'
 import { Close } from '@icon-park/vue-next'
 import { useRouter } from 'vue-router'
+import { AppUtils } from '@/utils/AppUtils'
 
 const props = defineProps({
   title: String,
@@ -13,7 +14,7 @@ const props = defineProps({
 
 const router = useRouter()
 function goBack() {
-  router.back()
+  AppUtils.back(router)
 }
 
 function mouseDown() {

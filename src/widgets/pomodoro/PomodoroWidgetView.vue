@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BrowserWindowApi, MenuApi, WidgetData, type WidgetMenuItem } from '@widget-js/core'
+import { BrowserWindowApi, MenuApi, type WidgetMenuItem } from '@widget-js/core'
 import { useMenuListener, useWidget } from '@widget-js/vue3'
 import { nextTick, onMounted } from 'vue'
 import { useStorage } from '@vueuse/core'
@@ -13,9 +13,10 @@ import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import { usePomodoroWindowStateStore } from '@/widgets/pomodoro/usePomodoroWindowStateStore'
 import PomodoroProgressBar from '@/widgets/pomodoro/components/PomodoroProgressBar.vue'
 
-useWidget(WidgetData, { defaultOverlapMenu: false })
+useWidget({ defaultOverlapMenu: false })
 const sceneStore = usePomodoroSceneStore()
 const pomodoro = usePomodoroStore()
+
 usePomodoroWindowStateStore()
 
 const { scenes, currentScene } = storeToRefs(sceneStore)

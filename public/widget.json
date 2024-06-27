@@ -63,41 +63,6 @@
       }
     },
     {
-      "name": "cn.widgetjs.widgets.countdown2",
-      "title": {
-        "zh-CN": "倒计时"
-      },
-      "description": {
-        "zh-CN": "日历样式的倒计时组件"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 2,
-      "height": 2,
-      "maxWidth": 4,
-      "webviewTag": false,
-      "maxHeight": 4,
-      "minWidth": 2,
-      "minHeight": 2,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/countdown2",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_countdown.png",
-      "categories": [
-        "countdown"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
-      "routes": []
-    },
-    {
       "name": "itime.fun.calendar",
       "title": {
         "zh-CN": "日历"
@@ -130,6 +95,41 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
+      "routes": []
+    },
+    {
+      "name": "cn.widgetjs.widgets.countdown2",
+      "title": {
+        "zh-CN": "倒计时"
+      },
+      "description": {
+        "zh-CN": "日历样式的倒计时组件"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 2,
+      "height": 2,
+      "maxWidth": 4,
+      "webviewTag": false,
+      "maxHeight": 4,
+      "minWidth": 2,
+      "minHeight": 2,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/countdown2",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_countdown.png",
+      "categories": [
+        "countdown"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
       "routes": []
     }
   ],

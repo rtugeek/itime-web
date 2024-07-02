@@ -64,6 +64,12 @@ useMenuListener((type, menu) => {
   if (menu.id == 'new-countdown') {
     BrowserWindowApi.openUrl('/countdown/add?width=400&height=700&frame=true&transparent=false')
   }
+  else {
+    CountdownEventRepository.get(menu.id).then((res) => {
+      event.value = res
+      countdownEventId.value = res?.id
+    })
+  }
 })
 </script>
 

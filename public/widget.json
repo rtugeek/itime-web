@@ -63,41 +63,6 @@
       }
     },
     {
-      "name": "itime.fun.calendar",
-      "title": {
-        "zh-CN": "日历"
-      },
-      "description": {
-        "zh-CN": "简单的日历，支持节假日显示"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 4,
-      "minHeight": 4,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/calendar",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_calendar.png",
-      "categories": [
-        "calendar"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
-      "routes": []
-    },
-    {
       "name": "cn.widgetjs.widgets.countdown2",
       "title": {
         "zh-CN": "倒计时"
@@ -130,6 +95,41 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
+      "routes": []
+    },
+    {
+      "name": "itime.fun.calendar",
+      "title": {
+        "zh-CN": "日历"
+      },
+      "description": {
+        "zh-CN": "简单的日历，支持节假日显示"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 4,
+      "minHeight": 4,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
       "routes": []
     }
   ],

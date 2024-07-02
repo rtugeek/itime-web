@@ -11,7 +11,7 @@ export default defineConfig({
   base: '/web',
   plugins: [
     vue(),
-    widget({ generateFullNamePackage: true }),
+    widget(),
     Components({
       resolvers: [NutUIResolver()],
     }),

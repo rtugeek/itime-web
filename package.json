@@ -1,14 +1,13 @@
 {
   "name": "itime-web",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build",
     "preview": "vite preview",
     "test:unit": "vitest",
-    "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "release": "widget release -t ftp",
     "remote": "widget dependencies -t remote",

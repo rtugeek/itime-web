@@ -30,8 +30,6 @@ declare module 'vue' {
     NutSwitch: typeof import('@nutui/nutui')['Switch']
     NutTabbar: typeof import('@nutui/nutui')['Tabbar']
     NutTabbarItem: typeof import('@nutui/nutui')['TabbarItem']
-    NutTabPane: typeof import('@nutui/nutui')['TabPane']
-    NutTabs: typeof import('@nutui/nutui')['Tabs']
     ProgressBar: typeof import('./src/components/ProgressBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -6,6 +6,9 @@ import { RouterView } from 'vue-router'
   <RouterView />
 </template>
 
-<style scoped>
-
+<style>
+html {
+  font-size: var(--widget-font-size);
+  font-family: var(--widget-font-family);
+}
 </style>

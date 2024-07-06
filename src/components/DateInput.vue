@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { Lunar } from 'lunar-typescript'
 
+defineProps({
+  lunar: {
+    type: Boolean,
+    default: true,
+  },
+  minDate: {
+    type: Date,
+  },
+})
 const modelValue = defineModel({ default: new Date() })
 const dateType = defineModel('dateType', { default: 0 })
 const showDateTimePicker = ref(false)
 const showLunarPicker = ref(false)
-const selectedDate = ref(modelValue.value)
+const selectedDate = ref(new Date())
+onMounted(async () => {
+  await nextTick()
+  selectedDate.value = modelValue.value
+})
 const selectedLunarDate = ref(modelValue.value)
 const textModel = computed({
   get: () => {
@@ -22,6 +35,7 @@ const textModel = computed({
 
   },
 })
+
 function onDateTimeConfirm() {
   modelValue.value = selectedDate.value
   showDateTimePicker.value = false
@@ -50,7 +64,7 @@ function showPicker() {
     <template #left>
       <slot name="left" />
     </template>
-    <template #right>
+    <template v-if="lunar" #right>
       <nut-radio-group v-model="dateType" direction="horizontal" @click.stop="">
         <nut-radio :label="0">
           公历
@@ -66,13 +80,14 @@ function showPicker() {
       v-model="selectedDate"
       title="选择日期"
       type="date"
+      :min-date="minDate"
       :is-show-chinese="true"
       :three-dimensional="false"
       @confirm="onDateTimeConfirm"
       @cancel="showDateTimePicker = false"
     />
   </nut-popup>
-  <nut-popup v-model:visible="showLunarPicker" position="bottom">
+  <nut-popup v-if="lunar" v-model:visible="showLunarPicker" position="bottom">
     <nut-lunar-date-picker v-model="selectedLunarDate" @cancel="showLunarPicker = false" @confirm="onLunarDateConfirm" />
   </nut-popup>
 </template>

@@ -10,13 +10,13 @@ const props = defineProps({
     required: true,
   },
   almanac: {
-    type: Object as PropType<Almanac>
-  }
+    type: Object as PropType<Almanac>,
+  },
 })
 
 const isToday = computed<boolean>(() => {
   const todaySolar = Solar.fromDate(new Date())
-  return props.day.getYear() === todaySolar.getYear() && props.day.getMonth() === todaySolar.getMonth() && props.day.getDay() === todaySolar.getDay();
+  return props.day.getYear() === todaySolar.getYear() && props.day.getMonth() === todaySolar.getMonth() && props.day.getDay() === todaySolar.getDay()
 })
 
 const festivals = computed(() => {
@@ -26,7 +26,7 @@ const festivals = computed(() => {
 
 <template>
   <div
-    class="calendar-day flex flex-col items-center relative content-center rounded-full  size-10" :class="{
+    class="calendar-day flex flex-col items-center relative content-center rounded-full size-11" :class="{
       today: isToday,
     }"
   >
@@ -41,7 +41,7 @@ const festivals = computed(() => {
         {{ day.getLunar().getDayInChinese() }}
       </span>
     </div>
-    <div v-if="almanac?.status" class="top-right" :class="{work:almanac?.status == 2}">
+    <div v-if="almanac?.status" class="top-right" :class="{ work: almanac?.status == 2 }">
       <span v-if="almanac?.status == 1">
         休
       </span>

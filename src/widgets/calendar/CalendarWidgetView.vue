@@ -83,10 +83,6 @@ function findAlmanac(solar: Solar) {
 </template>
 
 <style lang="scss">
-html {
-  font-size: var(--widget-font-size);
-}
-
 body {
   background-color: transparent;
 }

@@ -5,5 +5,6 @@ export class AppConfig {
   static KEY_COUNTDOWN_INIT = 'ru9choS2gahh'
   static KEY_POMODORO = 'aeSe1neich7S'
   static KEY_GET_SMS_CODE_TIME = 'Foophooth7ah'
+  static KEY_DEADLINE_CONFIG = 'deadline-config'
   static SIZE_POMODORO_WINDOW = 150
 }

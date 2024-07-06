@@ -12,11 +12,10 @@ import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import duration from 'dayjs/plugin/duration'
-import BScroll from '@better-scroll/core'
-import ScrollBar from '@better-scroll/scroll-bar'
+import Vue3ColorPicker from 'vue3-colorpicker'
 import router from './router'
 import App from './App.vue'
-
+import 'vue3-colorpicker/style.css'
 
 dayjs.extend(isoWeek)
 dayjs.extend(isToday)
@@ -27,6 +26,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(Toast)
 app.use(router)
+app.use(Vue3ColorPicker)
 app.use(WidgetJsPlugin)
 app.use(ConfigProvider)
 app.mount('#app')

@@ -1,8 +1,9 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import WidgetRouter from '../widgets/widget-router'
-import HomeView from '../views/HomeView.vue'
 import SignIn from '@/views/user/SignIn.vue'
 import SignUp from '@/views/user/SignUp.vue'
+import HomeLayout from '@/components/layout/HomeLayout.vue'
+import BaseLayout from '@/components/layout/BaseLayout.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -10,19 +11,46 @@ const router = createRouter({
     ...WidgetRouter,
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
+      meta: {
+        title: 'iTime',
+      },
+      component: HomeLayout,
+      children: [
+        {
+          path: '',
+          redirect: '/countdown',
+        },
+        {
+          path: 'countdown',
+          component: () => import('@/views/countdown/CountdownList.vue'),
+        },
+        {
+          path: 'pomodoro',
+          component: () => import('@/views/pomodoro/PomodoroView.vue'),
+        },
+        {
+          path: 'settings',
+          component: () => import('@/views/settings/Settings.vue'),
+        },
+      ],
     },
     {
       path: '/user',
       name: 'User',
+      component: BaseLayout,
       children: [
         {
           path: 'sign/in',
+          meta: {
+            title: '登录',
+          },
           name: 'UserSignIn',
           component: SignIn,
         },
         {
+          meta: {
+            title: '注册',
+          },
           path: 'sign/up',
           name: 'UserSignUp',
           component: SignUp,

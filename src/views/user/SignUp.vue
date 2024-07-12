@@ -40,33 +40,31 @@ async function signUp() {
 </script>
 
 <template>
-  <BaseView title="注册">
-    <div class="flex flex-col gap-2 p-4">
-      <nut-form ref="formRef" :rules="rules" :model-value="formData">
-        <nut-form-item label="手机号" prop="phone">
-          <nut-input v-model="formData.phone" placeholder="请输入手机号" type="text" />
-        </nut-form-item>
-        <nut-form-item label="验证码" prop="code">
-          <nut-input v-model="formData.code" placeholder="请输入验证码" type="text">
-            <template #right>
-              <SmsCodeButton />
-            </template>
-          </nut-input>
-        </nut-form-item>
-        <nut-form-item label="密码" prop="password">
-          <nut-input v-model="formData.password" placeholder="8-16位，必须包含字母和数字" type="text" />
-        </nut-form-item>
-        <nut-form-item label="确认密码" prop="confirmPassword">
-          <nut-input v-model="formData.confirmPassword" placeholder="请确认密码" type="text" />
-        </nut-form-item>
-      </nut-form>
-      <div class="flex gap-4">
-        <nut-button class="flex-1" type="primary" @click="signUp">
-          注册
-        </nut-button>
-      </div>
+  <div class="flex flex-col gap-2 p-4">
+    <nut-form ref="formRef" :rules="rules" :model-value="formData">
+      <nut-form-item label="手机号" prop="phone">
+        <nut-input v-model="formData.phone" placeholder="请输入手机号" type="text" />
+      </nut-form-item>
+      <nut-form-item label="验证码" prop="code">
+        <nut-input v-model="formData.code" placeholder="请输入验证码" type="text">
+          <template #right>
+            <SmsCodeButton />
+          </template>
+        </nut-input>
+      </nut-form-item>
+      <nut-form-item label="密码" prop="password">
+        <nut-input v-model="formData.password" placeholder="8-16位，必须包含字母和数字" type="text" />
+      </nut-form-item>
+      <nut-form-item label="确认密码" prop="confirmPassword">
+        <nut-input v-model="formData.confirmPassword" placeholder="请确认密码" type="text" />
+      </nut-form-item>
+    </nut-form>
+    <div class="flex gap-4">
+      <nut-button class="flex-1" type="primary" @click="signUp">
+        注册
+      </nut-button>
     </div>
-  </BaseView>
+  </div>
 </template>
 
 <style scoped lang="scss">

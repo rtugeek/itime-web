@@ -19,3 +19,9 @@
 .rubik-regular{
   font-family: 'Rubik', sans-serif;
 }
+
+a:-webkit-any-link {
+  color: -webkit-link;
+  cursor: pointer;
+  text-decoration: none;
+}

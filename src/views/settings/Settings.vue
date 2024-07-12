@@ -5,14 +5,16 @@ import PomodoroSettings from '@/views/settings/PomodoroSettings.vue'
 
 <template>
   <div class="flex flex-col">
-    <NutCell>
-      <div class="flex gap-2 items-center">
-        <nut-avatar shape="round">
-          <User />
-        </nut-avatar>
-        数据备份，开发中🔨
-      </div>
-    </NutCell>
+    <RouterLink :to="{ name: 'UserSignIn' }">
+      <NutCell class="cursor-pointer">
+        <div class="flex gap-2 items-center ">
+          <nut-avatar shape="round">
+            <User />
+          </nut-avatar>
+          数据备份，开发中🔨
+        </div>
+      </NutCell>
+    </RouterLink>
     番茄钟设置
     <PomodoroSettings />
   </div>

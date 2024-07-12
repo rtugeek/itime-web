@@ -1,29 +1,28 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { HourglassNull, SettingTwo, Stopwatch } from '@icon-park/vue-next'
-import { useRoute } from 'vue-router'
-import PomodoroSceneList from '@/widgets/pomodoro/components/PomodoroSceneList.vue'
-import Settings from '@/views/settings/Settings.vue'
-import CountdownList from '@/views/countdown/CountdownList.vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
-const active = ref(0)
-
-if (route.query.tab == 'countdown') {
-  active.value = 0
-}
-if (route.query.tab == 'pomodoro') {
-  active.value = 1
-}
+const router = useRouter()
+const tabRoute = ['/countdown', '/pomodoro', '/settings']
+const active = computed<number>({
+  get: () => {
+    return tabRoute.indexOf(route.path)
+  },
+  set: (tab: number) => {
+    router.push({ path: tabRoute[tab] })
+  },
+})
 </script>
 
 <template>
   <BaseView :left-show="false" title="iTime">
-    <div class="flex flex-col h-full">
+    <div class="h-full">
       <div class="p-4">
-        <CountdownList v-show="active == 0" />
-        <PomodoroSceneList v-show="active == 1" />
-        <Settings v-show="active == 2" />
+        <RouterView v-slot="{ Component }">
+          <component :is="Component" />
+        </RouterView>
       </div>
       <nut-tabbar v-model="active" bottom safe-area-inset-bottom>
         <!--        <nut-tabbar-item tab-title="代办事项"> -->

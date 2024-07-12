@@ -5,7 +5,6 @@ export default new WidgetPackage({
   description: {
     'zh-CN': '修改成你的组件描述',
   },
-  entry: '',
   remoteEntry: 'https://itime.fun/web',
   remotePackage: 'https://itime.fun/web/widget.json',
   hash: true,

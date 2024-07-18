@@ -6,7 +6,6 @@ import { WidgetJsPlugin } from '@widget-js/vue3'
 
 import '@nutui/nutui/dist/style.css'
 import '@widget-js/vue3/dist/style.css'
-import 'virtual:uno.css'
 import './assets/main.css'
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
@@ -16,6 +15,7 @@ import Vue3ColorPicker from 'vue3-colorpicker'
 import router from './router'
 import App from './App.vue'
 import 'vue3-colorpicker/style.css'
+import 'virtual:uno.css'
 
 dayjs.extend(isoWeek)
 dayjs.extend(isToday)

@@ -1,20 +1,53 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { User } from '@icon-park/vue-next'
+import { showDialog } from '@nutui/nutui'
+import { useRouter } from 'vue-router'
 import PomodoroSettings from '@/views/settings/PomodoroSettings.vue'
+import { useUserStore } from '@/stores/useUserStore'
+
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
+const router = useRouter()
+function logout() {
+  showDialog({
+    title: '确认退出账号？',
+    content: '退出账号后，数据将不再同步',
+    onCancel: () => {},
+    onOk: () => {
+      userStore.logout()
+    },
+  })
+}
+
+function profileClick() {
+  if (!user.value) {
+    router.push({ name: 'UserSignIn' })
+  }
+}
 </script>
 
 <template>
   <div class="flex flex-col">
-    <RouterLink :to="{ name: 'UserSignIn' }">
-      <NutCell class="cursor-pointer">
-        <div class="flex gap-2 items-center ">
+    <NutCell class="cursor-pointer" @click="profileClick">
+      <div class="flex gap-2 items-center w-full">
+        <template v-if="user">
+          <nut-avatar shape="round">
+            <img v-if="user!.avatar" :src="user!.avatar">     <User v-else />
+          </nut-avatar>
+          <span>{{ user.nick }}</span>
+          <nut-button class="ml-auto" size="small" @click="logout">
+            退出登录
+          </nut-button>
+        </template>
+        <template v-else>
           <nut-avatar shape="round">
             <User />
           </nut-avatar>
-          数据备份，开发中🔨
-        </div>
-      </NutCell>
-    </RouterLink>
+          <span>未登录</span>
+        </template>
+      </div>
+    </NutCell>
     番茄钟设置
     <PomodoroSettings />
   </div>

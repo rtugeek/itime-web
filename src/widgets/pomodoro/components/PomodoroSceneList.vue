@@ -15,7 +15,7 @@ pomodoroSceneStore.reload()
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 w-full">
     <div v-for="scene in scenes" :key="scene.id" class="scene flex" @click="goDetail(scene)">
       <div class="flex gap-2">
         <div>{{ scene.icon }}</div>

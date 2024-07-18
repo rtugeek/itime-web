@@ -109,7 +109,7 @@ export default {
     .info {
       position: absolute;
       width: 100%;
-      height: 100%;
+      height: calc(100vh - 20px);
       justify-content: center;
       align-items: center;
       justify-items: center;

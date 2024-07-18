@@ -3,7 +3,9 @@ import { ref } from 'vue'
 import type { Form } from '@nutui/nutui'
 import { showToast } from '@nutui/nutui'
 import consola from 'consola'
+import { useRouter } from 'vue-router'
 import SmsCodeButton from '@/components/form/SmsCodeButton.vue'
+import { useUserStore } from '@/stores/useUserStore'
 
 const formData = ref({
   phone: '',
@@ -13,7 +15,7 @@ const formData = ref({
 })
 
 const formRef = ref<InstanceType<typeof Form>>()
-
+const userStore = useUserStore()
 const rules = {
   phone: [
     { regex: /^1[3-9]\d{9}$/, message: '请输入正确手机号' },
@@ -26,15 +28,20 @@ const rules = {
   ],
 }
 
+const router = useRouter()
 async function signUp() {
   showToast.loading('注册中')
-  formRef.value?.validate().then(({ valid, errors }) => {
+  formRef.value?.validate().then(async ({ valid, errors }) => {
     if (valid) {
-      consola.log('success:', formData.value)
+      const user = await userStore.register(formData.value.phone, formData.value.password, formData.value.code)
+      if (user) {
+        router.push({ name: 'Settings' })
+      }
     }
     else {
       consola.warn('error:', errors)
     }
+    showToast.hide()
   })
 }
 </script>

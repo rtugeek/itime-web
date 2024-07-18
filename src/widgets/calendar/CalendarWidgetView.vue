@@ -51,10 +51,10 @@ function findAlmanac(solar: Solar) {
           第{{ currentMonth.isoWeek() }}周
         </div>
         <div class="ml-auto flex gap-1 btn-group text-center">
-          <div class="btn-next flex items-center rounded-full size-7 cursor-pointer justify-center" @click="previous">
+          <div class="btn btn-next flex items-center rounded-full cursor-pointer justify-center" @click="previous">
             <Left :size="20" />
           </div>
-          <div class="btn-previous flex items-center rounded-full size-7 cursor-pointer justify-center" @click="next">
+          <div class="btn btn-previous flex items-center rounded-full cursor-pointer justify-center" @click="next">
             <Right :size="20" />
           </div>
         </div>
@@ -83,20 +83,18 @@ function findAlmanac(solar: Solar) {
 </template>
 
 <style lang="scss">
-body {
-  background-color: transparent;
-}
-
 .root {
   color: var(--widget-color);
-  border-radius: var(--widget-border-radius);
-  background-color: var(--widget-background-color);
 }
 
 .btn-group {
   div:hover {
     background-color: rgba(0, 0, 0, 0.35);
     color: white;
+  }
+  .btn{
+    width: 28px;
+    height: 28px;
   }
 }
 </style>

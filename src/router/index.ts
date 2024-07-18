@@ -29,6 +29,7 @@ const router = createRouter({
           component: () => import('@/views/pomodoro/PomodoroView.vue'),
         },
         {
+          name: 'Settings',
           path: 'settings',
           component: () => import('@/views/settings/Settings.vue'),
         },

@@ -6,5 +6,7 @@ export class AppConfig {
   static KEY_POMODORO = 'aeSe1neich7S'
   static KEY_GET_SMS_CODE_TIME = 'Foophooth7ah'
   static KEY_DEADLINE_CONFIG = 'deadline-config'
+  static KEY_TOKEN = 'ahG3Ooxiewaa'
+  static KEY_USER = 'Aekie8aht3og'
   static SIZE_POMODORO_WINDOW = 150
 }

@@ -26,6 +26,17 @@ const rules = {
   password: [
     { regex: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/, message: '密码为8-16位，必须包含字母和数字' },
   ],
+  confirmPassword: [
+    {
+      validator: (value: string) => {
+        if (value !== formData.value.password) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          return Promise.reject('两次密码不一致')
+        }
+        return Promise.resolve()
+      },
+    },
+  ],
 }
 
 const router = useRouter()
@@ -55,7 +66,7 @@ async function signUp() {
       <nut-form-item label="验证码" prop="code">
         <nut-input v-model="formData.code" placeholder="请输入验证码" type="text">
           <template #right>
-            <SmsCodeButton />
+            <SmsCodeButton :phone="formData.phone" />
           </template>
         </nut-input>
       </nut-form-item>

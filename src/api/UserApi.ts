@@ -13,4 +13,8 @@ export class UserApi {
   static async register(phone: string, password: string, code: string): Promise<User> {
     return await api.post(`/user/register?phone=${phone}&password=${password}&code=${code}`)
   }
+
+  static async isPhoneUsed(phone: string): Promise<boolean> {
+    return await api.get(`/user/phone/used?phone=${phone}`)
+  }
 }

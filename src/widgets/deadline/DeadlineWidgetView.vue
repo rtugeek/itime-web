@@ -188,26 +188,17 @@ html {
   line-height: 1.4;
 }
 
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-}
-
 #deadline {
-  width:581px;
+  width:90vw;
   max-width: 100%;
-  height:158px;
+  height: var(--widget-inner-height);
   position: absolute;
-  top: 50%;
-  left: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
 }
 
 #deadline svg {

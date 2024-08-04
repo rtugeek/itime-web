@@ -8,10 +8,12 @@ import BaseView from '@/components/BaseView.vue'
 import { RRuleUtils } from '@/utils/RRuleUtils'
 import NutRecurrentPicker from '@/components/NutRecurrentPicker.vue'
 import DateTimePicker from '@/components/DateTimePicker.vue'
+import { useTodoStore } from '@/data/useTodoStore'
 
+const todoStore = useTodoStore()
 const route = useRoute()
 const showDatePicker = ref(false)
-const showReminderDatePicker = ref(false)
+// const showReminderDatePicker = ref(false)
 const showRRulePicker = ref(false)
 const id = route.query.id
 const title = ref('代办事项')
@@ -44,6 +46,22 @@ const rruleTxt = computed({
     todo.recurrence = val
   },
 })
+
+const dueDateTime = computed({
+  get: () => {
+    return todo.dueDateTime
+  },
+  set: (val: Date) => {
+    todo.dueDateTime = val.toISOString()
+  },
+})
+
+function save() {
+  todoStore.saveTodo({
+    title: todo.title,
+    todoId: id ? Number.parseInt(id.toString()) : undefined,
+  })
+}
 </script>
 
 <template>
@@ -107,9 +125,9 @@ const rruleTxt = computed({
         </nut-form-item>
       </nut-form>
       <NutRecurrentPicker v-model="showRRulePicker" v-model:rrule="todo.recurrence" />
-      <DateTimePicker v-model="showDatePicker" v-model:date-time="todo.dueDateTime" />
-      <DateTimePicker v-model="showReminderDatePicker" v-model:date-time="todo.reminderDateTime" />
-      <nut-button class="mt-4" block type="primary">
+      <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" />
+      <!--      <DateTimePicker v-model="showReminderDatePicker" v-model:date-time="todo.reminderDateTime" /> -->
+      <nut-button class="mt-4" block type="primary" @click="save">
         保存
       </nut-button>
     </div>

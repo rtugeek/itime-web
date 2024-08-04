@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { computed } from 'vue'
 import type { User } from '@/data/User'
 import { UserApi } from '@/api/UserApi'
 import { AppConfig } from '@/common/AppConfig'
 
 export const useUserStore = defineStore('userStore', () => {
+  const latestUsername = useStorage(AppConfig.KEY_LATEST_USER, '')
   const user = useStorage<User | undefined>(AppConfig.KEY_USER, undefined, undefined, {
     serializer: {
       read: (raw: string): User | undefined => {
@@ -26,27 +28,28 @@ export const useUserStore = defineStore('userStore', () => {
       },
     },
   })
-  const token = useStorage(AppConfig.KEY_TOKEN, '')
-
   const login = (loginUser: User) => {
-    token.value = loginUser.accessToken
+    localStorage.setItem(AppConfig.KEY_TOKEN, loginUser.accessToken)
     user.value = loginUser
     return loginUser
   }
 
   const loginByPassword = async (phone: string, password: string) => {
     const remoteUser = await UserApi.loginByPassword(phone, password)
+    latestUsername.value = phone
     return login(remoteUser)
   }
 
   const logout = () => {
     user.value = undefined
-    token.value = ''
+    localStorage.removeItem(AppConfig.KEY_TOKEN)
   }
+
+  const isLogin = computed(() => user.value != undefined)
 
   const register = async (phone: string, password: string, code: string) => {
     const remoteUser = await UserApi.register(phone, password, code)
     return login(remoteUser)
   }
-  return { user, loginByPassword, register, logout }
+  return { user, isLogin, latestUsername, loginByPassword, register, logout }
 })

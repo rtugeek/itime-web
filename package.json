@@ -16,8 +16,6 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@better-scroll/core": "^2.5.1",
-    "@better-scroll/scroll-bar": "^2.5.1",
     "@icon-park/vue-next": "^1.4.2",
     "@nutui/nutui": "^4.3.9",
     "@nutui/touch-emulator": "^1.0.0",
@@ -29,6 +27,7 @@
     "axios-cache-interceptor": "^1.5.2",
     "consola": "^3.2.3",
     "dayjs": "^1.11.10",
+    "element-plus": "^2.7.8",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
     "lunar-typescript": "^1.7.5",

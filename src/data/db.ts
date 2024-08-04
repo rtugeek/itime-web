@@ -3,10 +3,10 @@ import TodoListWidget from '@/widgets/todo-list/TodoList.widget'
 
 const todoListStorage = localforage.createInstance({
   name: `${TodoListWidget.name}`,
-  storeName: 'todo-list',
+  storeName: 'todo-list-v1',
 })
-const dueStorage = localforage.createInstance({
+const completeStorage = localforage.createInstance({
   name: `${TodoListWidget.name}`,
-  storeName: 'due-list',
+  storeName: 'complete-list-v1',
 })
-export { todoListStorage, dueStorage }
+export { todoListStorage, completeStorage }

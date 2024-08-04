@@ -7,6 +7,7 @@ import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import FinishedTodoList from '@/widgets/todo-list/components/FinishedTodoList.vue'
 import { useTodoStore } from '@/data/useTodoStore'
 import type { Todo, TodoUpdate } from '@/data/Todo'
+import { WindowUtils } from '@/utils/WindowUtils'
 
 type ViewType = 'default' | 'edit' | 'history'
 const viewType = ref<ViewType>('default')
@@ -27,6 +28,10 @@ function saveTodo(data: TodoUpdate) {
   viewType.value = 'default'
   todoStore.saveTodo(data)
 }
+
+function openAddPage() {
+  WindowUtils.open('/todo/add')
+}
 </script>
 
 <template>
@@ -39,12 +44,11 @@ function saveTodo(data: TodoUpdate) {
         <div class="actions flex gap-4">
           <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
           <History class="icon" @click="viewType = 'history'" />
-          <AddOne class="icon" @click="viewType = 'edit'" />
+          <AddOne class="icon" @click="openAddPage" />
         </div>
       </div>
-      <!-- list-body设置高度，解决todo拖动会导致视图上升，这个不知道是electron bug，还是文档流设置不当导致的      -->
-      <div class="list-body" :height="height - 48">
-        <el-scrollbar :height="height - 48">
+      <div class="list-body">
+        <el-scrollbar :height="height - 48" wrap-style="overflow-x:hidden;">
           <TodoList
             v-show="viewType === 'default'"
             @update="todoStore.save"
@@ -64,11 +68,7 @@ function saveTodo(data: TodoUpdate) {
 
 <style scoped lang="scss">
 .todo-list-widget {
-  background-color: var(--widget-background-color);
-  border-radius: var(--widget-border-radius);
   font-weight: bold;
-  width: 100%;
-  height: 100%;
 
   .header {
     align-items: center;
@@ -95,7 +95,7 @@ function saveTodo(data: TodoUpdate) {
     position: relative;
     color: var(--widget-color);
     font-size: 1.1rem;
-
+    height: calc(100% - 48px);
     .list {
       width: 100%;
       padding: 16px;

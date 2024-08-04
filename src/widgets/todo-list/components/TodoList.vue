@@ -28,7 +28,6 @@ useSortable(listRef, todoStore.todos, {
     for (let i = 0; i < todoStore.todos.length; i++) {
       todoStore.todos[i].order = i
     }
-
     todoStore.save()
   },
 })
@@ -38,7 +37,7 @@ useSortable(listRef, todoStore.todos, {
   <div class="wrapper">
     <audio ref="ringtone" src="./audio/ding.mp3" />
     <div ref="listRef" class="list">
-      <div v-for="item in todoStore.todos" :key="item.id">
+      <div v-for="item in todoStore.todos" :key="item.id" class="draggable">
         <TodoItem
           editable :todo="item" @finish="finishTodo(item)" @delete="todoStore.deleteTodo(item)"
           @edit="edit(item)"
@@ -54,5 +53,8 @@ useSortable(listRef, todoStore.todos, {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.draggable{
+  -webkit-user-drag: element;
 }
 </style>

@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { nextTick, onMounted, ref } from 'vue'
-import BScroll from '@better-scroll/core'
-import ScrollBar from '@better-scroll/scroll-bar'
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
 import CountdownItem from '@/views/countdown/CountdownItem.vue'
 
-BScroll.use(ScrollBar)
 const router = useRouter()
 const countdownEventStore = useCountdownEventStore()
 const { events } = storeToRefs(countdownEventStore)
@@ -15,15 +12,6 @@ const bsWrapper = ref()
 function goAdd() {
   router.push({ name: 'CountdownAdd' })
 }
-
-onMounted(async () => {
-  await nextTick()
-  // eslint-disable-next-line no-new
-  new BScroll('.bs-wrapper', {
-    scrollY: true,
-    scrollbar: true,
-  })
-})
 </script>
 
 <template>

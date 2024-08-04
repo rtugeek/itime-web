@@ -4,10 +4,11 @@ import { buildWebStorage, setupCache } from 'axios-cache-interceptor'
 import { showNotify } from '@nutui/nutui'
 import { SignatureUtils } from '@/utils/SignatureUtils'
 import { AppConfig } from '@/common/AppConfig'
+import { useUserStore } from '@/stores/useUserStore'
 // import { setupCache } from 'axios-cache-interceptor/dev';
 
-const baseURL = 'https://itime.fun/api/v2'
-// const baseURL = "http://127.0.0.1:8080/api/v2"
+// const baseURL = 'https://itime.fun/api/v2'
+const baseURL = 'http://127.0.0.1:8082/api/v2'
 const api = axios.create({ baseURL, withCredentials: true })
 const cacheApi = setupCache(axios.create({ baseURL, withCredentials: true }), {
   storage: buildWebStorage(localStorage, 'itime-api-cache:'),
@@ -34,7 +35,7 @@ function setupInterceptors(instance: AxiosInstance) {
     config.headers.sign = SignatureUtils.sign(config.params, appKey, timestamp.toString(), nonce)
     const token = localStorage.getItem(AppConfig.KEY_TOKEN)
     if (token) {
-      config.headers.setAuthorization(`Bearer ${token}`)
+      config.headers.set('itime-token', token)
     }
     return config
   }, (error) => {
@@ -44,7 +45,15 @@ function setupInterceptors(instance: AxiosInstance) {
 
   instance.interceptors.response.use((response) => {
     if (response.data && response.data.code != 0) {
-      showNotify.danger(response.data.message)
+      if (response.data.code == 1003) {
+        showNotify.danger('登录已过期，请重新登录')
+        localStorage.removeItem(AppConfig.KEY_TOKEN)
+        const userStore = useUserStore()
+        userStore.logout()
+      }
+      else {
+        showNotify.danger(response.data.message)
+      }
       throw new Error(response.data.message)
     }
     else {

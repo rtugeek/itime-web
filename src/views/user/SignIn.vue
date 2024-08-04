@@ -6,16 +6,17 @@ import { useRouter } from 'vue-router'
 import SmsCodeButton from '@/components/form/SmsCodeButton.vue'
 import { useUserStore } from '@/stores/useUserStore'
 
+const userStore = useUserStore()
+const router = useRouter()
 const formRef = ref()
 const formData = ref({
-  phone: '',
+  phone: userStore.latestUsername,
   password: '',
   code: '',
 })
 
 const loginType = ref<'password' | 'sms'>('password')
-const userStore = useUserStore()
-const router = useRouter()
+
 function signIn() {
   showToast.loading('登录中')
   formRef.value?.validate().then(async ({ valid, errors }) => {

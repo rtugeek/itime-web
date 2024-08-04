@@ -13,12 +13,11 @@ const TodoListWidget = new Widget({
   width: 4,
   height: 4,
   minWidth: 3,
-  disabled: true,
   maxWidth: 6,
   minHeight: 3,
   maxHeight: 6,
   path: '/widget/todo_list',
-  configPagePath: '/widget/config/todo_list',
+  configPagePath: '/widget/config/todo_list?frame=true&transparent=false',
 })
 
 export default TodoListWidget

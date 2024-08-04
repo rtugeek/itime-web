@@ -1,31 +1,33 @@
 import { defineStore } from 'pinia'
 import { computed, reactive } from 'vue'
-import { dueStorage, todoListStorage } from '@/data/db'
-import type { TodoUpdate } from '@/data/Todo'
+import { completeStorage, todoListStorage } from '@/data/db'
+import type { ITodo, TodoUpdate } from '@/data/Todo'
 import { Todo } from '@/data/Todo'
+import { useUserStore } from '@/stores/useUserStore'
+import { TodoApi } from '@/api/TodoApi'
 
 export const useTodoStore = defineStore('todo-store', () => {
   const todos = reactive<Todo[]>([])
   const finishedTodos = reactive<Todo[]>([])
-
+  const userStore = useUserStore()
   const sortedTodos = computed(() => {
     return todos.sort((a, b) => a.order - b.order)
   })
 
   const loadTodo = async () => {
-    const keys = await dueStorage.keys()
+    const keys = await completeStorage.keys()
     for (const key of keys) {
-      const todo = await dueStorage.getItem<string>(key)
+      const todo = await completeStorage.getItem<ITodo>(key)
       if (todo) {
-        finishedTodos.push(Todo.fromJSON(JSON.parse(todo)))
+        finishedTodos.push(Todo.fromObject(todo))
       }
     }
 
     const todoListKeys = await todoListStorage.keys()
     for (const key of todoListKeys) {
-      const todo = await todoListStorage.getItem<string>(key)
+      const todo = await todoListStorage.getItem<ITodo>(key)
       if (todo) {
-        todos.push(Todo.fromJSON(JSON.parse(todo)))
+        todos.push(Todo.fromObject(todo))
       }
     }
 
@@ -37,45 +39,62 @@ export const useTodoStore = defineStore('todo-store', () => {
   function deleteTodo(todo: Todo) {
     todos.splice(todos.indexOf(todo), 1)
     todoListStorage.removeItem(`${todo.id}`)
+    if (userStore.isLogin) {
+      TodoApi.delete(todo.id)
+    }
   }
 
-  function finishTodo(todo: Todo) {
+  async function updateRemoteTodo(todo: Todo) {
+    if (userStore.isLogin) {
+      const webTodo = await TodoApi.save(todo)
+      if (!todo.tableId) {
+        todo.tableId = webTodo.tableId
+        await completeStorage.setItem(`${todo.id}`, todo)
+      }
+    }
+  }
+
+  async function finishTodo(todo: Todo) {
     todos.splice(todos.indexOf(todo), 1)
-    todo.completedDateTime = new Date()
+    todo.completedDateTime = new Date().toISOString()
     finishedTodos.splice(0, 0, todo)
-    dueStorage.setItem(`${todo.id}`, JSON.stringify(todo))
-    todoListStorage.removeItem(`${todo.id}`)
+    await completeStorage.setItem(`${todo.id}`, todo)
+    await todoListStorage.removeItem(`${todo.id}`)
+    await updateRemoteTodo(todo)
   }
 
-  function reTodo(todo: Todo) {
+  async function reTodo(todo: Todo) {
     todo.completedDateTime = undefined
     todo.order = 0
     finishedTodos.splice(finishedTodos.indexOf(todo), 1)
     todos.splice(0, 0, todo)
     const id = todo.id
-    dueStorage.removeItem(`${id}`)
-    todoListStorage.setItem(`${id}`, JSON.stringify(todo))
+    await completeStorage.removeItem(`${id}`)
+    await todoListStorage.setItem(`${id}`, todo)
+    await updateRemoteTodo(todo)
   }
 
-  function saveTodo(data: TodoUpdate) {
+  async function saveTodo(data: TodoUpdate) {
     if (data.todoId) {
       const findIndex = todos.findIndex(it => it.id == data.todoId)
       if (findIndex > -1) {
         const editTodo = todos[findIndex]
         editTodo.title = data.title
-        todoListStorage.setItem(`${editTodo.id}`, JSON.stringify(editTodo))
+        await todoListStorage.setItem(`${editTodo.id}`, editTodo.toCloneable())
+        await updateRemoteTodo(editTodo)
       }
     }
     else {
       const todo = new Todo(data.title)
       todos.splice(0, 0, todo)
-      todoListStorage.setItem(`${todo.id}`, JSON.stringify(todo))
+      await todoListStorage.setItem(`${todo.id}`, todo.toCloneable())
+      await updateRemoteTodo(todo)
     }
   }
 
   const save = () => {
     for (const todo of todos) {
-      todoListStorage.setItem(`${todo.id}`, JSON.stringify(todo))
+      todoListStorage.setItem(`${todo.id}`, todo.toCloneable())
     }
   }
 

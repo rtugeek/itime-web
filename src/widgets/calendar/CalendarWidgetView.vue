@@ -2,15 +2,16 @@
 import { type Solar, SolarMonth } from 'lunar-typescript'
 import dayjs from 'dayjs'
 import { ref } from 'vue'
-import { useWidget } from '@widget-js/vue3'
+import { useAppBroadcast, useWidget } from '@widget-js/vue3'
 import { Left, Right } from '@icon-park/vue-next'
+import { SystemApiEvent } from '@widget-js/core'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
 import { type Almanac, PublicEventApi } from '@/api/PublicEventApi'
 
-const today = dayjs()
+const today = ref(dayjs())
 const currentMonth = ref(dayjs())
-const currentMonthIndex = ref(today.month())
-const solarMonth = ref(SolarMonth.fromYm(today.year(), today.month() + 1))
+const currentMonthIndex = ref(today.value.month())
+const solarMonth = ref(SolarMonth.fromYm(today.value.year(), today.value.month() + 1))
 const weeks = ref(solarMonth.value.getWeeks(0))
 useWidget()
 
@@ -38,6 +39,18 @@ function findAlmanac(solar: Solar) {
     return it.year == solar.getYear() && it.month == solar.getMonth() && it.dayOfMonth == solar.getDay()
   })
 }
+
+function refresh() {
+  today.value = dayjs()
+  currentMonth.value = dayjs()
+  currentMonthIndex.value = today.value.month()
+  solarMonth.value = SolarMonth.fromYm(today.value.year(), today.value.month() + 1)
+  weeks.value = solarMonth.value.getWeeks(0)
+}
+
+useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
+  refresh()
+})
 </script>
 
 <template>

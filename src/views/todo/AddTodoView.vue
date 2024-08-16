@@ -3,6 +3,8 @@ import { computed, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import dayjs from 'dayjs'
 import { AlarmClock, Calendar, CloseOne, Flag, PlayCycle } from '@icon-park/vue-next'
+import { showToast } from '@nutui/nutui'
+import consola from 'consola'
 import { Todo } from '@/data/Todo'
 import BaseView from '@/components/BaseView.vue'
 import { RRuleUtils } from '@/utils/RRuleUtils'
@@ -15,52 +17,63 @@ const route = useRoute()
 const showDatePicker = ref(false)
 // const showReminderDatePicker = ref(false)
 const showRRulePicker = ref(false)
-const id = route.query.id
+const id = route.query.id as string
 const title = ref('代办事项')
-let todo = reactive(new Todo(''))
+const todo = ref(new Todo(''))
 
 if (id) {
   title.value = '编辑代办事项'
-  todo = reactive(new Todo(''))
+  todoStore.find(id).then((res) => {
+    if (res) {
+      todo.value = reactive(res)
+    }
+  })
 }
 
 const dueDateTimeText = computed(() => {
-  if (todo.dueDateTime) {
-    return dayjs(todo.dueDateTime).format('YYYY年MM月DD日 HH时mm分')
+  if (todo.value.dueDateTime) {
+    return dayjs(todo.value.dueDateTime).format('YYYY年MM月DD日 HH时mm分')
   }
   return ''
 })
 
 const reminderDateTimeText = computed(() => {
-  if (todo.reminderDateTime) {
-    return dayjs(todo.reminderDateTime).format('YYYY年MM月DD日 HH时mm分')
+  if (todo.value.reminderDateTime) {
+    return dayjs(todo.value.reminderDateTime).format('YYYY年MM月DD日 HH时mm分')
   }
   return ''
 })
 
 const rruleTxt = computed({
   get: () => {
-    return RRuleUtils.toString(todo.recurrence)
+    return RRuleUtils.toString(todo.value.recurrence)
   },
   set: (val: string) => {
-    todo.recurrence = val
+    todo.value.recurrence = val
   },
 })
 
-const dueDateTime = computed({
+const dueDateTime = computed<string | undefined>({
   get: () => {
-    return todo.dueDateTime
+    return todo.value.dueDateTime
   },
-  set: (val: Date) => {
-    todo.dueDateTime = val.toISOString()
+  set: (val: Date | undefined) => {
+    todo.value.dueDateTime = val ? val.toISOString() : undefined
   },
 })
 
-function save() {
-  todoStore.saveTodo({
-    title: todo.title,
-    todoId: id ? Number.parseInt(id.toString()) : undefined,
-  })
+async function save() {
+  showToast.loading('保存中', { id: 'loading' })
+  try {
+    await todoStore.saveTodo({
+      title: todo.value.title,
+      todoId: id ? Number.parseInt(id.toString()) : undefined,
+    })
+  }
+  catch (e) {
+    consola.error(e)
+  }
+  showToast.hide('loading')
 }
 </script>
 

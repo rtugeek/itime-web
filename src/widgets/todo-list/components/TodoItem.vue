@@ -4,6 +4,7 @@ import {
   Edit,
 } from '@icon-park/vue-next'
 import { Todo } from '@/data/Todo'
+import { WindowUtils } from '@/utils/WindowUtils'
 
 const props = defineProps({
   todo: {
@@ -20,7 +21,7 @@ function finish() {
 }
 
 function edit() {
-  emits('edit', props.todo)
+  WindowUtils.open(`/todo/add?id=${props.todo.id}`)
 }
 
 function deleteTodo() {

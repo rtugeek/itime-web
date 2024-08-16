@@ -17,7 +17,7 @@ const TodoListWidget = new Widget({
   minHeight: 3,
   maxHeight: 6,
   path: '/widget/todo_list',
-  configPagePath: '/widget/config/todo_list?frame=true&transparent=false',
+  configPagePath: '/settings?frame=true&transparent=false&width=400&height=700',
 })
 
 export default TodoListWidget

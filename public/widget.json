@@ -53,6 +53,42 @@
       "routes": []
     },
     {
+      "name": "itime.fun.deadline",
+      "title": {
+        "zh-CN": "Deadline"
+      },
+      "description": {
+        "zh-CN": "Deadline最后期限进度条"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 2,
+      "maxWidth": 4,
+      "webviewTag": false,
+      "maxHeight": 2,
+      "minWidth": 4,
+      "minHeight": 2,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/deadline",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_deadline.png",
+      "categories": [
+        "fun",
+        "countdown"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/deadline?width=400&height=700&frame=true&transparent=false",
+      "routes": []
+    },
+    {
       "name": "itime.fun.pomodoro",
       "title": {
         "zh-CN": "番茄钟"
@@ -93,42 +129,6 @@
         "backgroundMaterial": "acrylic",
         "backgroundThrottling": false
       }
-    },
-    {
-      "name": "itime.fun.deadline",
-      "title": {
-        "zh-CN": "Deadline"
-      },
-      "description": {
-        "zh-CN": "Deadline最后期限进度条"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 2,
-      "maxWidth": 4,
-      "webviewTag": false,
-      "maxHeight": 2,
-      "minWidth": 4,
-      "minHeight": 2,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/deadline",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_deadline.png",
-      "categories": [
-        "fun",
-        "countdown"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/deadline?width=400&height=700&frame=true&transparent=false",
-      "routes": []
     },
     {
       "name": "itime.fun.countdown",

@@ -9,5 +9,6 @@ export class AppConfig {
   static KEY_TOKEN = 'ahG3Ooxiewaa'
   static KEY_USER = 'Aekie8aht3og'
   static KEY_LATEST_USER = 'Aekie8aht3o2'
+  static CHANNEL_TODO = 'NohW8chaepu2'
   static SIZE_POMODORO_WINDOW = 150
 }

@@ -49,8 +49,50 @@
       "backgroundThrottling": true,
       "previewImage": "/images/preview_todo_list.png",
       "supportDeployMode": 17,
-      "configPagePath": "/widget/config/todo_list?frame=true&transparent=false",
+      "configPagePath": "/settings?frame=true&transparent=false&width=400&height=700",
       "routes": []
+    },
+    {
+      "name": "itime.fun.pomodoro",
+      "title": {
+        "zh-CN": "番茄钟"
+      },
+      "description": {
+        "zh-CN": "高效管理时间，提高专注力"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 1,
+      "height": 1,
+      "maxWidth": 1,
+      "webviewTag": false,
+      "maxHeight": 1,
+      "minWidth": 1,
+      "minHeight": 1,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/pomodoro",
+      "meta": {},
+      "backgroundThrottling": false,
+      "previewImage": "/images/preview_pomodoro.png",
+      "categories": [
+        "productivity"
+      ],
+      "supportDeployMode": 65536,
+      "requiredAppVersion": "24.6.2",
+      "configPagePath": "/settings?frame=true&transparent=false&width=400&height=700",
+      "routes": [],
+      "browserWindowOptions": {
+        "transparent": false,
+        "frame": false,
+        "backgroundMaterial": "acrylic",
+        "backgroundThrottling": false
+      }
     },
     {
       "name": "itime.fun.deadline",
@@ -87,48 +129,6 @@
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/deadline?width=400&height=700&frame=true&transparent=false",
       "routes": []
-    },
-    {
-      "name": "itime.fun.pomodoro",
-      "title": {
-        "zh-CN": "番茄钟"
-      },
-      "description": {
-        "zh-CN": "高效管理时间，提高专注力"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 1,
-      "height": 1,
-      "maxWidth": 1,
-      "webviewTag": false,
-      "maxHeight": 1,
-      "minWidth": 1,
-      "minHeight": 1,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/pomodoro",
-      "meta": {},
-      "backgroundThrottling": false,
-      "previewImage": "/images/preview_pomodoro.png",
-      "categories": [
-        "productivity"
-      ],
-      "supportDeployMode": 65536,
-      "requiredAppVersion": "24.6.2",
-      "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=pomodoro",
-      "routes": [],
-      "browserWindowOptions": {
-        "transparent": false,
-        "frame": false,
-        "backgroundMaterial": "acrylic",
-        "backgroundThrottling": false
-      }
     },
     {
       "name": "itime.fun.countdown",

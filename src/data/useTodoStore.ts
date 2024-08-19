@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia'
-import { computed, reactive, watch } from 'vue'
+import { reactive, watch } from 'vue'
 import consola from 'consola'
 import { useBroadcastChannel } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { completeStorage, todoListStorage } from '@/data/db'
-import type { ITodo, TodoUpdate } from '@/data/Todo'
+import type { ITodo } from '@/data/Todo'
 import { Todo } from '@/data/Todo'
 import { useUserStore } from '@/stores/useUserStore'
 import { TodoApi } from '@/api/TodoApi'
 import { AppConfig } from '@/common/AppConfig'
+import { TodoUtils } from '@/utils/TodoUtils'
 
 interface TodoEvent {
   type: 'insert' | 'update' | 'delete'
@@ -27,24 +28,20 @@ export const useTodoStore = defineStore('todo-store', () => {
     const payload = broadcastChannel.data.value as (TodoEvent | undefined)
     if (payload) {
       const todo = Todo.fromObject(payload.todo)
-      if (payload.type == 'insert') {
-        todos.splice(0, 0, todo)
-        sortTodos()
-      }
-      else if (payload.type == 'update') {
+      if (payload.type == 'update') {
         const findIndex = todos.findIndex(it => it.id == todo.id)
         if (findIndex > -1) {
           todos[findIndex] = todo
+        }
+        else {
+          todos.splice(0, 0, todo)
+          sortTodos()
         }
       }
       else if (payload.type == 'delete') {
         todos.splice(todos.findIndex(it => it.id == todo.id), 1)
       }
     }
-  })
-
-  const sortedTodos = computed(() => {
-    return todos.sort((a, b) => a.order - b.order)
   })
 
   const find = async (id: string) => {
@@ -90,11 +87,17 @@ export const useTodoStore = defineStore('todo-store', () => {
     })
   }
 
-  loadTodo()
-
   function deleteTodo(todo: Todo) {
-    todos.splice(todos.indexOf(todo), 1)
+    const todoIndex = todos.findIndex(it => it.id == todo.id)
+    if (todoIndex > -1) {
+      todos.splice(todoIndex, 1)
+    }
+    const completedIndex = completedTodos.findIndex(it => it.id == todo.id)
+    if (completedIndex > -1) {
+      completedTodos.splice(completedIndex, 1)
+    }
     todoListStorage.removeItem(`${todo.id}`)
+    completeStorage.removeItem(`${todo.id}`)
     if (userStore.isLogin) {
       TodoApi.delete(todo.id)
     }
@@ -114,17 +117,24 @@ export const useTodoStore = defineStore('todo-store', () => {
     const todo = rawTodo.toCloneable ? rawTodo.toCloneable() : rawTodo
     todos.splice(todos.findIndex(it => it.id == rawTodo.id), 1)
     todo.completedDateTime = new Date().toISOString()
-    completedTodos.splice(0, 0, rawTodo)
+    completedTodos.splice(0, 0, todo)
     await completeStorage.setItem(`${todo.id}`, todo)
     await todoListStorage.removeItem(`${todo.id}`)
     updateRemoteTodo(todo).catch()
+    if (todo.recurrence) {
+      const nextTodo = TodoUtils.recurrent(todo)
+      if (nextTodo) {
+        await saveTodo(nextTodo)
+      }
+    }
   }
 
   async function reTodo(rawTodo: Todo) {
     const todo = rawTodo.toCloneable ? rawTodo.toCloneable() : rawTodo
     todo.completedDateTime = undefined
     todo.order = 0
-    completedTodos.splice(completedTodos.indexOf(todo), 1)
+    const index = completedTodos.findIndex(it => it.id == rawTodo.id)
+    completedTodos.splice(index, 1)
     todos.splice(0, 0, todo)
     const id = todo.id
     await completeStorage.removeItem(`${id}`)
@@ -132,51 +142,23 @@ export const useTodoStore = defineStore('todo-store', () => {
     updateRemoteTodo(todo).catch()
   }
 
-  async function saveTodo(data: TodoUpdate) {
-    if (data.todoId) {
-      const findIndex = todos.findIndex(it => it.id == data.todoId)
-      if (findIndex > -1) {
-        const editTodo = todos[findIndex]
-        editTodo.title = data.title
-        broadcastChannel.post({ type: 'update', todo: editTodo.toCloneable() })
-        await todoListStorage.setItem(`${editTodo.id}`, editTodo.toCloneable())
-        try {
-          await updateRemoteTodo(editTodo)
-        }
-        catch (e) {
-          consola.error(e)
-        }
-      }
-    }
-    else {
-      const todo = new Todo(data.title)
-      todos.splice(0, 0, todo)
-      broadcastChannel.post({ type: 'insert', todo: todo.toCloneable() })
-      await todoListStorage.setItem(`${todo.id}`, todo.toCloneable())
-      try {
-        await updateRemoteTodo(todo)
-      }
-      catch (e) {
-        consola.error(e)
-      }
-    }
+  async function saveTodo(todo: Todo) {
+    broadcastChannel.post({ type: 'update', todo: todo.toCloneable() })
+    await todoListStorage.setItem(`${todo.id}`, todo.toCloneable())
+    updateRemoteTodo(todo).catch()
+    todos.splice(0, 0, todo)
+    sortTodos()
   }
 
-  const save = () => {
-    for (const todo of todos) {
-      todoListStorage.setItem(`${todo.id}`, todo.toCloneable())
-    }
-  }
+  loadTodo()
 
   return {
     deleteTodo,
-    save,
     saveTodo,
     todos,
     find,
     reTodo,
-    sortedTodos,
-    finishedTodos: completedTodos,
+    completedTodos,
     finishTodo,
   }
 })

@@ -1,5 +1,4 @@
-import { it, describe, expect } from 'vitest'
-import { cacheApi } from '../../src/api/Api'
+import { describe, expect, it } from 'vitest'
 import { PublicEventApi } from '../../src/api/PublicEventApi'
 
 describe('publicEventApi', () => {

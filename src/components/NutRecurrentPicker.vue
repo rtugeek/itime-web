@@ -1,19 +1,9 @@
 <script setup lang="ts">
-import { useVModel } from '@vueuse/core'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RRuleUtils } from '@/utils/RRuleUtils'
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-  rrule: {
-    type: String,
-  },
-})
-
-const emits = defineEmits(['update:modelValue', 'update:rrule'])
+const modelValue = defineModel({ type: Boolean, default: false })
+const rrule = defineModel('rrule', { type: String, default: '' })
 
 const rrules = ref([
   { text: '不重复', value: '' },
@@ -22,26 +12,31 @@ const rrules = ref([
   { text: '每月', value: RRuleUtils.MONTHLY_STR },
 ])
 
-const model = useVModel(props, 'modelValue', emits)
-const rruleModel = ref([props.rrule ?? ''])
+const rruleModel = computed<string[]>({
+  get: () => {
+    return [rrule.value]
+  },
+  set: (val: string[]) => {
+    rrule.value = val[0]
+  },
+})
 
-function onConfirm() {
-  model.value = false
-  if (rruleModel.value) {
-    emits('update:rrule', rruleModel.value[0])
-  }
-  else {
-    emits('update:rrule', undefined)
-  }
+function onConfirm({ selectedValue }) {
+  rrule.value = selectedValue[0]
+  modelValue.value = false
 }
+//
+// watch(rrule, (val) => {
+//   console.log(val[0])
+// })
 </script>
 
 <template>
-  <nut-popup v-model:visible="model" position="bottom">
+  <nut-popup v-model:visible="modelValue" position="bottom">
     <nut-picker
       v-model="rruleModel" :columns="rrules" title="重复设置" :three-dimensional="false"
       @confirm="onConfirm"
-      @cancel="model = false"
+      @cancel="modelValue = false"
     />
   </nut-popup>
 </template>

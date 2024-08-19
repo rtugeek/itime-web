@@ -1,8 +1,13 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 import {
   Delete,
   Edit,
+  PlayCycle,
+  Time,
 } from '@icon-park/vue-next'
+import dayjs from 'dayjs'
+import { RRuleUtils } from '../../../utils/RRuleUtils'
 import { Todo } from '@/data/Todo'
 import { WindowUtils } from '@/utils/WindowUtils'
 
@@ -27,18 +32,30 @@ function edit() {
 function deleteTodo() {
   emits('delete', props.todo)
 }
+
+const isCompleted = computed(() => {
+  return !!props.todo.completedDateTime
+})
 </script>
 
 <template>
   <div class="todo-item">
     <div class="flex items-center">
-      <ElCheckbox :checked="todo.isFinished()" @click="finish">
+      <ElCheckbox :checked="isCompleted" @click="finish">
         <span />
       </ElCheckbox>
       <div class="todo" style="line-height: 1.2">
-        <p :style=" { 'text-decoration': todo.isFinished() ? 'line-through' : 'none' }">
+        <p :style=" { 'text-decoration': isCompleted ? 'line-through' : 'none' }">
           {{ todo.title }}
         </p>
+        <div class="flex text-xs items-center gap-3" style="font-weight: normal">
+          <div v-if="todo.dueDateTime" class="items-center justify-center flex gap-1">
+            <Time class="icon" size="12" /> {{ dayjs(todo.dueDateTime).format('YYYY-MM-DD') }}
+          </div>
+          <div v-if="todo.recurrence" class="items-center flex gap-1">
+            <PlayCycle size="12" /> {{ RRuleUtils.toString(todo.recurrence) }}
+          </div>
+        </div>
       </div>
       <div class="actions flex items-center">
         <div
@@ -72,9 +89,14 @@ p {
 }
 
 .todo-item {
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--widget-divider-color);
-
+  font-size: 1rem;
+  background-color: color(from var(--widget-background-color) srgb r g b / 0.2);
+  border-radius: 4px;
+  height: 3rem;
+  display: flex;
+  position: relative;
+  justify-items: center;
+  padding: 0 12px;
   &:hover {
     .actions {
       opacity: 1;

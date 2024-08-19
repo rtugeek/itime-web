@@ -1,4 +1,5 @@
 import { RRule } from 'rrule'
+import dayjs from 'dayjs'
 
 export class RRuleUtils {
   static DAILY = new RRule({ freq: RRule.DAILY })
@@ -13,5 +14,16 @@ export class RRuleUtils {
     if (rule == this.WEEKLY_STR) { return '每周重复' }
     if (rule == this.MONTHLY_STR) { return '每月重复' }
     return ''
+  }
+
+  static next(str: string, startDate?: Date): Date | null {
+    const now = dayjs()
+    const option = RRule.parseString(str)
+    const today = now.toDate()
+    const rule = new RRule({
+      ...option,
+      dtstart: startDate ?? today,
+    })
+    return rule.after(startDate ?? today)
   }
 }

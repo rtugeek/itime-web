@@ -69,10 +69,6 @@ export class Todo implements ITodo {
     this.id = now.getTime()
   }
 
-  isFinished = (): boolean => {
-    return this.dueDateTime != undefined
-  }
-
   static fromObject(json: object): Todo {
     const todo = new Todo('')
     Object.assign(todo, json)
@@ -88,9 +84,4 @@ export class Todo implements ITodo {
   toCloneable() {
     return JSON.parse(JSON.stringify(this))
   }
-}
-
-export interface TodoUpdate {
-  title: string
-  todoId?: number
 }

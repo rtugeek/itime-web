@@ -2,32 +2,15 @@
 import { ref } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import { AddOne, ArrowCircleLeft, History } from '@icon-park/vue-next'
-import EditBox from '@/widgets/todo-list/components/EditBox.vue'
 import TodoList from '@/widgets/todo-list/components/TodoList.vue'
-import FinishedTodoList from '@/widgets/todo-list/components/FinishedTodoList.vue'
-import { useTodoStore } from '@/data/useTodoStore'
-import type { Todo, TodoUpdate } from '@/data/Todo'
 import { WindowUtils } from '@/utils/WindowUtils'
 
-type ViewType = 'default' | 'edit' | 'history'
+type ViewType = 'default' | 'history'
 const viewType = ref<ViewType>('default')
-
-const todoStore = useTodoStore()
 
 const root = ref<HTMLElement>()
 
-const editBox = ref<InstanceType<typeof EditBox>>()
 const { height } = useElementSize(root)
-
-function edit(todo: Todo) {
-  editBox.value!.setTodo(todo)
-  viewType.value = 'edit'
-}
-
-function saveTodo(data: TodoUpdate) {
-  viewType.value = 'default'
-  todoStore.saveTodo(data)
-}
 
 function openAddPage() {
   WindowUtils.open('/todo/add')
@@ -43,7 +26,7 @@ function openAddPage() {
         </div>
         <div class="actions flex gap-4">
           <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
-          <History class="icon" @click="viewType = 'history'" />
+          <History v-if="viewType !== 'history'" class="icon" @click="viewType = 'history'" />
           <AddOne class="icon" @click="openAddPage" />
         </div>
       </div>
@@ -51,15 +34,12 @@ function openAddPage() {
         <el-scrollbar :height="height - 48" wrap-style="overflow-x:hidden;">
           <TodoList
             v-show="viewType === 'default'"
-            @update="todoStore.save"
-            @edit="edit"
           />
 
-          <FinishedTodoList
+          <TodoList
             v-show="viewType === 'history'"
-            @update="todoStore.save"
+            is-completed
           />
-          <EditBox v-show="viewType === 'edit'" ref="editBox" @cancel="viewType = 'default'" @save="saveTodo($event)" />
         </el-scrollbar>
       </div>
     </div>

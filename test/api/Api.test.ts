@@ -1,4 +1,4 @@
-import { it, describe } from 'vitest'
+import { describe, it } from 'vitest'
 import { cacheApi } from '../../src/api/Api'
 
 describe('api', () => {
@@ -7,7 +7,8 @@ describe('api', () => {
       const res = await cacheApi.get('/event/public/calendar')
       // const res1 = await cacheApi.get('/event/public/calendar')
       // console.log(res.data)
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e)
     }
   }, 30000)

@@ -5,10 +5,11 @@ import {
 
 const TodoListWidget = new Widget({
   name: 'itime.fun.todo_list',
-  title: { 'zh-CN': '待办事项' },
-  description: { 'zh-CN': 'TODO待办事项' },
+  title: { 'zh-CN': '待办事项（Pro）' },
+  description: { 'zh-CN': '带数据同步功能的待办事项' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
+  categories: ['productivity', 'utilities'],
   previewImage: '/images/preview_todo_list.png',
   width: 4,
   height: 4,

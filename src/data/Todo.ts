@@ -1,5 +1,8 @@
 export type TodoImportance = 'low' | 'normal' | 'high'
-export interface ITodo {
+/**
+ * https://learn.microsoft.com/zh-cn/graph/api/resources/todotask?view=graph-rest-1.0
+ */
+export interface Todo {
   tableId?: string | number
   /**
    * 任务的标识符。 可以是任何唯一的字符串。
@@ -41,47 +44,4 @@ export interface ITodo {
    * 如果设置警报以提醒用户有任务，则设置为 true。
    */
   isReminderOn: boolean
-}
-/**
- * https://learn.microsoft.com/zh-cn/graph/api/resources/todotask?view=graph-rest-1.0
- */
-export class Todo implements ITodo {
-  createdDateTime: string
-  id: number
-  isReminderOn = false
-  lastModifiedDateTime: string
-  order = 0
-  title: string
-  completedDateTime: string | undefined
-  dueDateTime: string | undefined
-  importance: TodoImportance = 'normal'
-  recurrence?: string
-  reminderDateTime?: string
-  startDateTime?: string
-  tableId?: string | number
-
-  constructor(title: string) {
-    this.title = title
-    const now = new Date()
-    this.createdDateTime = now.toISOString()
-    this.lastModifiedDateTime = now.toISOString()
-    this.dueDateTime = undefined
-    this.id = now.getTime()
-  }
-
-  static fromObject(json: object): Todo {
-    const todo = new Todo('')
-    Object.assign(todo, json)
-    return todo
-  }
-
-  static fromJSON(json: string): Todo {
-    const todo = new Todo('')
-    Object.assign(todo, JSON.parse(json))
-    return todo
-  }
-
-  toCloneable() {
-    return JSON.parse(JSON.stringify(this))
-  }
 }

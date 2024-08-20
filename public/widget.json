@@ -1,6 +1,6 @@
 {
   "name": "itime.fun",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "author": "Wisdom LTD",
   "homepage": "",
   "title": {
@@ -23,10 +23,10 @@
     {
       "name": "itime.fun.todo_list",
       "title": {
-        "zh-CN": "待办事项"
+        "zh-CN": "待办事项（Pro）"
       },
       "description": {
-        "zh-CN": "TODO待办事项"
+        "zh-CN": "带数据同步功能的待办事项"
       },
       "keywords": [
         "recommend"
@@ -48,6 +48,10 @@
       "meta": {},
       "backgroundThrottling": true,
       "previewImage": "/images/preview_todo_list.png",
+      "categories": [
+        "productivity",
+        "utilities"
+      ],
       "supportDeployMode": 17,
       "configPagePath": "/settings?frame=true&transparent=false&width=400&height=700",
       "routes": []

@@ -4,6 +4,7 @@ import { useElementSize } from '@vueuse/core'
 import { AddOne, ArrowCircleLeft, History } from '@icon-park/vue-next'
 import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import { WindowUtils } from '@/utils/WindowUtils'
+import { useTodoStore } from '@/data/useTodoStore'
 
 type ViewType = 'default' | 'history'
 const viewType = ref<ViewType>('default')
@@ -15,6 +16,8 @@ const { height } = useElementSize(root)
 function openAddPage() {
   WindowUtils.open('/todo/add')
 }
+const todoStore = useTodoStore()
+todoStore.sync()
 </script>
 
 <template>

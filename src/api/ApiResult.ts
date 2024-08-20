@@ -3,3 +3,11 @@ export interface ApiResult<T> {
   message: string
   data: T
 }
+
+export interface PageResult<T> {
+  data: T[]
+  page: number
+  size: number
+  total: number
+  hasNext: boolean
+}

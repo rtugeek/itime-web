@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
-import { reactive, watch } from 'vue'
+import { reactive, toRaw, watch } from 'vue'
 import consola from 'consola'
 import { useBroadcastChannel } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { completeStorage, todoListStorage } from '@/data/db'
-import type { ITodo } from '@/data/Todo'
-import { Todo } from '@/data/Todo'
+import type { Todo } from '@/data/Todo'
 import { useUserStore } from '@/stores/useUserStore'
 import { TodoApi } from '@/api/TodoApi'
 import { AppConfig } from '@/common/AppConfig'
@@ -13,7 +12,7 @@ import { TodoUtils } from '@/utils/TodoUtils'
 
 interface TodoEvent {
   type: 'insert' | 'update' | 'delete'
-  todo: ITodo
+  todo: Todo
 }
 export const useTodoStore = defineStore('todo-store', () => {
   const todos = reactive<Todo[]>([])
@@ -27,7 +26,7 @@ export const useTodoStore = defineStore('todo-store', () => {
     consola.info('broadcastChannel.data', broadcastChannel.data.value)
     const payload = broadcastChannel.data.value as (TodoEvent | undefined)
     if (payload) {
-      const todo = Todo.fromObject(payload.todo)
+      const todo = payload.todo
       if (payload.type == 'update') {
         const findIndex = todos.findIndex(it => it.id == todo.id)
         if (findIndex > -1) {
@@ -44,14 +43,16 @@ export const useTodoStore = defineStore('todo-store', () => {
     }
   })
 
-  const find = async (id: string) => {
-    let todo = await todoListStorage.getItem<ITodo>(id)
+  const find = async (id: string, includeCompleted: boolean = true) => {
+    let todo = await todoListStorage.getItem<Todo>(id)
     if (todo) {
-      return Todo.fromObject(todo)
+      return todo
     }
-    todo = await completeStorage.getItem<ITodo>(id)
-    if (todo) {
-      return Todo.fromObject(todo)
+    if (includeCompleted) {
+      todo = await completeStorage.getItem<Todo>(id)
+      if (todo) {
+        return todo
+      }
     }
     return undefined
   }
@@ -61,20 +62,49 @@ export const useTodoStore = defineStore('todo-store', () => {
     todos.splice(0, todos.length)
     const keys = await completeStorage.keys()
     for (const key of keys) {
-      const todo = await completeStorage.getItem<ITodo>(key)
+      const todo = await completeStorage.getItem<Todo>(key)
       if (todo) {
-        completedTodos.push(Todo.fromObject(todo))
+        completedTodos.push(todo)
       }
     }
 
     const todoListKeys = await todoListStorage.keys()
     for (const key of todoListKeys) {
-      const todo = await todoListStorage.getItem<ITodo>(key)
+      const todo = await todoListStorage.getItem<Todo>(key)
       if (todo) {
-        todos.push(Todo.fromObject(todo))
+        todos.push(todo)
       }
     }
     sortTodos()
+  }
+
+  const sync = async () => {
+    const todos = await TodoApi.getTodos()
+    // 先不处理已经完成的任务
+    const uncompletedTodos = todos.data.filter(it => !it.completedDateTime)
+    let changed = false
+    for (const todo of uncompletedTodos) {
+      // 先判断本地是否存在
+      if (todo) {
+        const localTodo = await find(todo.id, false)
+        if (localTodo) {
+          if (dayjs(localTodo.lastModifiedDateTime).isBefore(dayjs(todo.lastModifiedDateTime))) {
+            const index = todos.findIndex(it => it.id == todo.id)
+            todos.splice(index, 1, localTodo)
+            consola.info('update todo from server', todo)
+            changed = true
+          }
+        }
+        else {
+          changed = true
+          consola.info('create todo from server', todo)
+          await saveTodo(todo, { sort: false, broadcast: false })
+        }
+      }
+    }
+    if (changed) {
+      sortTodos()
+    }
   }
 
   const sortTodos = () => {
@@ -114,7 +144,7 @@ export const useTodoStore = defineStore('todo-store', () => {
   }
 
   async function finishTodo(rawTodo: Todo) {
-    const todo = rawTodo.toCloneable ? rawTodo.toCloneable() : rawTodo
+    const todo = toRaw(rawTodo)
     todos.splice(todos.findIndex(it => it.id == rawTodo.id), 1)
     todo.completedDateTime = new Date().toISOString()
     completedTodos.splice(0, 0, todo)
@@ -130,7 +160,7 @@ export const useTodoStore = defineStore('todo-store', () => {
   }
 
   async function reTodo(rawTodo: Todo) {
-    const todo = rawTodo.toCloneable ? rawTodo.toCloneable() : rawTodo
+    const todo = toRaw(rawTodo)
     todo.completedDateTime = undefined
     todo.order = 0
     const index = completedTodos.findIndex(it => it.id == rawTodo.id)
@@ -142,12 +172,37 @@ export const useTodoStore = defineStore('todo-store', () => {
     updateRemoteTodo(todo).catch()
   }
 
-  async function saveTodo(todo: Todo) {
-    broadcastChannel.post({ type: 'update', todo: todo.toCloneable() })
-    await todoListStorage.setItem(`${todo.id}`, todo.toCloneable())
-    updateRemoteTodo(todo).catch()
+  async function saveTodo(rawTodo: Todo, options?: {
+    sync: boolean
+    sort: boolean
+    broadcast: boolean
+  }) {
+    const sync = options?.sync ?? true
+    const sort = options?.sort ?? true
+    const broadcast = options?.broadcast ?? true
+    const todo = toRaw(rawTodo)
+    await todoListStorage.setItem(`${todo.id}`, todo)
     todos.splice(0, 0, todo)
-    sortTodos()
+    if (broadcast) {
+      broadcastChannel.post({ type: 'update', todo })
+    }
+    if (sync) {
+      try {
+        await updateRemoteTodo(todo)
+      }
+      catch (e) {
+        consola.error('updateRemoteTodo', e)
+      }
+    }
+    if (sort) {
+      sortTodos()
+    }
+  }
+
+  async function save() {
+    for (const todo of todos) {
+      await todoListStorage.setItem(`${todo.id}`, toRaw(todo))
+    }
   }
 
   loadTodo()
@@ -157,6 +212,8 @@ export const useTodoStore = defineStore('todo-store', () => {
     saveTodo,
     todos,
     find,
+    sync,
+    save,
     reTodo,
     completedTodos,
     finishTodo,

@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Flag, PlayCycle } from '@icon-park/vue-next'
+import { Calendar, CloseOne, Flag, PlayCycle } from '@icon-park/vue-next'
 import consola from 'consola'
 import { showToast } from '@nutui/nutui'
-import { Todo } from '@/data/Todo'
+import dayjs from 'dayjs'
 import BaseView from '@/components/BaseView.vue'
 import { RRuleUtils } from '@/utils/RRuleUtils'
 import NutRecurrentPicker from '@/components/NutRecurrentPicker.vue'
 import { useTodoStore } from '@/data/useTodoStore'
+import { TodoUtils } from '@/utils/TodoUtils'
 
 const todoStore = useTodoStore()
 const route = useRoute()
-// const showDatePicker = ref(false)
+const showDatePicker = ref(false)
 // const showReminderDatePicker = ref(false)
 const showRRulePicker = ref(false)
 const id = Number.parseInt((route.query.id ?? '0') as string)
 const title = ref('代办事项')
-const todo = ref(new Todo(''))
+const todo = ref(TodoUtils.new())
 
 if (id > 0) {
   title.value = '编辑代办事项'
@@ -32,12 +33,12 @@ watch(() => todo.value.recurrence, (val) => {
   consola.info(val)
 })
 
-// const dueDateTimeText = computed(() => {
-//   if (todo.value.dueDateTime) {
-//     return dayjs(todo.value.dueDateTime).format('YYYY年MM月DD日 HH时mm分')
-//   }
-//   return ''
-// })
+const dueDateTimeText = computed(() => {
+  if (todo.value.dueDateTime) {
+    return dayjs(todo.value.dueDateTime).format('YYYY年MM月DD日')
+  }
+  return ''
+})
 //
 // const reminderDateTimeText = computed(() => {
 //   if (todo.value.reminderDateTime) {
@@ -48,25 +49,31 @@ watch(() => todo.value.recurrence, (val) => {
 
 const rruleTxt = computed(() => RRuleUtils.toString(todo.value.recurrence))
 
-// const dueDateTime = computed<string | undefined>({
-//   get: () => {
-//     return todo.value.dueDateTime
-//   },
-//   set: (val: Date | undefined) => {
-//     todo.value.dueDateTime = val ? val.toISOString() : undefined
-//   },
-// })
-//
+const dueDateTime = computed<string | undefined>({
+  get: () => {
+    return todo.value.dueDateTime
+  },
+  set: (val: Date | undefined) => {
+    todo.value.dueDateTime = val ? val.toISOString() : undefined
+  },
+})
+
+watch(() => todo.value.recurrence, () => {
+  if (!todo.value.dueDateTime) {
+    todo.value.dueDateTime = new Date().toISOString()
+  }
+})
+
 async function save() {
   showToast.loading('保存中', { id: 'loading' })
   try {
     await todoStore.saveTodo(todo.value)
-    // window.close()
   }
   catch (e) {
     consola.error(e)
   }
   showToast.hide('loading')
+  window.close()
 }
 </script>
 
@@ -80,6 +87,26 @@ async function save() {
           </template>
           <nut-input v-model="todo.title" placeholder="代办内容" />
         </nut-form-item>
+        <nut-form-item :label-width="30" label-align="center" @click="showDatePicker = true">
+          <template #label>
+            <div class="flex items-center justify-center content-center h-full">
+              <Calendar />
+            </div>
+          </template>
+          <nut-input
+            v-model="dueDateTimeText" readonly class="w-full cursor-pointer" placeholder="目标日期"
+            @click="showDatePicker = true"
+          >
+            <template #right>
+              <div
+                class="w-6 h-6 flex items-center cursor-pointer text-center"
+                @click.stop="todo.dueDateTime = undefined"
+              >
+                <CloseOne v-if="todo.dueDateTime" />
+              </div>
+            </template>
+          </nut-input>
+        </nut-form-item>
         <nut-form-item :label-width="30" label-align="center" @click="showRRulePicker = true">
           <template #label>
             <PlayCycle />
@@ -89,26 +116,6 @@ async function save() {
             @click="showRRulePicker = true"
           />
         </nut-form-item>
-        <!--        <nut-form-item :label-width="30" label-align="center" @click="showDatePicker = true"> -->
-        <!--          <template #label> -->
-        <!--            <div class="flex items-center justify-center content-center h-full"> -->
-        <!--              <Calendar /> -->
-        <!--            </div> -->
-        <!--          </template> -->
-        <!--          <nut-input -->
-        <!--            v-model="dueDateTimeText" readonly class="w-full cursor-pointer" placeholder="时间" -->
-        <!--            @click="showDatePicker = true" -->
-        <!--          > -->
-        <!--            <template #right> -->
-        <!--              <div -->
-        <!--                class="w-6 h-6 flex items-center cursor-pointer text-center" -->
-        <!--                @click.stop="todo.dueDateTime = undefined" -->
-        <!--              > -->
-        <!--                <CloseOne v-if="todo.dueDateTime" /> -->
-        <!--              </div> -->
-        <!--            </template> -->
-        <!--          </nut-input> -->
-        <!--        </nut-form-item> -->
         <!--        <nut-form-item v-show="todo.dueDateTime" :label-width="30" label-align="center"> -->
         <!--          <template #label> -->
         <!--            <div class="flex items-center justify-center content-center h-full"> -->
@@ -131,7 +138,7 @@ async function save() {
         <!--        </nut-form-item> -->
       </nut-form>
       <NutRecurrentPicker v-model="showRRulePicker" v-model:rrule="todo.recurrence" />
-      <!--      <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" /> -->
+      <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" />
       <!--      <DateTimePicker v-model="showReminderDatePicker" v-model:date-time="todo.reminderDateTime" /> -->
       <nut-button class="mt-4" block type="primary" @click="save">
         保存

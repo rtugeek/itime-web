@@ -23,6 +23,7 @@ export default antfu({
     'import/namespace': 'off',
     'eqeqeq': 'off',
     'import/default': 'off',
+    'ts/ban-ts-comment': 'off',
     'ts/no-use-before-define': 'off',
     'import/no-named-as-default': 'off',
     'import/no-named-as-default-member': 'off',

@@ -10,6 +10,10 @@ const props = defineProps({
   dateTime: {
     type: Date,
   },
+  type: {
+    type: String,
+    default: 'date',
+  },
 })
 
 const emits = defineEmits(['update:modelValue', 'update:dateTime'])
@@ -58,7 +62,7 @@ function formatter(type: string, option: any) {
     <nut-date-picker
       v-model="dateModel"
       :min-date="now"
-      type="datehour"
+      type="date"
       :max-date="max"
       :formatter="formatter"
       :three-dimensional="false"

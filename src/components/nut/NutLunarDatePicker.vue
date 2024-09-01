@@ -24,8 +24,8 @@ interface LunarPickData {
   children: LunarPickData[]
 }
 
-watch(model, () => {
-  updateSelectedLunar ()
+watch(() => model.value, () => {
+  updateSelectedLunar()
 })
 
 function generateYearLunar() {
@@ -48,7 +48,6 @@ function generateYearLunar() {
         monthData.children.push({
           text: LunarUtils.getLunarDayText(i),
           value: i,
-          children: [],
         })
       }
       data.children.push(monthData)
@@ -60,7 +59,7 @@ function generateYearLunar() {
 
 onMounted(async () => {
   await nextTick()
-  updateSelectedLunar ()
+  updateSelectedLunar()
 })
 </script>
 

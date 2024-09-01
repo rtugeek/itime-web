@@ -2,9 +2,10 @@
 import { ref } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import { AddOne, ArrowCircleLeft, History } from '@icon-park/vue-next'
+import { useWidget } from '@widget-js/vue3'
 import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import { WindowUtils } from '@/utils/WindowUtils'
-import { useTodoStore } from '@/data/useTodoStore'
+import { useTodoStore } from '@/stores/useTodoStore'
 
 type ViewType = 'default' | 'history'
 const viewType = ref<ViewType>('default')
@@ -18,11 +19,12 @@ function openAddPage() {
 }
 const todoStore = useTodoStore()
 todoStore.sync()
+useWidget()
 </script>
 
 <template>
   <widget-wrapper>
-    <div ref="root" class="todo-list-widget">
+    <div ref="root" class="todo-list-widget h-full">
       <div class="header">
         <div class="title">
           {{ viewType === 'history' ? '历史记录' : '待办事项' }}

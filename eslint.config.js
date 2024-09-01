@@ -9,6 +9,7 @@ export default antfu({
     'vue/no-template-shadow': 'off',
     'vue/require-prop-types': 'off',
     'vue/dot-location': 'off',
+    'ts/prefer-ts-expect-error': 'off',
     'spaced-comment': ['error', 'always', { exceptions: ['#__PURE__'] }],
     'no-restricted-imports': [
       'error',

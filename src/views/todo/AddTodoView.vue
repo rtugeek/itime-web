@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 import BaseView from '@/components/BaseView.vue'
 import { RRuleUtils } from '@/utils/RRuleUtils'
 import NutRecurrentPicker from '@/components/NutRecurrentPicker.vue'
-import { useTodoStore } from '@/data/useTodoStore'
+import { useTodoStore } from '@/stores/useTodoStore'
 import { TodoUtils } from '@/utils/TodoUtils'
 
 const todoStore = useTodoStore()

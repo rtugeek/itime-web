@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import '@nutui/touch-emulator'
-import { ConfigProvider, Toast } from '@nutui/nutui'
+import { ConfigProvider, Notify, Toast } from '@nutui/nutui'
 import { WidgetJsPlugin } from '@widget-js/vue3'
 
 import '@nutui/nutui/dist/style.css'
@@ -25,6 +25,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(Toast)
+app.use(Notify)
 app.use(router)
 app.use(Vue3ColorPicker)
 app.use(WidgetJsPlugin)

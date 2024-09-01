@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Lunar } from 'lunar-typescript'
 
 defineProps({
@@ -10,6 +10,7 @@ defineProps({
   },
   minDate: {
     type: Date,
+    default: dayjs().subtract(100, 'year').toDate(),
   },
 })
 const modelValue = defineModel({ default: new Date() })
@@ -20,29 +21,32 @@ const selectedDate = ref(new Date())
 onMounted(async () => {
   await nextTick()
   selectedDate.value = modelValue.value
+  selectedLunarDate.value = modelValue.value
 })
 const selectedLunarDate = ref(modelValue.value)
-const textModel = computed({
-  get: () => {
-    if (dateType.value == 0) {
-      return dayjs(modelValue.value).format('YYYY年MM月DD日')
-    }
-    else {
-      return Lunar.fromDate(modelValue.value).toString()
-    }
-  },
-  set: (_val) => {
+const textModel = computed(() => {
+  if (dateType.value == 0) {
+    return dayjs(modelValue.value).format('YYYY年MM月DD日')
+  }
+  else {
+    return Lunar.fromDate(modelValue.value).toString()
+  }
+})
 
-  },
+watch(() => modelValue.value, () => {
+  selectedDate.value = modelValue.value
+  selectedLunarDate.value = modelValue.value
 })
 
 function onDateTimeConfirm() {
   modelValue.value = selectedDate.value
+  selectedLunarDate.value = modelValue.value
   showDateTimePicker.value = false
 }
 
 function onLunarDateConfirm() {
   modelValue.value = selectedLunarDate.value
+  selectedDate.value = selectedLunarDate.value
   showLunarPicker.value = false
 }
 

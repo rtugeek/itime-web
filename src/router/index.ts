@@ -64,6 +64,11 @@ const router = createRouter({
       component: () => import('../views/todo/AddTodoView.vue'),
     },
     {
+      path: '/birthday/add',
+      name: 'AddBirthday',
+      component: () => import('../views/birthday/AddBirthdayView.vue'),
+    },
+    {
       path: '/countdown',
       name: 'Countdown',
       children: [

@@ -55,7 +55,7 @@ useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
 
 <template>
   <widget-wrapper>
-    <div class="root flex flex-col">
+    <div class="root flex flex-col h-full">
       <div class="flex items-baseline gap-2 py-3 px-4">
         <div class="text-xl font-bold">
           {{ currentMonth.format('YYYY年MM月') }}

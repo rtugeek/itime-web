@@ -1,4 +1,6 @@
-import type { Lunar, Solar } from 'lunar-typescript'
+import { Lunar, LunarMonth } from 'lunar-typescript'
+import type { Solar } from 'lunar-typescript'
+import dayjs from 'dayjs'
 
 export class LunarUtils {
   private static CHINESE_NUMBER = '〇一二三四五六七八九十'
@@ -54,7 +56,35 @@ export class LunarUtils {
     return this.solarToDate(lunar.getSolar())
   }
 
+  static lunarToDayJS(lunar: Lunar): dayjs.Dayjs {
+    return dayjs(this.lunarToDate(lunar))
+  }
+
   static solarToDate(solar: Solar): Date {
     return new Date(solar.getYear(), solar.getMonth() - 1, solar.getDay())
+  }
+
+  static addYear(lunar: Lunar) {
+    const year = lunar.getYear()
+    const month = lunar.getMonth()
+    const dayOfMonth = lunar.getDay()
+    return this.fromYmd(year + 1, month, dayOfMonth)
+  }
+
+  static isToday(lunar: Lunar) {
+    const today = Lunar.fromDate(new Date())
+    return lunar.getYear() == today.getYear()
+      && lunar.getMonth() == today.getMonth()
+      && lunar.getDay() == today.getDay()
+  }
+
+  static fromYmd(year: number, month: number, dayOfMonth: number) {
+    const lunarMonth = LunarMonth.fromYm(year, month)
+    const lastDay = lunarMonth!.getDayCount()
+    return Lunar.fromYmd(year, month, dayOfMonth > lastDay ? lastDay : dayOfMonth)
+  }
+
+  static dateToLunar(date: Date) {
+    return Lunar.fromDate(date)
   }
 }

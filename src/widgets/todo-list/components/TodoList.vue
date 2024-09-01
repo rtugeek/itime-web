@@ -4,7 +4,7 @@ import { useSortable } from '@vueuse/integrations/useSortable'
 import { storeToRefs } from 'pinia'
 import TodoItem from '@/widgets/todo-list/components/TodoItem.vue'
 import { delay } from '@/utils/TimeUtils'
-import { useTodoStore } from '@/data/useTodoStore'
+import { useTodoStore } from '@/stores/useTodoStore'
 import type { Todo } from '@/data/Todo'
 
 const props = defineProps({

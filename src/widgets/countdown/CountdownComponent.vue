@@ -16,7 +16,7 @@ export default {
       default: false,
     },
   },
-  emits: ['headerClick'],
+  emits: ['click'],
   setup(props) {
     const days = computed(() => {
       const now = dayjs()
@@ -44,14 +44,14 @@ export default {
 
 <template>
   <div class="countdown-widget">
-    <div class="title cursor-pointer" @click="$emit('headerClick')">
-      {{ title }}{{ days < 0 ? '已经' : '还有' }}
+    <div class="title">
+      <span class="cursor-pointer" @click="$emit('click')">{{ title }}{{ days < 0 ? '已经' : '还有' }}</span>
     </div>
     <div class="stack">
       <div class="card" />
       <div class="card" />
       <div class="info">
-        <span class="days">{{ Math.abs(days) }}</span>
+        <span class="days cursor-pointer" @click="$emit('click')">{{ Math.abs(days) }}</span>
         <span class="date">{{ dateStr }}</span>
       </div>
     </div>

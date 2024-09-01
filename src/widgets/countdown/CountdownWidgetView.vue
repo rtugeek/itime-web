@@ -80,7 +80,7 @@ useMenuListener((type, menu) => {
       :date="event.dateTime"
       :title="event.name"
       :is-lunar="event.dateType === 1"
-      @header-click="onSetCountdownClick"
+      @click="onSetCountdownClick"
     />
     <div v-else class="flex items-center justify-center">
       <nut-button @click="onSetCountdownClick">

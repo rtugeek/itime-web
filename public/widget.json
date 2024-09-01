@@ -1,6 +1,6 @@
 {
   "name": "itime.fun",
-  "version": "0.3.1",
+  "version": "0.4.1",
   "author": "Wisdom LTD",
   "homepage": "",
   "title": {
@@ -236,7 +236,7 @@
         "countdown"
       ],
       "supportDeployMode": 17,
-      "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false",
+      "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
       "routes": []
     }
   ],

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useWidgetParams, useWidgetTheme } from '@widget-js/vue3'
+import { useAppBroadcast, useWidgetParams, useWidgetTheme } from '@widget-js/vue3'
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { AppApi, DefaultWidgetTheme, WidgetTheme } from '@widget-js/core'
+import { AppApi, DefaultWidgetTheme, SystemApiEvent, WidgetTheme } from '@widget-js/core'
 import { TransitionPresets, useIntervalFn, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import consola from 'consola'
@@ -74,6 +74,11 @@ onMounted(async () => {
     deathGroupFillProgress.value = Math.round(percent.value * 100 - 100)
     maskRedWidth.value = Math.round(percent.value * 100)
   }, 60 * 1000, { immediate: true, immediateCallback: true })
+})
+
+useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
+  percent.effect.run()
+  countdownDays.effect.run()
 })
 </script>
 

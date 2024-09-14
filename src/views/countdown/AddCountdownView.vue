@@ -38,7 +38,7 @@ function save() {
     showNotify.warn('名称不能为空')
     return
   }
-  CountdownEventRepository.save(toRaw(event))
+  countdownEventStore.save(toRaw(event))
   AppUtils.back(router)
 }
 

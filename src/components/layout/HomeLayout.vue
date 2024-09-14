@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { HourglassNull, SettingTwo, Stopwatch } from '@icon-park/vue-next'
 import { RouterView, useRoute, useRouter } from 'vue-router'
+import { useWindowSize } from '@vueuse/core'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,16 +15,21 @@ const active = computed<number>({
     router.push({ path: tabRoute[tab] })
   },
 })
+
+const { height } = useWindowSize()
 </script>
 
 <template>
   <BaseView :left-show="false" title="iTime">
     <div class="h-full">
-      <div class="p-4">
-        <RouterView v-slot="{ Component }">
-          <component :is="Component" />
-        </RouterView>
-      </div>
+      <el-scrollbar class="w-full" :height="height - 100">
+        <div class="p-4">
+          <RouterView v-slot="{ Component }">
+            <component :is="Component" />
+          </RouterView>
+        </div>
+      </el-scrollbar>
+
       <nut-tabbar v-model="active" bottom safe-area-inset-bottom>
         <!--        <nut-tabbar-item tab-title="代办事项"> -->
         <!--          <template #icon> -->

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { useBroadcastChannel } from '@vueuse/core'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { CountdownEvent } from '@/data/CountdownEvent'
+import { delay } from '@/utils/TimeUtils'
 
 export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   const events = ref<CountdownEvent[]>([])
@@ -15,7 +16,9 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   CountdownEventRepository.createDefaultCountdown()
 
   const { post, data } = useBroadcastChannel({ name: 'countdownEventStore' })
-  watch(data, () => {
+  watch(data, async () => {
+    await delay(1000)
+    console.log('asdf')
     reload()
   })
 
@@ -28,7 +31,7 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   const save = async (event: CountdownEvent) => {
     await CountdownEventRepository.save(event)
     await reload()
-    post({ type: 'save', event })
+    post({ type: 'save', event, time: Date.now() })
   }
   reload()
   return {

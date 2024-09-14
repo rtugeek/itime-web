@@ -13,6 +13,8 @@ declare module 'vue' {
     DateTimeInput: typeof import('./src/components/DateTimeInput.vue')['default']
     DateTimePicker: typeof import('./src/components/DateTimePicker.vue')['default']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
+    ElFormItem: typeof import('element-plus/es')['ElFormItem']
+    ElInput: typeof import('element-plus/es')['ElInput']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     FloatingActionButton: typeof import('./src/components/FloatingActionButton.vue')['default']
     HomeLayout: typeof import('./src/components/layout/HomeLayout.vue')['default']

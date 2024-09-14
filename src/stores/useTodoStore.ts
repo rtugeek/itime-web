@@ -79,6 +79,9 @@ export const useTodoStore = defineStore('todo-store', () => {
   }
 
   const sync = async () => {
+    if (!userStore.isLogin) {
+      return
+    }
     const todos = await TodoApi.getTodos()
     // 先不处理已经完成的任务
     const uncompletedTodos = todos.data.filter(it => !it.completedDateTime)

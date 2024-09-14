@@ -1,4 +1,5 @@
 export interface PomodoroScene {
+  tableId?: string
   id?: string
   createTime?: Date
   updateTime?: Date

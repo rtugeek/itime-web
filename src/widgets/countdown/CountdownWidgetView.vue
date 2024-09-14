@@ -82,7 +82,7 @@ useMenuListener((type, menu) => {
       :is-lunar="event.dateType === 1"
       @click="onSetCountdownClick"
     />
-    <div v-else class="flex items-center justify-center">
+    <div v-else class="flex h-full items-center justify-center">
       <nut-button @click="onSetCountdownClick">
         设置倒计时
       </nut-button>

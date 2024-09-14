@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import type { User } from '@/data/User'
 import { UserApi } from '@/api/UserApi'
 import { AppConfig } from '@/common/AppConfig'
+import consola from 'consola'
 
 export const useUserStore = defineStore('userStore', () => {
   const latestUsername = useStorage(AppConfig.KEY_LATEST_USER, '')
@@ -29,6 +30,7 @@ export const useUserStore = defineStore('userStore', () => {
     },
   })
   const login = (loginUser: User) => {
+    consola.log(loginUser)
     localStorage.setItem(AppConfig.KEY_TOKEN, loginUser.accessToken)
     user.value = loginUser
     return loginUser
@@ -36,6 +38,7 @@ export const useUserStore = defineStore('userStore', () => {
 
   const loginByPassword = async (phone: string, password: string) => {
     const remoteUser = await UserApi.loginByPassword(phone, password)
+    console.log(remoteUser)
     latestUsername.value = phone
     return login(remoteUser)
   }

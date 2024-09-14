@@ -4,7 +4,7 @@ import {
 } from '@widget-js/core'
 
 const TodoListWidget = new Widget({
-  name: 'itime.fun.todo_list',
+  name: '.todo_list',
   title: { 'zh-CN': '待办事项（Pro）' },
   description: { 'zh-CN': '带数据同步功能的待办事项' },
   keywords: [WidgetKeyword.RECOMMEND],
@@ -18,7 +18,7 @@ const TodoListWidget = new Widget({
   minHeight: 3,
   maxHeight: 6,
   path: '/widget/todo_list',
-  configPagePath: '/settings?frame=true&transparent=false&width=400&height=700',
+  configPagePath: '/widget/todo_list/config?frame=true&transparent=false&width=600&height=500',
 })
 
 export default TodoListWidget

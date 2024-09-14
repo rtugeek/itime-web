@@ -98,6 +98,7 @@ useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
 <style lang="scss">
 .root {
   color: var(--widget-color);
+  height: 100%;
 }
 
 .btn-group {

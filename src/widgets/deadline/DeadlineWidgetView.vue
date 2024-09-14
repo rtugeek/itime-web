@@ -77,8 +77,7 @@ onMounted(async () => {
 })
 
 useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
-  percent.effect.run()
-  countdownDays.effect.run()
+  location.reload()
 })
 </script>
 

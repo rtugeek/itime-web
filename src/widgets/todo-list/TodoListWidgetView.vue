@@ -1,14 +1,16 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useStorage } from '@vueuse/core'
 import { AddOne, ArrowCircleLeft, History } from '@icon-park/vue-next'
-import { useWidget } from '@widget-js/vue3'
+import { useContextMenu, useWidget } from '@widget-js/vue3'
+import type { WidgetMenuItem } from '@widget-js/core'
 import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import { WindowUtils } from '@/utils/WindowUtils'
 import { useTodoStore } from '@/stores/useTodoStore'
 
 type ViewType = 'default' | 'history'
 const viewType = ref<ViewType>('default')
+const title = useStorage('title', '代办事项')
 
 const root = ref<HTMLElement>()
 
@@ -20,6 +22,11 @@ function openAddPage() {
 const todoStore = useTodoStore()
 todoStore.sync()
 useWidget()
+useContextMenu({ menus: [{ label: '应用设置', id: 'app-settings' }], onMenuClick: (menu: WidgetMenuItem) => {
+  if (menu.id == 'app-settings') {
+    WindowUtils.open('/settings')
+  }
+} })
 </script>
 
 <template>
@@ -27,7 +34,7 @@ useWidget()
     <div ref="root" class="todo-list-widget h-full">
       <div class="header">
         <div class="title">
-          {{ viewType === 'history' ? '历史记录' : '待办事项' }}
+          {{ viewType === 'history' ? '历史记录' : title }}
         </div>
         <div class="actions flex gap-4">
           <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />

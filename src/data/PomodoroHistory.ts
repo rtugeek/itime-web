@@ -1,4 +1,5 @@
 export interface PomodoroHistory {
+  tableId?: string
   id: string
   duration: number
   finishAt: Date

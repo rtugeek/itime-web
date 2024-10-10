@@ -10,15 +10,17 @@ import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
 import { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { AppUtils } from '@/utils/AppUtils'
+import { useI18n } from 'vue-i18n'
 
 BrowserWindowApi.setAlwaysOnTop(true)
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 const id = route.query.id as string
 
 const countdownEventStore = useCountdownEventStore()
 const title = computed(
-  () => id ? '编辑倒计时' : '添加倒计时',
+  () => id ? t('countdown.edit') : t('countdown.add'),
 )
 
 const event = reactive<CountdownEvent>(new CountdownEvent('', new Date()))
@@ -35,7 +37,7 @@ if (id) {
 
 function save() {
   if (!event.name.trim()) {
-    showNotify.warn('名称不能为空')
+    showNotify.warn(t('countdown.nameEmptyWarning'))
     return
   }
   countdownEventStore.save(toRaw(event))
@@ -44,7 +46,7 @@ function save() {
 
 function deleteCountdown() {
   showDialog({
-    title: `确定要删除 ${event.name}?`,
+    title: t('countdown.deleteConfirm', { name: event.name }),
     footerDirection: 'vertical',
     onOk: () => {
       countdownEventStore.deleteCountdown(event.id!)
@@ -75,7 +77,7 @@ const dateTimeModel = computed<Date>({
     <div class="section p-4">
       <nut-form label-position="top">
         <nut-form-item>
-          <nut-input v-model="event.name" placeholder="请输入倒计时名称" :max-length="15">
+          <nut-input v-model="event.name" :placeholder="t('countdown.namePlaceholder')" :max-length="15">
             <template #left>
               <Calendar />
             </template>

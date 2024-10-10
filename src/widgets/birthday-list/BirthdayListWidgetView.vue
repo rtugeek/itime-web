@@ -38,7 +38,7 @@ useMenuListener((eventType, menu) => {
     >
       <img class="image" src="./images/balloon.png">
       <div class="title">
-        <span>生日列表</span>
+        <span v-t="'birthday.list'" />
         <AddOne class="add cursor-pointer" @click="add" />
       </div>
       <el-scrollbar :height="height - 110">

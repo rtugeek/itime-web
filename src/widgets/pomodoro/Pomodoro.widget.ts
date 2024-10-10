@@ -2,8 +2,8 @@ import { BackgroundWidget, WidgetKeyword } from '@widget-js/core'
 
 const PomodoroWidget = new BackgroundWidget({
   name: 'itime.fun.pomodoro',
-  title: { 'zh-CN': '番茄钟' },
-  description: { 'zh-CN': '高效管理时间，提高专注力' },
+  title: { 'zh-CN': '番茄钟', 'en-US': 'Pomodoro Timer' },
+  description: { 'zh-CN': '高效管理时间，提高专注力', 'en-US': ' Help you focus on any tasks' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
   previewImage: '/images/preview_pomodoro.png',

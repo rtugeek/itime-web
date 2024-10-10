@@ -5,8 +5,8 @@ import {
 
 const TodoListWidget = new Widget({
   name: '.todo_list',
-  title: { 'zh-CN': '待办事项（Pro）' },
-  description: { 'zh-CN': '带数据同步功能的待办事项' },
+  title: { 'zh-CN': '待办事项（Pro）', 'en-US': 'To-Do' },
+  description: { 'zh-CN': '带数据同步功能的待办事项', 'en-US': 'To-Do list with data synchronization' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
   categories: ['productivity', 'utilities'],

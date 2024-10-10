@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import {
   WidgetConfigOption,
-  useContextMenu,
   useWidget,
 } from '@widget-js/vue3'
 import { useStorage } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
 
 const {
   widgetParams,
 } = useWidget()
 
-const title = useStorage('title', '代办事项')
-// 修改成需要设置组件参数配置
+const { t } = useI18n()
+const title = useStorage('title', t('todo.title'))
 const widgetConfigOption = new WidgetConfigOption({
   custom: true,
   theme: {

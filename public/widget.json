@@ -23,10 +23,12 @@
     {
       "name": "itime.fun.pomodoro",
       "title": {
-        "zh-CN": "番茄钟"
+        "zh-CN": "番茄钟",
+        "en-US": "Pomodoro Timer"
       },
       "description": {
-        "zh-CN": "高效管理时间，提高专注力"
+        "zh-CN": "高效管理时间，提高专注力",
+        "en-US": " Help you focus on any tasks"
       },
       "keywords": [
         "recommend"
@@ -65,10 +67,12 @@
     {
       "name": "itime.fun.todo_list",
       "title": {
-        "zh-CN": "待办事项（Pro）"
+        "zh-CN": "待办事项（Pro）",
+        "en-US": "To-Do"
       },
       "description": {
-        "zh-CN": "带数据同步功能的待办事项"
+        "zh-CN": "带数据同步功能的待办事项",
+        "en-US": "To-Do list with data synchronization"
       },
       "keywords": [
         "recommend"
@@ -101,10 +105,12 @@
     {
       "name": "itime.fun.deadline",
       "title": {
-        "zh-CN": "Deadline"
+        "zh-CN": "Deadline",
+        "en-US": "Deadline"
       },
       "description": {
-        "zh-CN": "Deadline最后期限进度条"
+        "zh-CN": "最后期限进度条",
+        "en-US": "Deadline countdown progress bar"
       },
       "keywords": [
         "recommend"
@@ -137,10 +143,12 @@
     {
       "name": "itime.fun.countdown",
       "title": {
-        "zh-CN": "倒计时"
+        "zh-CN": "倒计时",
+        "en-US": "Countdown"
       },
       "description": {
-        "zh-CN": "日历样式的倒计时组件"
+        "zh-CN": "日历样式的倒计时组件",
+        "en-US": "Countdown widget with calendar style"
       },
       "keywords": [
         "recommend"
@@ -170,47 +178,14 @@
       "routes": []
     },
     {
-      "name": "itime.fun.calendar",
-      "title": {
-        "zh-CN": "日历"
-      },
-      "description": {
-        "zh-CN": "简单的日历，支持节假日显示"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 4,
-      "minHeight": 4,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/calendar",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_calendar.png",
-      "categories": [
-        "calendar"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
-      "routes": []
-    },
-    {
       "name": "itime.fun.birthday_list",
       "title": {
-        "zh-CN": "生日列表"
+        "zh-CN": "生日列表",
+        "en-US": "Birthday List"
       },
       "description": {
-        "zh-CN": "自动倒计时的生日列表"
+        "zh-CN": "自动倒计时的生日列表",
+        "en-US": "Birthday list with countdown"
       },
       "keywords": [
         "recommend"
@@ -237,6 +212,43 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
+      "routes": []
+    },
+    {
+      "name": "itime.fun.calendar",
+      "title": {
+        "zh-CN": "日历",
+        "en-US": "Calendar"
+      },
+      "description": {
+        "zh-CN": "简单的日历，支持节假日显示",
+        "en-US": "Simple calendar with holiday display"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 4,
+      "minHeight": 4,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
       "routes": []
     }
   ],

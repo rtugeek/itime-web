@@ -4,13 +4,16 @@ import { useElementSize, useStorage } from '@vueuse/core'
 import { AddOne, ArrowCircleLeft, History } from '@icon-park/vue-next'
 import { useContextMenu, useWidget } from '@widget-js/vue3'
 import type { WidgetMenuItem } from '@widget-js/core'
+import { useI18n } from 'vue-i18n'
 import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import { WindowUtils } from '@/utils/WindowUtils'
 import { useTodoStore } from '@/stores/useTodoStore'
+import UserIcon from '@/widgets/todo-list/components/UserIcon.vue'
 
+const { t } = useI18n()
 type ViewType = 'default' | 'history'
 const viewType = ref<ViewType>('default')
-const title = useStorage('title', '代办事项')
+const title = useStorage('title', t('todo.title'))
 
 const root = ref<HTMLElement>()
 
@@ -22,7 +25,7 @@ function openAddPage() {
 const todoStore = useTodoStore()
 todoStore.sync()
 useWidget()
-useContextMenu({ menus: [{ label: '应用设置', id: 'app-settings' }], onMenuClick: (menu: WidgetMenuItem) => {
+useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMenuClick: (menu: WidgetMenuItem) => {
   if (menu.id == 'app-settings') {
     WindowUtils.open('/settings')
   }
@@ -34,9 +37,10 @@ useContextMenu({ menus: [{ label: '应用设置', id: 'app-settings' }], onMenuC
     <div ref="root" class="todo-list-widget h-full">
       <div class="header">
         <div class="title">
-          {{ viewType === 'history' ? '历史记录' : title }}
+          {{ viewType === 'history' ? t('todo.history') : title }}
         </div>
         <div class="actions flex gap-4">
+          <UserIcon />
           <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
           <History v-if="viewType !== 'history'" class="icon" @click="viewType = 'history'" />
           <AddOne class="icon" @click="openAddPage" />

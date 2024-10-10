@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { RRuleUtils } from '@/utils/RRuleUtils'
 
 const modelValue = defineModel({ type: Boolean, default: false })
 const rrule = defineModel('rrule', { type: String, default: '' })
 
+const { t } = useI18n()
+
 const rrules = ref([
-  { text: '不重复', value: '' },
-  { text: '每天', value: RRuleUtils.DAILY_STR },
-  { text: '每周', value: RRuleUtils.WEEKLY_STR },
-  { text: '每月', value: RRuleUtils.MONTHLY_STR },
+  { text: t('recurrence.none'), value: '' },
+  { text: t('recurrence.daily'), value: RRuleUtils.DAILY_STR },
+  { text: t('recurrence.weekly'), value: RRuleUtils.WEEKLY_STR },
+  { text: t('recurrence.monthly'), value: RRuleUtils.MONTHLY_STR },
 ])
 
 const rruleModel = computed<string[]>({
@@ -34,7 +37,7 @@ function onConfirm({ selectedValue }) {
 <template>
   <nut-popup v-model:visible="modelValue" position="bottom">
     <nut-picker
-      v-model="rruleModel" :columns="rrules" title="重复设置" :three-dimensional="false"
+      v-model="rruleModel" :columns="rrules" :title="t('recurrence.title')" :three-dimensional="false"
       @confirm="onConfirm"
       @cancel="modelValue = false"
     />

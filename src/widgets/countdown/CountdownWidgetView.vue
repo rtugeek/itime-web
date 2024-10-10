@@ -7,6 +7,7 @@ import {
 } from '@widget-js/vue3'
 import { BrowserWindowApi, DefaultWidgetTheme, MenuApi, type WidgetMenuItem } from '@widget-js/core'
 import { useStorage } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
 import CountdownComponent from '@/widgets/countdown/CountdownComponent.vue'
 import type { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
@@ -20,6 +21,7 @@ const {
   primaryColor: 'rgb(0,149,255)',
   backgroundColor: 'white',
 }) })
+const { t } = useI18n()
 const event = ref<CountdownEvent | null>(null)
 const countdownEventStore = useCountdownEventStore()
 const countdownEventId = useStorage<string>(`countdownEventId-${widgetParams.id}`, '')
@@ -53,7 +55,7 @@ function onSetCountdownClick() {
     menuItems: [
       {
         id: 'new-countdown',
-        label: '新建倒计时',
+        label: t('countdown.add'),
       },
       ...menus,
     ],
@@ -84,7 +86,7 @@ useMenuListener((type, menu) => {
     />
     <div v-else class="flex h-full items-center justify-center">
       <nut-button @click="onSetCountdownClick">
-        设置倒计时
+        {{ t('countdown.set') }}
       </nut-button>
     </div>
   </WidgetWrapper>

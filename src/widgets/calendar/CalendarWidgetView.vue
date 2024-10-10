@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { useAppBroadcast, useWidget } from '@widget-js/vue3'
 import { Left, Right } from '@icon-park/vue-next'
 import { SystemApiEvent } from '@widget-js/core'
+import { useI18n } from 'vue-i18n'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
 import { type Almanac, PublicEventApi } from '@/api/PublicEventApi'
 
@@ -13,6 +14,8 @@ const currentMonth = ref(dayjs())
 const currentMonthIndex = ref(today.value.month())
 const solarMonth = ref(SolarMonth.fromYm(today.value.year(), today.value.month() + 1))
 const weeks = ref(solarMonth.value.getWeeks(0))
+const { t, d } = useI18n()
+
 useWidget()
 
 function next() {
@@ -51,6 +54,8 @@ function refresh() {
 useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
   refresh()
 })
+
+const weekKeyPath = ['week.short.sunday', 'week.short.monday', 'week.short.tuesday', 'week.short.wednesday', 'week.short.thursday', 'week.short.friday', 'week.short.saturday']
 </script>
 
 <template>
@@ -58,10 +63,10 @@ useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
     <div class="root flex flex-col h-full">
       <div class="flex items-baseline gap-2 py-3 px-4">
         <div class="text-xl font-bold">
-          {{ currentMonth.format('YYYY年MM月') }}
+          {{ d(currentMonth.toDate(), 'yearMonth') }}
         </div>
         <div v-if="currentMonthIndex == today.month()" class="text-xs">
-          第{{ currentMonth.isoWeek() }}周
+          {{ t('week.number', { week: currentMonth.isoWeek() }) }}
         </div>
         <div class="ml-auto flex gap-1 btn-group text-center">
           <div class="btn btn-next flex items-center rounded-full cursor-pointer justify-center" @click="previous">
@@ -73,13 +78,7 @@ useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
         </div>
       </div>
       <div class="flex justify-around px-2 text-xs opacity-70">
-        <div>日</div>
-        <div>一</div>
-        <div>二</div>
-        <div>三</div>
-        <div>四</div>
-        <div>五</div>
-        <div>六</div>
+        <div v-for="item in weekKeyPath" :key="`week-key-${item}`" v-t="item" />
       </div>
       <div class="flex flex-col h-full justify-around px-2">
         <div v-for="week in weeks" :key="`week-${week.getIndex()}`" class="flex w-full justify-around">

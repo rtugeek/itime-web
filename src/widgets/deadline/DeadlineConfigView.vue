@@ -4,10 +4,12 @@ import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 import { DefaultWidgetTheme } from '@widget-js/core'
+import { useI18n } from 'vue-i18n'
 import { AppConfig } from '@/common/AppConfig'
 import type { DeadlineConfig } from '@/widgets/deadline/DeadlineConfig'
 
 const { widgetParams } = useWidget()
+const { t } = useI18n()
 const now = dayjs()
 const deadlineConfig = useStorage<DeadlineConfig>(`${AppConfig.KEY_DEADLINE_CONFIG}-${widgetParams.id}`, {
   title: 'Deadline',
@@ -40,37 +42,37 @@ const borderRadius = computed({
 </script>
 
 <template>
-  <BaseView title="Deadline设置">
+  <BaseView :title="t('deadlineSetting.title')">
     <div class="p2 flex flex-col gap-2">
       <div>
-        <h4>Deadline设置</h4>
+        <h4>{{ t('deadlineSetting.title') }}</h4>
         <NutForm>
-          <NutFormItem label="标题">
+          <NutFormItem :label="t('deadlineSetting.form.title')">
             <NutInput v-model="deadlineConfig.title" />
           </NutFormItem>
-          <NutFormItem label="开始日期">
+          <NutFormItem :label="t('deadlineSetting.form.startDate')">
             <DateInput v-model="deadlineConfig.startTime" :lunar="false" />
           </NutFormItem>
-          <NutFormItem label="最后期限">
+          <NutFormItem :label="t('deadlineSetting.form.endDate')">
             <DateInput v-model="deadlineConfig.endTime" :min-date="minEndDate" :lunar="false" />
           </NutFormItem>
         </NutForm>
       </div>
       <div>
-        <h4>主题设置</h4>
+        <h4>{{ t('themeSetting.title') }}</h4>
         <NutForm>
-          <NutFormItem label="使用全局主题">
+          <NutFormItem :label="t('themeSetting.useGlobalTheme')">
             <NutSwitch v-model="widgetTheme.useGlobalTheme" />
           </NutFormItem>
-          <NutFormItem v-show="!widgetTheme.useGlobalTheme" label="主色调">
+          <NutFormItem v-show="!widgetTheme.useGlobalTheme" :label="t('themeSetting.primaryColor')">
             <NutColorPicker v-model="widgetTheme.primaryColor" />
           </NutFormItem>
 
-          <NutFormItem v-show="!widgetTheme.useGlobalTheme" label="背景颜色">
+          <NutFormItem v-show="!widgetTheme.useGlobalTheme" :label="t('themeSetting.backgroundColor')">
             <NutColorPicker v-model="widgetTheme.backgroundColor" />
           </NutFormItem>
 
-          <NutFormItem v-show="!widgetTheme.useGlobalTheme" label="背景圆角">
+          <NutFormItem v-show="!widgetTheme.useGlobalTheme" :label="t('themeSetting.borderRadius')">
             <NutRange v-model="borderRadius" :min="0" :max="50" />
           </NutFormItem>
         </NutForm>

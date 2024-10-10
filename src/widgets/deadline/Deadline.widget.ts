@@ -2,8 +2,8 @@ import { Widget, WidgetKeyword } from '@widget-js/core'
 
 const DeadlineWidget = new Widget({
   name: '.deadline',
-  title: { 'zh-CN': 'Deadline' },
-  description: { 'zh-CN': 'Deadline最后期限进度条' },
+  title: { 'zh-CN': 'Deadline', 'en-US': 'Deadline' },
+  description: { 'zh-CN': '最后期限进度条', 'en-US': 'Deadline countdown progress bar' },
   keywords: [WidgetKeyword.RECOMMEND],
   categories: ['fun', 'countdown'],
   lang: 'zh-CN',

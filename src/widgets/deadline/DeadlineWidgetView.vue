@@ -1,19 +1,21 @@
 <script lang="ts" setup>
 import { useAppBroadcast, useWidgetParams, useWidgetTheme } from '@widget-js/vue3'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { AppApi, DefaultWidgetTheme, SystemApiEvent, WidgetTheme } from '@widget-js/core'
 import { TransitionPresets, useIntervalFn, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import consola from 'consola'
+import { useI18n } from 'vue-i18n'
 import { type DeadlineConfig, getDefaultDeadlineConfig } from '@/widgets/deadline/DeadlineConfig'
 import { AppConfig } from '@/common/AppConfig'
 import { useUnitTransition } from '@/components/useUnitTransition'
 
 const widgetParams = useWidgetParams()
-const now = dayjs()
+const now = ref(dayjs())
+const { t } = useI18n()
 const deadlineConfig = useStorage<DeadlineConfig>(`${AppConfig.KEY_DEADLINE_CONFIG}-${widgetParams.id}`, getDefaultDeadlineConfig())
 const countdownDays = computed(() => {
-  return dayjs(deadlineConfig.value.endTime).diff(now, 'day')
+  return dayjs(deadlineConfig.value.endTime).diff(now.value, 'day')
 })
 
 const percent = computed(() => {
@@ -30,6 +32,11 @@ const animDeathGroupXPx = useUnitTransition(deathGroupX, {
   unit: 'px',
   duration: 3000,
   transition: TransitionPresets.easeOutCubic,
+})
+
+watch(deadlineConfig, () => {
+  now.value = dayjs()
+  update()
 })
 
 const animFillProgressPercent = useUnitTransition(deathGroupFillProgress, {
@@ -56,28 +63,26 @@ const { widgetTheme } = useWidgetTheme({ defaultTheme: DefaultWidgetTheme.copy({
   }
 } })
 
+function update() {
+  deathGroupX.value = Math.round(percent.value * 520)
+  deathGroupFillProgress.value = Math.round(percent.value * 100 - 100)
+  maskRedWidth.value = Math.round(percent.value * 100)
+}
 onMounted(async () => {
   await nextTick()
   updateThemeColor(widgetTheme.value?.primaryColor)
-  // timer arguments:
-  //   #1 - time of animation in mileseconds,
-  //   #2 - days to deadline
   const armGrop = document.getElementById('designer-arm-grop')
   const progressTimeFill = document.getElementById('progress-time-fill')
   const deathGroup = document.getElementById('death-group')
   progressTimeFill?.style.setProperty('animation-duration', `${animationTime}s`)
   deathGroup?.style.setProperty('animation-duration', `${animationTime}s`)
   armGrop?.style.setProperty('animation-duration', '1.5s')
-
-  useIntervalFn(() => {
-    deathGroupX.value = Math.round(percent.value * 520)
-    deathGroupFillProgress.value = Math.round(percent.value * 100 - 100)
-    maskRedWidth.value = Math.round(percent.value * 100)
-  }, 60 * 1000, { immediate: true, immediateCallback: true })
+  useIntervalFn(update, 60 * 1000, { immediate: true, immediateCallback: true })
 })
 
 useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
-  location.reload()
+  now.value = dayjs()
+  update()
 })
 </script>
 
@@ -178,7 +183,12 @@ useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
       <div class="deadline-days">
         <div class="mask-red">
           <div class="inner">
-            {{ deadlineConfig.title }} 剩余 <span class="day">{{ countdownDays }}</span> <span class="days">天</span>
+            {{ deadlineConfig.title }}
+            <i18n-t keypath="countdown.deadline.remain">
+              <span>
+                <span class="day">{{ countdownDays }}</span> <span class="days">{{ t('countdown.days', countdownDays) }}</span>
+              </span>
+            </i18n-t>
           </div>
         </div>
       </div>

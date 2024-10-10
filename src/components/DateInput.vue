@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { type PropType, computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Lunar } from 'lunar-typescript'
+import { useI18n } from 'vue-i18n'
 
 defineProps({
   lunar: {
@@ -9,8 +10,19 @@ defineProps({
     default: true,
   },
   minDate: {
-    type: Date,
+    type: Object as PropType<Date | string>,
     default: dayjs().subtract(100, 'year').toDate(),
+  },
+})
+
+const { t, d } = useI18n({
+  messages: {
+    zh: {
+      pickDate: '选择日期',
+    },
+    en: {
+      pickDate: 'Pick Date',
+    },
   },
 })
 const modelValue = defineModel({ default: new Date() })
@@ -20,13 +32,13 @@ const showLunarPicker = ref(false)
 const selectedDate = ref(new Date())
 onMounted(async () => {
   await nextTick()
-  selectedDate.value = modelValue.value
+  selectedDate.value = dayjs(modelValue.value).toDate()
   selectedLunarDate.value = modelValue.value
 })
 const selectedLunarDate = ref(modelValue.value)
 const textModel = computed(() => {
   if (dateType.value == 0) {
-    return dayjs(modelValue.value).format('YYYY年MM月DD日')
+    return d(modelValue.value)
   }
   else {
     return Lunar.fromDate(modelValue.value).toString()
@@ -34,7 +46,7 @@ const textModel = computed(() => {
 })
 
 watch(() => modelValue.value, () => {
-  selectedDate.value = modelValue.value
+  selectedDate.value = dayjs(modelValue.value).toDate()
   selectedLunarDate.value = modelValue.value
 })
 
@@ -82,7 +94,7 @@ function showPicker() {
   <nut-popup v-model:visible="showDateTimePicker" position="bottom">
     <nut-date-picker
       v-model="selectedDate"
-      title="选择日期"
+      :title="t('pickDate')"
       type="date"
       :min-date="minDate"
       :is-show-chinese="true"

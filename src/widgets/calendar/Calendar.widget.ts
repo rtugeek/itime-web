@@ -2,8 +2,8 @@ import { Widget, WidgetKeyword } from '@widget-js/core'
 
 const CalendarWidget = new Widget({
   name: 'itime.fun.calendar',
-  title: { 'zh-CN': '日历' },
-  description: { 'zh-CN': '简单的日历，支持节假日显示' },
+  title: { 'zh-CN': '日历', 'en-US': 'Calendar' },
+  description: { 'zh-CN': '简单的日历，支持节假日显示', 'en-US': 'Simple calendar with holiday display' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
   width: 4,

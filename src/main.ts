@@ -16,6 +16,7 @@ import router from './router'
 import App from './App.vue'
 import 'vue3-colorpicker/style.css'
 import 'virtual:uno.css'
+import { i18n } from '@/i18n'
 
 dayjs.extend(isoWeek)
 dayjs.extend(isToday)
@@ -26,6 +27,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(Toast)
 app.use(Notify)
+app.use(i18n)
 app.use(router)
 app.use(Vue3ColorPicker)
 app.use(WidgetJsPlugin)

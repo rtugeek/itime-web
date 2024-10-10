@@ -12,8 +12,10 @@ import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import { usePomodoroWindowStateStore } from '@/widgets/pomodoro/usePomodoroWindowStateStore'
 import PomodoroProgressBar from '@/widgets/pomodoro/components/PomodoroProgressBar.vue'
+import { useI18n } from 'vue-i18n'
 
 useWidget({ defaultOverlapMenu: false })
+const {t} = useI18n()
 const sceneStore = usePomodoroSceneStore()
 const pomodoro = usePomodoroStore()
 
@@ -80,7 +82,7 @@ onMounted(async () => {
         <div class="scene">
           <div class="flex gap-1 items-center cursor-pointer" @click="onSceneClick">
             <div>{{ currentScene.icon }}</div>
-            <div>{{ status == 'resting' ? '休息中' : currentScene.name }}</div>
+            <div>{{ status == 'resting' ? t('pomodoro.resting') : currentScene.name }}</div>
             <Right v-show="status == 'stop'" />
           </div>
         </div>
@@ -100,7 +102,7 @@ onMounted(async () => {
         </div>
       </template>
       <div v-else class="flex text-center p-4">
-        请到设置页面添加专注场景
+        {{ t('pomodoro.emptyTip') }}
       </div>
     </div>
     <PomodoroProgressBar />

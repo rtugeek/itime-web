@@ -2,10 +2,12 @@
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 
 const router = useRouter()
+const { t } = useI18n()
 const pomodoroSceneStore = usePomodoroSceneStore()
 const { scenes } = storeToRefs(pomodoroSceneStore)
 function goDetail(scene: PomodoroScene) {
@@ -22,7 +24,7 @@ pomodoroSceneStore.reload()
         <div>{{ scene.name }}</div>
       </div>
       <div class="ml-auto">
-        {{ Math.round(dayjs.duration(scene.duration ?? 0, 'second').as('minutes')) }}分钟
+        {{ Math.round(dayjs.duration(scene.duration ?? 0, 'second').as('minutes')) }}{{ t('minute') }}
       </div>
     </div>
   </div>

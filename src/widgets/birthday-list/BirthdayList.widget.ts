@@ -2,8 +2,8 @@ import { Widget, WidgetKeyword } from '@widget-js/core'
 
 const BirthdayListWidget = new Widget({
   name: '.birthday_list',
-  title: { 'zh-CN': '生日列表' },
-  description: { 'zh-CN': '自动倒计时的生日列表' },
+  title: { 'zh-CN': '生日列表', 'en-US': 'Birthday List' },
+  description: { 'zh-CN': '自动倒计时的生日列表', 'en-US': 'Birthday list with countdown' },
   keywords: [WidgetKeyword.RECOMMEND],
   lang: 'zh-CN',
   width: 4,

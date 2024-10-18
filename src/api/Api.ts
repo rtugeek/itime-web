@@ -7,11 +7,8 @@ import { AppConfig } from '@/common/AppConfig'
 import { useUserStore } from '@/stores/useUserStore'
 // import { setupCache } from 'axios-cache-interceptor/dev';
 
-// @ts-expect-error
-let baseURL = 'https://itime.fun/api/v2'
-// if (window.location.hostname != 'itime.fun') {
-//   baseURL = 'http://127.0.0.1:8082/api/v2'
-// }
+const baseURL = 'https://itime.fun/api/v2'
+// const baseURL = 'http://127.0.0.1:8082/api/v2'
 const api = axios.create({ baseURL, withCredentials: true })
 const cacheApi = setupCache(axios.create({ baseURL, withCredentials: true }), {
   storage: buildWebStorage(localStorage, 'itime-api-cache:'),
@@ -34,6 +31,7 @@ function setupInterceptors(instance: AxiosInstance) {
     const timestamp = new Date().getTime()
     config.headers.appKey = appKey
     config.headers.nonce = nonce
+    config.headers['content-type'] = 'application/json;charset=UTF-8'
     config.headers.timestamp = timestamp
     config.headers.sign = SignatureUtils.sign(config.params, appKey, timestamp.toString(), nonce)
     const token = localStorage.getItem(AppConfig.KEY_TOKEN)

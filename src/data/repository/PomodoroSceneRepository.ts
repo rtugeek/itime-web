@@ -1,23 +1,23 @@
 import localforage from 'localforage'
-import { nanoid } from 'nanoid'
+import dayjs from 'dayjs'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { DefaultScenes } from '@/data/PomodoroScene'
 
 const pomodoroSceneRepository = localforage.createInstance({ name: 'pomodoro-scene' })
 export class PomodoroSceneRepository {
-  static async get(key: string) {
-    return pomodoroSceneRepository.getItem<PomodoroScene>(key)
+  static async get(key: string | number) {
+    return pomodoroSceneRepository.getItem<PomodoroScene>(key.toString())
   }
 
   static async save(value: PomodoroScene) {
     if (!value.id) {
-      value.id = nanoid()
+      value.id = new Date().getTime() + Math.ceil(Math.random() * 1000)
     }
     if (!value.createTime) {
       value.createTime = new Date()
     }
     value.updateTime = new Date()
-    return pomodoroSceneRepository.setItem(value.id, value)
+    return pomodoroSceneRepository.setItem(value.id.toString(), value)
   }
 
   static async remove(key: string) {
@@ -40,7 +40,7 @@ export class PomodoroSceneRepository {
     // 根据创建时间排序
     scenes.sort((a, b) => {
       if (a.createTime && b.createTime) {
-        return a.createTime.getTime() - b.createTime.getTime()
+        return dayjs(a.createTime).toDate().getTime() - dayjs(b.createTime).toDate().getTime()
       }
       return 0
     })

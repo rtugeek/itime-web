@@ -7,8 +7,9 @@ import type { PomodoroModel } from '@/widgets/pomodoro/PomodoroModel'
 import { AppConfig } from '@/common/AppConfig'
 import type { PomodoroSettings } from '@/data/PomodoroSettings'
 import { getDefaultPomodoroSettings } from '@/data/PomodoroSettings'
-import { PomodoroRepository } from '@/data/repository/PomodoroRepository'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
+import { usePomodoroHistoryStore } from '@/stores/usePomodoroHistoryStore'
+import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 
 export const usePomodoroStore = defineStore('pomodoroStore', () => {
   const model = useStorage<PomodoroModel>(AppConfig.KEY_POMODORO, {
@@ -24,7 +25,8 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   const status = computed(() => model.value.status)
   const duration = computed(() => model.value.duration)
   const shortBreakDuration = computed(() => settings.value.shortBreakTime * 60)
-
+  const pomodoroHistoryStore = usePomodoroHistoryStore()
+  const pomodoroSceneStore = usePomodoroSceneStore()
   const remindText = computed(() => {
     if (status.value == 'resting') {
       return dayjs.duration(settings.value.shortBreakTime, 'minute').subtract(model.value.restDuration, 'seconds').format('mm:ss')
@@ -107,12 +109,13 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
     else {
       const now = new Date()
       model.value.createAt = now
-      PomodoroRepository.set(now.getTime().toString(), {
+      const time = now.getTime()
+      pomodoroHistoryStore.save({
         sceneId: sceneId.value,
         createAt: now,
         duration: model.value.duration,
         finishAt: now,
-        id: now.getTime().toString(),
+        id: time,
         startAt: model.value.startAt!,
         updateAt: now,
       })
@@ -122,7 +125,7 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
             scene.duration = 0
           }
           scene.duration += model.value.duration
-          PomodoroSceneRepository.save(scene)
+          pomodoroSceneStore.save(scene)
         }
       })
 

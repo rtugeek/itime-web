@@ -11,8 +11,31 @@ export class PomodoroRepository {
     return pomodoroRepository.setItem(key, value)
   }
 
+  static async save(value: PomodoroHistory) {
+    if (!value.id) {
+      value.id = new Date().getTime() + Math.ceil(Math.random() * 1000)
+    }
+    if (!value.createAt) {
+      value.createAt = new Date()
+    }
+    value.updateAt = new Date()
+    return pomodoroRepository.setItem(value.id.toString(), value)
+  }
+
   static async remove(key: string) {
     return pomodoroRepository.removeItem(key)
+  }
+
+  static async all(): Promise<PomodoroHistory[]> {
+    const histories: PomodoroHistory[] = []
+    const keys = await pomodoroRepository.keys()
+    for (const key of keys) {
+      const history = await pomodoroRepository.getItem<PomodoroHistory>(key)
+      if (history) {
+        histories.push(history)
+      }
+    }
+    return histories
   }
 
   static async clear() {

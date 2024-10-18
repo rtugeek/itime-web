@@ -21,6 +21,7 @@ declare module 'vue' {
     NutAvatar: typeof import('@nutui/nutui')['Avatar']
     NutButton: typeof import('@nutui/nutui')['Button']
     NutCell: typeof import('@nutui/nutui')['Cell']
+    NutCellGroup: typeof import('@nutui/nutui')['CellGroup']
     NutColorPicker: typeof import('./src/components/nut/NutColorPicker.vue')['default']
     NutDatePicker: typeof import('@nutui/nutui')['DatePicker']
     NutForm: typeof import('@nutui/nutui')['Form']

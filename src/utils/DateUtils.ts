@@ -1,5 +1,5 @@
 export class DateUtils {
-  static parseDate() {
-
+  static parseDate(date: string): Date {
+    return new Date(date)
   }
 }

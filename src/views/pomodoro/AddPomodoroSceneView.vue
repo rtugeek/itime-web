@@ -48,7 +48,7 @@ function save() {
     showNotify.warn('名称不能为空')
     return
   }
-  PomodoroSceneRepository.save(toRaw(sence))
+  sceneStore.save(toRaw(sence))
   router.back()
 }
 

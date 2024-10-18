@@ -1,6 +1,6 @@
 {
   "name": "itime.fun",
-  "version": "0.5.1",
+  "version": "0.6.1",
   "author": "Wisdom LTD",
   "homepage": "",
   "title": {
@@ -20,6 +20,44 @@
   "hash": true,
   "url": "",
   "widgets": [
+    {
+      "name": "itime.fun.todo_list",
+      "title": {
+        "zh-CN": "待办事项（Pro）",
+        "en-US": "To-Do"
+      },
+      "description": {
+        "zh-CN": "带数据同步功能的待办事项",
+        "en-US": "To-Do list with data synchronization"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 3,
+      "minHeight": 3,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/todo_list",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_todo_list.png",
+      "categories": [
+        "productivity",
+        "utilities"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
+      "routes": []
+    },
     {
       "name": "itime.fun.pomodoro",
       "title": {
@@ -63,44 +101,6 @@
         "backgroundMaterial": "acrylic",
         "backgroundThrottling": false
       }
-    },
-    {
-      "name": "itime.fun.todo_list",
-      "title": {
-        "zh-CN": "待办事项（Pro）",
-        "en-US": "To-Do"
-      },
-      "description": {
-        "zh-CN": "带数据同步功能的待办事项",
-        "en-US": "To-Do list with data synchronization"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 3,
-      "minHeight": 3,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/todo_list",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_todo_list.png",
-      "categories": [
-        "productivity",
-        "utilities"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
-      "routes": []
     },
     {
       "name": "itime.fun.deadline",
@@ -178,43 +178,6 @@
       "routes": []
     },
     {
-      "name": "itime.fun.birthday_list",
-      "title": {
-        "zh-CN": "生日列表",
-        "en-US": "Birthday List"
-      },
-      "description": {
-        "zh-CN": "自动倒计时的生日列表",
-        "en-US": "Birthday list with countdown"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 4,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 3,
-      "minHeight": 3,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/birthday_list",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_birthday_list.png",
-      "categories": [
-        "countdown"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
-      "routes": []
-    },
-    {
       "name": "itime.fun.calendar",
       "title": {
         "zh-CN": "日历",
@@ -249,6 +212,43 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
+      "routes": []
+    },
+    {
+      "name": "itime.fun.birthday_list",
+      "title": {
+        "zh-CN": "生日列表",
+        "en-US": "Birthday List"
+      },
+      "description": {
+        "zh-CN": "自动倒计时的生日列表",
+        "en-US": "Birthday list with countdown"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 4,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 3,
+      "minHeight": 3,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/birthday_list",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_birthday_list.png",
+      "categories": [
+        "countdown"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
       "routes": []
     }
   ],

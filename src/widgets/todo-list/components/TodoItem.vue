@@ -86,6 +86,11 @@ p {
   margin: 0;
   word-wrap: break-word;
   white-space: pre-wrap;
+  line-clamp: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .todo-item {

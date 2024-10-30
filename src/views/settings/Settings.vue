@@ -3,11 +3,13 @@ import { storeToRefs } from 'pinia'
 import { User } from '@icon-park/vue-next'
 import { showDialog } from '@nutui/nutui'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import PomodoroSettings from '@/views/settings/PomodoroSettings.vue'
 import { useUserStore } from '@/stores/useUserStore'
 
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
+const { t } = useI18n()
 const router = useRouter()
 function logout() {
   showDialog({
@@ -37,18 +39,18 @@ function profileClick() {
           </nut-avatar>
           <span>{{ user.nick }}</span>
           <nut-button class="ml-auto" size="small" @click="logout">
-            退出登录
+            {{t('user.signOut')}}
           </nut-button>
         </template>
         <template v-else>
           <nut-avatar shape="round">
             <User />
           </nut-avatar>
-          <span>未登录</span>
+          <span>{{t('user.signIn')}}</span>
         </template>
       </div>
     </NutCell>
-    番茄钟设置
+    {{ t('pomodoro.settings') }}
     <PomodoroSettings />
   </div>
 </template>

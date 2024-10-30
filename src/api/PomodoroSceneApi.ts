@@ -16,6 +16,6 @@ export class PomodoroSceneApi {
   }
 
   static async delete(id: string) {
-    return await api.delete(id)
+    return await api.delete(`/pomodoro/scene/${id}`)
   }
 }

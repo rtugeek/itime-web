@@ -3,9 +3,11 @@ import { computed } from 'vue'
 import { HourglassNull, SettingTwo, Stopwatch } from '@icon-park/vue-next'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useWindowSize } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
+const {t} = useI18n()
 const tabRoute = ['/countdown', '/pomodoro', '/settings']
 const active = computed<number>({
   get: () => {
@@ -36,17 +38,17 @@ const { height } = useWindowSize()
         <!--            <Check></Check> -->
         <!--          </template> -->
         <!--        </nut-tabbar-item> -->
-        <nut-tabbar-item tab-title="倒计时">
+        <nut-tabbar-item :tab-title="t('countdown')">
           <template #icon>
             <HourglassNull />
           </template>
         </nut-tabbar-item>
-        <nut-tabbar-item tab-title="番茄钟">
+        <nut-tabbar-item :tab-title="t('pomodoro.title')">
           <template #icon>
             <Stopwatch />
           </template>
         </nut-tabbar-item>
-        <nut-tabbar-item tab-title="设置">
+        <nut-tabbar-item :tab-title="t('settings')">
           <template #icon>
             <SettingTwo />
           </template>

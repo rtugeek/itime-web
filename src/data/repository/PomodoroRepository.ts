@@ -26,6 +26,16 @@ export class PomodoroRepository {
     return pomodoroRepository.removeItem(key)
   }
 
+  static async removeBySceneId(sceneId: string) {
+    const keys = await pomodoroRepository.keys()
+    for (const key of keys) {
+      const history = await pomodoroRepository.getItem<PomodoroHistory>(key)
+      if (history && history.sceneId === sceneId) {
+        await pomodoroRepository.removeItem(key)
+      }
+    }
+  }
+
   static async all(): Promise<PomodoroHistory[]> {
     const histories: PomodoroHistory[] = []
     const keys = await pomodoroRepository.keys()

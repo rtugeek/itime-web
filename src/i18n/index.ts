@@ -2,7 +2,8 @@ import { createI18n } from 'vue-i18n'
 import { todoMessage } from '@/i18n/todo'
 import { pomodoroMessage } from '@/i18n/pomodoro'
 import { countdownMessage } from '@/i18n/countdown'
-import { birthdayMessage } from '@/i18n/birthday'
+import { birthdayMessage } from '@/i18n/birthdayMessage'
+import { userMessage } from '@/i18n/userMessage'
 
 export const i18n = createI18n({
   locale: 'en',
@@ -24,6 +25,10 @@ export const i18n = createI18n({
       ...pomodoroMessage.zh,
       ...countdownMessage.zh,
       ...birthdayMessage.zh,
+      ...userMessage.zh,
+      countdown: '倒计时',
+      pomodoro: '番茄钟',
+      settings: '设置',
       appSettings: '应用设置',
       save: '保存',
       minute: '分钟',
@@ -41,10 +46,8 @@ export const i18n = createI18n({
       },
     },
     en: {
-      ...todoMessage.en,
-      ...pomodoroMessage.en,
-      ...countdownMessage.en,
-      ...birthdayMessage.en,
+      countdown: 'Countdown',
+      settings: 'Settings',
       appSettings: 'App Settings',
       save: 'Save',
       saving: 'Saving',
@@ -60,6 +63,11 @@ export const i18n = createI18n({
         number: 'Week {week}',
         short: { sunday: 'Sun', monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri', saturday: 'Sat' },
       },
+      ...pomodoroMessage.en,
+      ...todoMessage.en,
+      ...countdownMessage.en,
+      ...birthdayMessage.en,
+      ...userMessage.en,
     },
   },
 })

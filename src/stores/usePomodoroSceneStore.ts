@@ -7,6 +7,7 @@ import { AppConfig } from '@/common/AppConfig'
 import { useUserStore } from '@/stores/useUserStore'
 import { PomodoroSceneApi } from '@/api/PomodoroSceneApi'
 import { usePomodoroHistoryStore } from '@/stores/usePomodoroHistoryStore'
+import { PomodoroRepository } from '@/data/repository/PomodoroRepository'
 
 export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
   const scenes = ref<PomodoroScene[]>([])
@@ -88,7 +89,12 @@ export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
   }
 
   async function deleteScene(id: string) {
+    if (userStore.isLogin) {
+      await PomodoroSceneApi.delete(id)
+    }
     await PomodoroSceneRepository.remove(id)
+    await PomodoroRepository.removeBySceneId(id)
+
     await reload()
     if (currentSceneId.value == id) {
       if (scenes.value.length > 0) {

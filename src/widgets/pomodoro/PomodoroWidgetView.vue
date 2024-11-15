@@ -5,6 +5,7 @@ import { nextTick, onMounted } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { Check, Pause, PlayOne, Right } from '@icon-park/vue-next'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { AppConfig } from '@/common/AppConfig'
 
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
@@ -12,10 +13,9 @@ import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import { usePomodoroWindowStateStore } from '@/widgets/pomodoro/usePomodoroWindowStateStore'
 import PomodoroProgressBar from '@/widgets/pomodoro/components/PomodoroProgressBar.vue'
-import { useI18n } from 'vue-i18n'
 
 useWidget({ defaultOverlapMenu: false })
-const {t} = useI18n()
+const { t } = useI18n()
 const sceneStore = usePomodoroSceneStore()
 const pomodoro = usePomodoroStore()
 

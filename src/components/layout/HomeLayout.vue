@@ -33,7 +33,7 @@ const { height } = useWindowSize()
       </el-scrollbar>
 
       <nut-tabbar v-model="active" bottom safe-area-inset-bottom>
-        <!--        <nut-tabbar-item tab-title="代办事项"> -->
+        <!--        <nut-tabbar-item tab-title="待办事项"> -->
         <!--          <template #icon> -->
         <!--            <Check></Check> -->
         <!--          </template> -->

@@ -11,6 +11,7 @@ import { RRuleUtils } from '@/utils/RRuleUtils'
 import NutRecurrentPicker from '@/components/NutRecurrentPicker.vue'
 import { useTodoStore } from '@/stores/useTodoStore'
 import { TodoUtils } from '@/utils/TodoUtils'
+import DateTimePicker from '@/components/DateTimePicker.vue'
 
 const { t } = useI18n()
 const todoStore = useTodoStore()

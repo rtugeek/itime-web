@@ -11,10 +11,13 @@ export const usePomodoroWindowStateStore = defineStore('pomodoroWindowStateStore
   const stickScreenEdge = useStickScreenEdge({ storageKey: 'overlap_page_state', peakSize: 6 })
   watch(status, (value, oldValue) => {
     if (value == 'waiting') {
-      stickScreenEdge.showWindow()
+      stickScreenEdge.showWindow().then(() => {
+        BrowserWindowApi.setAlwaysOnTop(true)
+      })
     }
     if (oldValue == 'resting' && value == 'running') {
       stickScreenEdge.showWindow().then(() => {
+        BrowserWindowApi.setAlwaysOnTop(true)
         stickScreenEdge.startHideWindow()
       })
     }

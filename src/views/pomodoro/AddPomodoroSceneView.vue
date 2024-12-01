@@ -2,21 +2,26 @@
 import { BrowserWindowApi } from '@widget-js/core'
 import { computed, reactive, ref, toRaw } from 'vue'
 import EmojiPicker from 'vue3-emoji-picker'
+import { Delete } from '@icon-park/vue-next'
 import 'vue3-emoji-picker/css'
+
 import { useRoute, useRouter } from 'vue-router'
 import { showNotify } from '@nutui/nutui'
+import { useI18n } from 'vue-i18n'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
+import FloatingActionButton from '@/components/FloatingActionButton.vue'
+import { AppUtils } from '@/utils/AppUtils'
 
 BrowserWindowApi.setAlwaysOnTop(true)
 const router = useRouter()
 const route = useRoute()
 const id = route.query.id as string
-
+const { t } = useI18n()
 const sceneStore = usePomodoroSceneStore()
 const title = computed(
-  () => id ? '编辑场景' : '添加场景',
+  () => id ? t('pomodoro.scene.edit') : t('pomodoro.scene.add'),
 )
 
 const sence = reactive<PomodoroScene>({
@@ -28,7 +33,7 @@ const sence = reactive<PomodoroScene>({
 
 if (id) {
   PomodoroSceneRepository.get(id).then((res) => {
-    sence.id = id
+    sence.id = Number.parseInt(id)
     if (res) {
       sence.createTime = res.createTime
       sence.icon = res.icon
@@ -38,6 +43,7 @@ if (id) {
 }
 
 const showEmojiPicker = ref(false)
+
 function onSelectEmoji(newEmoji: any) {
   sence.icon = newEmoji.i
   showEmojiPicker.value = false
@@ -45,16 +51,16 @@ function onSelectEmoji(newEmoji: any) {
 
 function save() {
   if (!sence.name.trim()) {
-    showNotify.warn('名称不能为空')
+    showNotify.warn(t('pomodoro.error.name'))
     return
   }
   sceneStore.save(toRaw(sence))
-  router.back()
+  AppUtils.back(router)
 }
 
 function deleteScene() {
   sceneStore.deleteScene(sence.id!)
-  router.back()
+  AppUtils.back(router)
 }
 </script>
 
@@ -64,7 +70,7 @@ function deleteScene() {
       <EmojiPicker :native="true" display-recent @select="onSelectEmoji" />
     </nut-popup>
     <div class="section mt-4">
-      <h5>图标与名称</h5>
+      <h5>{{ t('pomodoro.iconAndName') }}</h5>
       <nut-form label-position="top">
         <nut-form-item>
           <div class="flex items-center gap-2">
@@ -73,22 +79,25 @@ function deleteScene() {
                 {{ sence.icon }}
               </div>
             </nut-avatar>
-            <nut-input v-model="sence.name" placeholder="请输入场景名称" />
+            <nut-input v-model="sence.name" :placeholder="t('pomodoro.scene.placeholder')" />
           </div>
         </nut-form-item>
       </nut-form>
     </div>
     <div class="fixed-right-bottom gap-2 flex">
-      <FloatingActionButton v-if="id" type="danger" icon="delete" @click="deleteScene" />
-      <FloatingActionButton icon="check" @click="save" />
+      <FloatingActionButton v-if="id" v-no-android type="danger" @click="deleteScene">
+        <Delete size="24" />
+      </FloatingActionButton>
+      <FloatingActionButton @click="save" />
     </div>
   </BaseView>
 </template>
 
 <style lang="scss">
 @import url('@/assets/common.scss');
-.section{
-  h5{
+
+.section {
+  h5 {
     padding-left: 1rem;
   }
 }

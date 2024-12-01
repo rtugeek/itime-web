@@ -1,21 +1,20 @@
 import { defineStore } from 'pinia'
-import { PomodoroRepository } from '@/data/repository/PomodoroRepository'
+import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 import { useUserStore } from '@/stores/useUserStore'
 import { PomodoroHistoryApi } from '@/api/PomodoroHistoryApi'
-import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 
 export const usePomodoroHistoryStore = defineStore('pomodoroHistoryStore', () => {
   const userStore = useUserStore()
-  async function findBySceneId(sceneId: string): Promise<PomodoroHistory[]> {
-    return await PomodoroRepository.findBySceneId(sceneId)
+  async function findBySceneId(sceneId: number): Promise<PomodoroHistory[]> {
+    return await PomodoroHistoryRepository.findBySceneId(sceneId)
   }
 
   async function sync() {
-    const historyList = await PomodoroRepository.all()
+    const historyList = await PomodoroHistoryRepository.all()
     for (const history of historyList) {
       if (!history.sceneId) {
-        await PomodoroRepository.remove(history.id)
+        await PomodoroHistoryRepository.remove(history.id)
       }
       if (userStore.isLogin && !history.tableId) {
         await syncHistory(history)
@@ -26,7 +25,7 @@ export const usePomodoroHistoryStore = defineStore('pomodoroHistoryStore', () =>
   async function syncHistory(history: PomodoroHistory) {
     const res = await PomodoroHistoryApi.save(history)
     history.tableId = res.tableId
-    await PomodoroRepository.save(history)
+    await PomodoroHistoryRepository.save(history)
   }
 
   async function save(history: PomodoroHistory) {

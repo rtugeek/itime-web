@@ -80,8 +80,8 @@ const router = createRouter({
       ],
     },
     {
-      path: '/pomodoro',
-      name: 'Pomodoro',
+      path: '/pomodoro/scene',
+      name: 'PomodoroScene',
       children: [
         {
           path: 'add',

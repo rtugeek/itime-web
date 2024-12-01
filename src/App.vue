@@ -4,6 +4,7 @@ import { useAppLanguage } from '@widget-js/vue3'
 import { Locale } from '@nutui/nutui'
 import enUS from '@nutui/nutui/dist/packages/locale/lang/en-US'
 import { i18n } from '@/i18n'
+import { AndroidApi } from '@/api/android/AndroidApi'
 
 function updateLang(lang: string) {
   i18n.global.locale = lang
@@ -11,14 +12,19 @@ function updateLang(lang: string) {
     Locale.use('en-US', enUS)
   }
 }
-useAppLanguage({
-  onLoad: (lang) => {
-    updateLang(lang)
-  },
-  onChange: (lang) => {
-    updateLang(lang)
-  },
-})
+if (AndroidApi.hasApi()) {
+  updateLang(AndroidApi.getLanguage() ?? 'zh')
+}
+else {
+  useAppLanguage({
+    onLoad: (lang) => {
+      updateLang(lang)
+    },
+    onChange: (lang) => {
+      updateLang(lang)
+    },
+  })
+}
 </script>
 
 <template>

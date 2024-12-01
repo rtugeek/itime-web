@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { BrowserWindowApi } from '@widget-js/core'
-import { Close } from '@icon-park/vue-next'
+import { Close, Left } from '@icon-park/vue-next'
 import { useRouter } from 'vue-router'
+import { usePreferredDark } from '@vueuse/core'
 import { AppUtils } from '@/utils/AppUtils'
 
 const props = defineProps({
@@ -11,6 +12,8 @@ const props = defineProps({
     default: true,
   },
 })
+
+const isDark = usePreferredDark()
 
 const router = useRouter()
 function goBack() {
@@ -31,28 +34,33 @@ function close() {
 </script>
 
 <template>
-  <div class="base-view flex flex-col w-full">
-    <div class="div" @mousedown="mouseDown" @mouseup="mouseUp">
-      <nut-navbar fixed v-bind="props" @click-back="goBack">
-        <template #right>
-          <div class="flex gap-2">
-            <slot name="actions" />
-            <nut-button plain size="small" @click="close">
-              <Close />
-            </nut-button>
-          </div>
-        </template>
-      </nut-navbar>
+  <NutConfigProvider :theme="isDark ? 'dark' : 'light'">
+    <div class="base-view flex flex-col w-full">
+      <div class="div" @mousedown="mouseDown" @mouseup="mouseUp">
+        <nut-navbar fixed v-bind="{ ...props, leftShow: false }" style="height: 56px;font-size: 24px" @click-back="goBack">
+          <template #left>
+            <Left size="26" @click="goBack" />
+          </template>
+          <template #right>
+            <div class="flex gap-2">
+              <slot name="actions" />
+              <nut-button v-electron plain size="small" @click="close">
+                <Close />
+              </nut-button>
+            </div>
+          </template>
+        </nut-navbar>
+      </div>
+      <slot />
     </div>
-    <slot />
-  </div>
+  </NutConfigProvider>
 </template>
 
 <style scoped>
 .base-view{
   width: 100vw;
   height: 100vh;
-  background-color: rgb(241 245 249);
+  background-color: var(--background-color);
   border-radius: 8px;
   overflow: hidden;
   box-sizing: border-box;

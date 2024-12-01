@@ -1,55 +1,40 @@
-import localforage from 'localforage'
-import dayjs from 'dayjs'
 import type { PomodoroScene } from '@/data/PomodoroScene'
-import { DefaultScenes } from '@/data/PomodoroScene'
+import type { IPomodoroSceneRepository } from '@/data/repository/interface/IPomodoroSceneRepository'
+import { AndroidPomodoroSceneRepository } from '@/data/repository/android/AndroidPomodoroSceneRepository'
+import { WebPomodoroSceneRepository } from '@/data/repository/web/WebPomodoroSceneRepository'
+import { AndroidApi } from '@/api/android/AndroidApi'
 
-const pomodoroSceneRepository = localforage.createInstance({ name: 'pomodoro-scene' })
-export class PomodoroSceneRepository {
-  static async get(key: string | number) {
-    return pomodoroSceneRepository.getItem<PomodoroScene>(key.toString())
+let targetApi: IPomodoroSceneRepository
+if (AndroidApi.hasApi()) {
+  targetApi = new AndroidPomodoroSceneRepository()
+}
+else {
+  targetApi = new WebPomodoroSceneRepository()
+}
+export class PomodoroSceneRepositoryDelegate implements IPomodoroSceneRepository {
+  async get(key: string | number) {
+    return targetApi.get(key)
   }
 
-  static async save(value: PomodoroScene) {
-    if (!value.id) {
-      value.id = new Date().getTime() + Math.ceil(Math.random() * 1000)
-    }
-    if (!value.createTime) {
-      value.createTime = new Date()
-    }
-    value.updateTime = new Date()
-    return pomodoroSceneRepository.setItem(value.id.toString(), value)
+  async save(value: PomodoroScene) {
+    return targetApi.save(value)
   }
 
-  static async remove(key: string) {
-    return pomodoroSceneRepository.removeItem(key)
+  remove(id: string | number) {
+    return targetApi.remove(id)
   }
 
-  static async clear() {
-    return pomodoroSceneRepository.clear()
+  clear() {
+    return targetApi.clear()
   }
 
-  static async all(): Promise<PomodoroScene[]> {
-    const scenes: PomodoroScene[] = []
-    const keys = await pomodoroSceneRepository.keys()
-    for (const key of keys) {
-      const scene = await pomodoroSceneRepository.getItem<PomodoroScene>(key)
-      if (scene) {
-        scenes.push(scene)
-      }
-    }
-    // 根据创建时间排序
-    scenes.sort((a, b) => {
-      if (a.createTime && b.createTime) {
-        return dayjs(a.createTime).toDate().getTime() - dayjs(b.createTime).toDate().getTime()
-      }
-      return 0
-    })
-    return scenes
+  async all(): Promise<PomodoroScene[]> {
+    return targetApi.all()
   }
 
-  static async createDefaultScenes() {
-    for (const defaultScene of DefaultScenes) {
-      await this.save(defaultScene)
-    }
+  async createDefaultScenes() {
+    return targetApi.createDefaultScenes()
   }
 }
+
+export const PomodoroSceneRepository = new PomodoroSceneRepositoryDelegate()

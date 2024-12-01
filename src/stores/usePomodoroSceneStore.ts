@@ -6,14 +6,12 @@ import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneReposito
 import { AppConfig } from '@/common/AppConfig'
 import { useUserStore } from '@/stores/useUserStore'
 import { PomodoroSceneApi } from '@/api/PomodoroSceneApi'
-import { usePomodoroHistoryStore } from '@/stores/usePomodoroHistoryStore'
-import { PomodoroRepository } from '@/data/repository/PomodoroRepository'
+import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 
 export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
   const scenes = ref<PomodoroScene[]>([])
-  const currentSceneId = useStorage(AppConfig.KEY_POMODORO_USING_SCENE, '1')
+  const currentSceneId = useStorage(AppConfig.KEY_POMODORO_USING_SCENE, 1)
   const userStore = useUserStore()
-  const pomodoroHistoryStore = usePomodoroHistoryStore()
   const currentScene = computed(() => {
     const scene = scenes.value.find(it => it.id == currentSceneId.value)!
     if (scene) {
@@ -28,22 +26,6 @@ export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
   async function reload() {
     const res = await PomodoroSceneRepository.all()
     for (const scene of res) {
-      const oldSceneId = scene.id
-      if (typeof oldSceneId == 'string') {
-        await PomodoroSceneRepository.remove(oldSceneId)
-        const newId = new Date().getTime() + Math.ceil(Math.random() * 1000)
-        await PomodoroSceneRepository.save(scene)
-        pomodoroHistoryStore.findBySceneId(oldSceneId).then((result) => {
-          for (const pomodoroHistory of result) {
-            pomodoroHistory.sceneId = newId
-            pomodoroHistoryStore.save(pomodoroHistory)
-          }
-        })
-        scene.id = newId
-      }
-      if (!scene.icon) {
-        await PomodoroSceneRepository.remove(oldSceneId)
-      }
       if (userStore.isLogin) {
         if (!scene.tableId) {
           PomodoroSceneApi.save(scene)
@@ -57,9 +39,9 @@ export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
     if (userStore.isLogin) {
       PomodoroSceneApi.find().then(async (result) => {
         for (const datum of result.data) {
-          const localHis = await PomodoroSceneRepository.get(datum.tableId)
+          const localHis = await PomodoroSceneRepository.get(datum.tableId!)
           if (localHis) {
-            if (localHis.updateTime?.getTime() < datum.updateTime?.getTime()) {
+            if (localHis.updateTime!.getTime() < datum.updateTime!.getTime()) {
               await PomodoroSceneRepository.save(datum)
             }
           }
@@ -77,8 +59,8 @@ export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
     reload()
   })
 
-  async function findById(sceneId: number): Promise<PomodoroScene | undefined> {
-    return await PomodoroSceneRepository.get(sceneId)
+  async function findById(sceneId: number): Promise<PomodoroScene | null> {
+    return PomodoroSceneRepository.get(sceneId)
   }
 
   const save = async function save(scene: PomodoroScene) {
@@ -88,12 +70,12 @@ export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
     }
   }
 
-  async function deleteScene(id: string) {
+  async function deleteScene(id: number) {
     if (userStore.isLogin) {
       await PomodoroSceneApi.delete(id)
     }
     await PomodoroSceneRepository.remove(id)
-    await PomodoroRepository.removeBySceneId(id)
+    await PomodoroHistoryRepository.removeBySceneId(id)
 
     await reload()
     if (currentSceneId.value == id) {
@@ -101,7 +83,7 @@ export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
         currentSceneId.value = scenes.value[0].id
       }
       else {
-        currentSceneId.value = ''
+        currentSceneId.value = 0
       }
     }
     post({ type: 'delete', id })

@@ -62,7 +62,7 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
   </widget-wrapper>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 .todo-list-widget {
   font-weight: bold;
 

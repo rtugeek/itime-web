@@ -1,6 +1,6 @@
-import type { DefaultDateTimeFormatSchema } from 'vue-i18n'
+import type { DefaultLocaleMessageSchema } from 'vue-i18n'
 
-export const todoMessage: DefaultDateTimeFormatSchema = {
+export const todoMessage: DefaultLocaleMessageSchema = {
   zh: {
     todo: {
       title: '待办事项',

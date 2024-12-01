@@ -2,6 +2,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
 import dayjs from 'dayjs'
+import { showNotify } from '@nutui/nutui'
 import { PomodoroUtils } from '@/utils/PomodoroUtils'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import PomodoroDetailBlock from '@/views/pomodoro/PomodoroDetailBlock.vue'
@@ -33,7 +34,8 @@ pomodoroSceneStore.findById(id).then((data) => {
     })
   }
   else {
-    router.back()
+    showNotify.warn('Scene not found')
+    // router.back()
   }
 })
 
@@ -55,7 +57,7 @@ function onEdit() {
       </div>
       <div class="flex flex-col">
         <nut-cell-group class="overflow-auto">
-          <nut-cell v-for="history in histories" :key="history.id" >
+          <nut-cell v-for="history in histories" :key="history.id">
             <div class="flex gap-1 items-center w-full">
               <div class="text-lg">
                 {{ Math.ceil(history.duration / 60) }} 分钟

@@ -5,6 +5,7 @@ import { showNotify } from '@nutui/nutui'
 import { SignatureUtils } from '@/utils/SignatureUtils'
 import { AppConfig } from '@/common/AppConfig'
 import { useUserStore } from '@/stores/useUserStore'
+import { AndroidApi } from '@/api/android/AndroidApi'
 // import { setupCache } from 'axios-cache-interceptor/dev';
 
 const baseURL = 'https://itime.fun/api/v2'
@@ -34,7 +35,7 @@ function setupInterceptors(instance: AxiosInstance) {
     config.headers['content-type'] = 'application/json;charset=UTF-8'
     config.headers.timestamp = timestamp
     config.headers.sign = SignatureUtils.sign(config.params, appKey, timestamp.toString(), nonce)
-    const token = localStorage.getItem(AppConfig.KEY_TOKEN)
+    const token = AndroidApi.hasApi() ? AndroidApi.getAccessToken() : localStorage.getItem(AppConfig.KEY_TOKEN)
     if (token) {
       config.headers.set('itime-token', token)
     }

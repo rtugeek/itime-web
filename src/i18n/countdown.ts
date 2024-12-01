@@ -1,6 +1,6 @@
-import type { DefaultDateTimeFormatSchema } from 'vue-i18n'
+import type { DefaultLocaleMessageSchema } from 'vue-i18n'
 
-export const countdownMessage: DefaultDateTimeFormatSchema = {
+export const countdownMessage: DefaultLocaleMessageSchema = {
   zh: {
     countdown: {
       add: '添加倒计时',

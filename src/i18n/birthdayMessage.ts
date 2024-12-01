@@ -1,6 +1,6 @@
-import type { DefaultDateTimeFormatSchema } from 'vue-i18n'
+import type { DefaultLocaleMessageSchema } from 'vue-i18n'
 
-export const birthdayMessage: DefaultDateTimeFormatSchema = {
+export const birthdayMessage: DefaultLocaleMessageSchema = {
   zh: {
     birthday: {
       list: '生日列表',

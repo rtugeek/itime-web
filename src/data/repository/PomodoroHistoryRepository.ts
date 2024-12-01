@@ -2,7 +2,7 @@ import localforage from 'localforage'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 
 const pomodoroRepository = localforage.createInstance({ name: 'pomodoro' })
-export class PomodoroRepository {
+export class PomodoroHistoryRepository {
   static async get(key: string) {
     return pomodoroRepository.getItem<PomodoroHistory>(key)
   }
@@ -22,11 +22,11 @@ export class PomodoroRepository {
     return pomodoroRepository.setItem(value.id.toString(), value)
   }
 
-  static async remove(key: string) {
-    return pomodoroRepository.removeItem(key)
+  static async remove(key: number) {
+    return pomodoroRepository.removeItem(key.toString())
   }
 
-  static async removeBySceneId(sceneId: string) {
+  static async removeBySceneId(sceneId: number | string) {
     const keys = await pomodoroRepository.keys()
     for (const key of keys) {
       const history = await pomodoroRepository.getItem<PomodoroHistory>(key)
@@ -52,7 +52,7 @@ export class PomodoroRepository {
     return pomodoroRepository.clear()
   }
 
-  static async findBySceneId(sceneId: string): Promise<PomodoroHistory[]> {
+  static async findBySceneId(sceneId: number | string): Promise<PomodoroHistory[]> {
     const histories: PomodoroHistory[] = []
     const keys = await pomodoroRepository.keys()
     for (const key of keys) {

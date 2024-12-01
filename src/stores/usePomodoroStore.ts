@@ -7,9 +7,9 @@ import type { PomodoroModel } from '@/widgets/pomodoro/PomodoroModel'
 import { AppConfig } from '@/common/AppConfig'
 import type { PomodoroSettings } from '@/data/PomodoroSettings'
 import { getDefaultPomodoroSettings } from '@/data/PomodoroSettings'
-import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { usePomodoroHistoryStore } from '@/stores/usePomodoroHistoryStore'
 import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
+import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 
 export const usePomodoroStore = defineStore('pomodoroStore', () => {
   const model = useStorage<PomodoroModel>(AppConfig.KEY_POMODORO, {
@@ -21,7 +21,7 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   })
 
   const settings = useStorage<PomodoroSettings>(AppConfig.KEY_POMODORO_SETTINGS, getDefaultPomodoroSettings())
-  const sceneId = useStorage<string>(AppConfig.KEY_POMODORO_USING_SCENE, '1')
+  const sceneId = useStorage(AppConfig.KEY_POMODORO_USING_SCENE, 1)
   const status = computed(() => model.value.status)
   const duration = computed(() => model.value.duration)
   const shortBreakDuration = computed(() => settings.value.shortBreakTime * 60)

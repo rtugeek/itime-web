@@ -23,6 +23,7 @@ declare module 'vue' {
     NutCell: typeof import('@nutui/nutui')['Cell']
     NutCellGroup: typeof import('@nutui/nutui')['CellGroup']
     NutColorPicker: typeof import('./src/components/nut/NutColorPicker.vue')['default']
+    NutConfigProvider: typeof import('@nutui/nutui')['ConfigProvider']
     NutDatePicker: typeof import('@nutui/nutui')['DatePicker']
     NutForm: typeof import('@nutui/nutui')['Form']
     NutFormItem: typeof import('@nutui/nutui')['FormItem']

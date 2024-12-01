@@ -5,10 +5,42 @@
 }
 
 :root {
+  --color-on-background: rgba(0, 0, 0, 0.8);
   --nut-primary-color: #478EF2;
   --nut-primary-color-end: #496AF2;
   --nut-navbar-title-font-weight: 700;
   --nut-navbar-title-font-color: #0e1b2c;
+  --nut-navbar-title-font: 18px;
+  --background-color: #F8F8F8;
+}
+
+h5{
+  color: var(--color-on-background);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-on-background: #c4c4c4;
+    --nut-primary-color: #478EF2;
+    --nut-primary-color-end: #496AF2;
+    --nut-navbar-title-font-weight: 700;
+    --nut-navbar-title-font-color: #0e1b2c;
+    --nut-navbar-title-font: 18px;
+    --background-color: #0F0F0F
+  }
+
+  .nut-cell-group__wrap{
+    box-shadow: none;
+    background-color: transparent;
+  }
+  .nut-navbar{
+    box-shadow: none;
+  }
+
+  .nut-theme-dark .nut-input{
+    background-color: transparent;
+  }
+
 }
 
 .nut-button--plain:not([disabled]):hover {

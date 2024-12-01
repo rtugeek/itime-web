@@ -93,7 +93,7 @@ const dateTimeModel = computed<Date>({
       </nut-form>
     </div>
     <div class="fixed-right-bottom gap-2 flex">
-      <FloatingActionButton icon="check" @click="save" />
+      <FloatingActionButton @click="save" />
     </div>
   </BaseView>
 </template>

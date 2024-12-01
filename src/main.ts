@@ -6,7 +6,6 @@ import { WidgetJsPlugin } from '@widget-js/vue3'
 
 import '@nutui/nutui/dist/style.css'
 import '@widget-js/vue3/dist/style.css'
-import './assets/main.css'
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isoWeek from 'dayjs/plugin/isoWeek'
@@ -17,19 +16,15 @@ import App from './App.vue'
 import 'vue3-colorpicker/style.css'
 import 'virtual:uno.css'
 import { i18n } from '@/i18n'
+import { hideInAndroid, showInAndroid } from '@/common/directive/android-show'
+import './assets/main.css'
 
 dayjs.extend(isoWeek)
 dayjs.extend(isToday)
 dayjs.extend(duration)
 
 const app = createApp(App)
-
+app.directive('android', showInAndroid)
+  .directive('no-android', hideInAndroid)
 app.use(createPinia())
-app.use(Toast)
-app.use(Notify)
-app.use(i18n)
-app.use(router)
-app.use(Vue3ColorPicker)
-app.use(WidgetJsPlugin)
-app.use(ConfigProvider)
-app.mount('#app')
+  .use(Toast).use(Notify).use(i18n).use(router).use(Vue3ColorPicker).use(WidgetJsPlugin).use(ConfigProvider).mount('#app')

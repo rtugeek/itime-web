@@ -21,13 +21,7 @@ export const i18n = createI18n({
   },
   messages: {
     zh: {
-      ...todoMessage.zh,
-      ...pomodoroMessage.zh,
-      ...countdownMessage.zh,
-      ...birthdayMessage.zh,
-      ...userMessage.zh,
       countdown: '倒计时',
-      pomodoro: '番茄钟',
       settings: '设置',
       appSettings: '应用设置',
       save: '保存',
@@ -44,6 +38,11 @@ export const i18n = createI18n({
         number: '第{week}周',
         short: { sunday: '日', monday: '一', tuesday: '二', wednesday: '三', thursday: '四', friday: '五', saturday: '六' },
       },
+      ...todoMessage.zh,
+      ...pomodoroMessage.zh,
+      ...countdownMessage.zh,
+      ...birthdayMessage.zh,
+      ...userMessage.zh,
     },
     en: {
       countdown: 'Countdown',

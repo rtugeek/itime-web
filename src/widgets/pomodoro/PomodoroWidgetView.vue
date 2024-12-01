@@ -8,11 +8,11 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { AppConfig } from '@/common/AppConfig'
 
-import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import { usePomodoroWindowStateStore } from '@/widgets/pomodoro/usePomodoroWindowStateStore'
 import PomodoroProgressBar from '@/widgets/pomodoro/components/PomodoroProgressBar.vue'
+import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 
 useWidget({ defaultOverlapMenu: false })
 const { t } = useI18n()
@@ -41,7 +41,7 @@ function onSceneClick() {
   }
   const menus = scenes.value.map((it) => {
     const menu: WidgetMenuItem = {
-      id: it.id!,
+      id: it.id!.toString(),
       label: `${it.icon} ${it.name}`,
       type: 'radio',
       checked: sceneStore.currentSceneId == it.id,
@@ -54,7 +54,7 @@ function onSceneClick() {
 }
 
 useMenuListener((type, menu) => {
-  const scene = scenes.value.find(it => it.id == menu.id)
+  const scene = scenes.value.find(it => it.id?.toString() == menu.id)
   if (scene) {
     sceneStore.currentSceneId = scene.id!
   }

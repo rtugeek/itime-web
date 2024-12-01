@@ -1,12 +1,18 @@
 import type { Router } from 'vue-router'
+import { AndroidApi } from '@/api/android/AndroidApi'
 
 export class AppUtils {
   static back(router: Router) {
-    if (window.history.length == 1) {
-      router.push('/')
+    if (AndroidApi.hasApi()) {
+      AndroidApi.back()
     }
     else {
-      router.back()
+      if (window.history.length == 1) {
+        router.push('/')
+      }
+      else {
+        router.back()
+      }
     }
   }
 }

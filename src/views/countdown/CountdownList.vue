@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import { Plus } from '@icon-park/vue-next'
 import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
 import CountdownItem from '@/views/countdown/CountdownItem.vue'
 
@@ -18,7 +19,9 @@ function goAdd() {
       <CountdownItem v-for="event in events" :key="event.id" :event="event" />
     </div>
     <div class="pos-absolute right-6 bottom-18">
-      <floating-action-button @click="goAdd" />
+      <floating-action-button @click="goAdd">
+        <Plus size="24" />
+      </floating-action-button>
     </div>
   </div>
 </template>

@@ -42,13 +42,6 @@ const dueDateTimeText = computed(() => {
   }
   return ''
 })
-//
-// const reminderDateTimeText = computed(() => {
-//   if (todo.value.reminderDateTime) {
-//     return dayjs(todo.value.reminderDateTime).format('YYYY年MM月DD日 HH时mm分')
-//   }
-//   return ''
-// })
 
 const rruleTxt = computed(() => RRuleUtils.toString(todo.value.recurrence))
 

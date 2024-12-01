@@ -1,6 +1,6 @@
-import type { DefaultDateTimeFormatSchema } from 'vue-i18n'
+import type { DefaultLocaleMessageSchema } from 'vue-i18n'
 
-export const userMessage: DefaultDateTimeFormatSchema = {
+export const userMessage: DefaultLocaleMessageSchema = {
   zh: {
     user: {
       signOut: '退出登录',

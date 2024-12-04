@@ -1,4 +1,13 @@
-export type AndroidApiType = 'AndroidPomodoroSceneRepository' | 'AndroidApi'
+
+export type AndroidApiType =
+  'AndroidPomodoroSceneRepository'
+  | 'AndroidApi'
+  | 'AndroidUserApi'
+  | 'AndroidMomentRepository'
+  | 'AndroidAppSettingApi'
+  | 'AndroidClipboardApi'
+  | 'AndroidPomodoroHistoryRepository'
+
 export class AndroidApi {
   static hasApi() {
     return this.getApi() != undefined
@@ -51,4 +60,21 @@ export class AndroidApi {
   static getAccessToken() {
     return this.requestString<string>('AndroidApi', 'getAccessToken')
   }
+
+  static getDebugInfo() {
+    return this.request<DebugInfo>('AndroidApi', 'getDebugInfo')
+  }
+}
+
+export interface DebugInfo {
+  systemVersion: string
+  brand: string
+  device: string
+  manufacture: string
+  product: string
+  appVersionName: string
+  appVersionCode: number
+  screenSize: string
+  userId?: number // 可为空，表示用户未登录
+  premium: boolean
 }

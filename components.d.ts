@@ -16,6 +16,7 @@ declare module 'vue' {
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
+    ElSwitch: typeof import('element-plus/es')['ElSwitch']
     FloatingActionButton: typeof import('./src/components/FloatingActionButton.vue')['default']
     HomeLayout: typeof import('./src/components/layout/HomeLayout.vue')['default']
     NutAvatar: typeof import('@nutui/nutui')['Avatar']

@@ -4,7 +4,7 @@ import { AndroidApi } from '@/api/android/AndroidApi'
 
 export class AndroidPomodoroSceneRepository implements IPomodoroSceneRepository {
   get(id: string | number): Promise<PomodoroScene> {
-    return AndroidApi.request('AndroidPomodoroSceneRepository', 'get', id.toString())!
+    return Promise.resolve(AndroidApi.request('AndroidPomodoroSceneRepository', 'get', id.toString())!)
   }
 
   async save(value: PomodoroScene): Promise<PomodoroScene> {

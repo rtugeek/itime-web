@@ -11,5 +11,6 @@ export interface User {
   googleId?: string
   needUpdateInfo: boolean
   accessToken: string
+  accessTokenV2: string
   needSetPassword?: boolean
 }

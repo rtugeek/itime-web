@@ -10,6 +10,7 @@ import { AndroidApi } from '@/api/android/AndroidApi'
 
 const baseURL = 'https://itime.fun/api/v2'
 // const baseURL = 'http://127.0.0.1:8082/api/v2'
+// const baseURL = 'http://192.168.31.176:8082/api/v2'
 const api = axios.create({ baseURL, withCredentials: true })
 const cacheApi = setupCache(axios.create({ baseURL, withCredentials: true }), {
   storage: buildWebStorage(localStorage, 'itime-api-cache:'),

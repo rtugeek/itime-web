@@ -31,6 +31,9 @@ const router = createRouter({
         {
           name: 'Settings',
           path: 'settings',
+          children:[
+
+          ],
           component: () => import('@/views/settings/Settings.vue'),
         },
       ],
@@ -77,6 +80,11 @@ const router = createRouter({
           name: 'CountdownAdd',
           component: () => import('../views/countdown/AddCountdownView.vue'),
         },
+        {
+          path: 'format',
+          name: 'CountdownFormat',
+          component: () => import('../views/countdown/format/CountdownFormatView.vue'),
+        },
       ],
     },
     {
@@ -96,9 +104,34 @@ const router = createRouter({
       ],
     },
     {
+      path: '/pomodoro/history',
+      children: [
+        {
+          path: '',
+          name: 'PomodoroHistory',
+          component: () => import('../views/pomodoro/history/PomodoroHistoryView.vue'),
+        },
+      ],
+    },
+    {
+      path: '/settings/debug',
+      name: 'DebugInfo',
+      component: () => import('../views/settings/DebugInfoView.vue'),
+    },
+    {
+      path: '/settings/ics',
+      name: 'Ics',
+      component: () => import('../views/settings/IcsCalenderView.vue'),
+    },
+    {
       path: '/widget/todo/list',
       name: 'WidgetTodoList',
       component: () => import('../views/todo/AddTodoView.vue'),
+    },
+    {
+      path: '/widget/gallery',
+      name: 'WidgetGallery',
+      component: () => import('../widgets/WidgetGallery.vue'),
     },
   ],
 })

@@ -19,6 +19,10 @@ export const pomodoroMessage: DefaultLocaleMessageSchema = {
         name: '名称不能为空',
       },
       iconAndName: '图标与名称',
+      history: {
+        title: '历史记录',
+        deleteTip: '是否删除该记录？',
+      },
     },
   },
   en: {
@@ -39,6 +43,10 @@ export const pomodoroMessage: DefaultLocaleMessageSchema = {
         name: 'Name is required',
       },
       iconAndName: 'Icon and Name',
+      history: {
+        title: 'History',
+        deleteTip: 'Delete this record?',
+      },
     },
   },
 }

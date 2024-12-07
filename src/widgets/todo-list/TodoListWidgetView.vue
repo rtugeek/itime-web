@@ -93,7 +93,6 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
     font-size: 1.1rem;
     height: calc(100% - 48px);
     .list {
-      width: 100%;
       padding: 16px;
       display: flex;
       flex-direction: column;

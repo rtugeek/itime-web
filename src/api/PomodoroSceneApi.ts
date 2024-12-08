@@ -9,10 +9,10 @@ export class PomodoroSceneApi {
 
   /**
    * @param page      从1开始
-   * @param pageSize
+   * @param size
    */
-  static async find(page: number = 1, pageSize: number = 100): Promise<PageResult<PomodoroScene>> {
-    return await api.get(`/pomodoro/scene?page=${page}&pageSize=${pageSize}`)
+  static async find(page: number = 1, size: number = 100): Promise<PageResult<PomodoroScene>> {
+    return await api.get(`/pomodoro/scene?page=${page}&size=${size}`)
   }
 
   static async delete(id: string | number) {

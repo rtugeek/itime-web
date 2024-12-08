@@ -6,6 +6,7 @@ export interface PomodoroScene {
   name: string
   duration: number
   icon: string
+  needSync?: boolean
 }
 
 export const DefaultScenes: PomodoroScene[] = [

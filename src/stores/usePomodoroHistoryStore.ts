@@ -11,18 +11,6 @@ export const usePomodoroHistoryStore = defineStore('pomodoroHistoryStore', () =>
     return await PomodoroHistoryRepository.findBySceneId(sceneId)
   }
 
-  async function sync() {
-    const historyList = await PomodoroHistoryRepository.all()
-    for (const history of historyList) {
-      if (!history.sceneId) {
-        await PomodoroHistoryRepository.remove(history.id)
-      }
-      if (userStore.isLogin && !history.tableId) {
-        await syncHistory(history)
-      }
-    }
-  }
-
   async function deleteHistory(history: PomodoroHistory) {
     if (userStore.isLogin && history.tableId) {
       await PomodoroHistoryApi.delete(history.id)
@@ -36,6 +24,7 @@ export const usePomodoroHistoryStore = defineStore('pomodoroHistoryStore', () =>
   async function syncHistory(history: PomodoroHistory) {
     const res = await PomodoroHistoryApi.save(history)
     history.tableId = res.tableId
+    history.needSync = false
     await PomodoroHistoryRepository.save(history)
   }
 
@@ -46,7 +35,6 @@ export const usePomodoroHistoryStore = defineStore('pomodoroHistoryStore', () =>
     }
   }
 
-  sync()
   return {
     findBySceneId,
     deleteHistory,

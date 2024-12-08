@@ -1,12 +1,15 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useBroadcastChannel, useStorage } from '@vueuse/core'
+import consola from 'consola'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { AppConfig } from '@/common/AppConfig'
 import { useUserStore } from '@/stores/useUserStore'
 import { PomodoroSceneApi } from '@/api/PomodoroSceneApi'
 import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
+import { PomodoroHistorySync } from '@/data/sync/PomodoroHistorySync'
+import { PomodoroSceneSync } from '@/data/sync/PomodoroSceneSync'
 
 export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
   const scenes = ref<PomodoroScene[]>([])
@@ -23,35 +26,13 @@ export const usePomodoroSceneStore = defineStore('pomodoroSceneStore', () => {
     }
   })
 
+  if (userStore.isLogin) {
+    PomodoroSceneSync.sync().catch(consola.error)
+    PomodoroHistorySync.sync().catch(consola.error)
+  }
+
   async function reload() {
-    const res = await PomodoroSceneRepository.all()
-    for (const scene of res) {
-      if (userStore.isLogin) {
-        if (!scene.tableId) {
-          PomodoroSceneApi.save(scene)
-            .then((result) => {
-              scene.tableId = result.tableId
-              PomodoroSceneRepository.save(scene)
-            }).catch()
-        }
-      }
-    }
-    if (userStore.isLogin) {
-      PomodoroSceneApi.find().then(async (result) => {
-        for (const datum of result.data) {
-          const localHis = await PomodoroSceneRepository.get(datum.tableId!)
-          if (localHis) {
-            if (localHis.updateTime!.getTime() < datum.updateTime!.getTime()) {
-              await PomodoroSceneRepository.save(datum)
-            }
-          }
-          else {
-            await PomodoroSceneRepository.save(datum)
-          }
-        }
-      }).catch()
-    }
-    scenes.value = res
+    scenes.value = await PomodoroSceneRepository.all()
   }
 
   const { post, data } = useBroadcastChannel({ name: 'pomodoroSceneStore' })

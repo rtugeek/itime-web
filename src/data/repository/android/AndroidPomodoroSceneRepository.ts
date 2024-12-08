@@ -7,8 +7,8 @@ export class AndroidPomodoroSceneRepository implements IPomodoroSceneRepository 
     return Promise.resolve(AndroidApi.request('AndroidPomodoroSceneRepository', 'get', id.toString())!)
   }
 
-  async save(value: PomodoroScene): Promise<PomodoroScene> {
-    return AndroidApi.request('AndroidPomodoroSceneRepository', 'save', JSON.stringify(value))!
+  async save(value: PomodoroScene, needSync: boolean): Promise<PomodoroScene> {
+    return AndroidApi.request('AndroidPomodoroSceneRepository', 'save', JSON.stringify(value), `${needSync}`)!
   }
 
   remove(id: string | number): Promise<void> {

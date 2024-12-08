@@ -110,14 +110,15 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
       const now = new Date()
       model.value.createAt = now
       const time = now.getTime()
+      const nowISO = now.toISOString()
       pomodoroHistoryStore.save({
         sceneId: sceneId.value,
-        createAt: now,
         duration: model.value.duration,
         finishAt: now,
+        finishTime: nowISO,
         id: time,
+        startTime: model.value.startAt!.toISOString(),
         startAt: model.value.startAt!,
-        updateAt: now,
       })
       PomodoroSceneRepository.get(sceneId.value).then((scene) => {
         if (scene) {

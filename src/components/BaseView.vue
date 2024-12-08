@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { BrowserWindowApi } from '@widget-js/core'
 import { Close, Left } from '@icon-park/vue-next'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { usePreferredDark } from '@vueuse/core'
 import { AppUtils } from '@/utils/AppUtils'
 
@@ -31,6 +31,8 @@ function mouseUp() {
 function close() {
   window.close()
 }
+
+const route = useRoute()
 </script>
 
 <template>

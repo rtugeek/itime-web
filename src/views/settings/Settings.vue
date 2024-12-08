@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { User } from '@icon-park/vue-next'
+import { Android, Apple, User } from '@icon-park/vue-next'
 import { showDialog } from '@nutui/nutui'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { BrowserWindowApi } from '../../../../@widget-js/core'
 import PomodoroSettings from '@/views/settings/PomodoroSettings.vue'
 import { useUserStore } from '@/stores/useUserStore'
 
@@ -27,6 +28,10 @@ function profileClick() {
     router.push({ name: 'UserSignIn' })
   }
 }
+
+function viewApp() {
+  BrowserWindowApi.openUrl('https://itime.fun/', { external: true })
+}
 </script>
 
 <template>
@@ -39,19 +44,31 @@ function profileClick() {
           </nut-avatar>
           <span>{{ user.nick }}</span>
           <nut-button class="ml-auto" size="small" @click="logout">
-            {{t('user.signOut')}}
+            {{ t('user.signOut') }}
           </nut-button>
         </template>
         <template v-else>
           <nut-avatar shape="round">
             <User />
           </nut-avatar>
-          <span>{{t('user.signIn')}}</span>
+          <span>{{ t('user.signIn') }}</span>
         </template>
       </div>
     </NutCell>
     {{ t('pomodoro.settings') }}
     <PomodoroSettings />
+    <div class="flex items-center gap-2">{{t('app.download')}} <Android /> /  <Apple /></div>
+    <NutCell>
+      <div class="flex gap-2 items-center w-full">
+        <nut-avatar shape="round">
+          <img src="@/assets/logo.png">
+        </nut-avatar>
+        <span>iTime</span>
+        <nut-button class="ml-auto" size="small" @click="viewApp">
+          {{t('view')}}
+        </nut-button>
+      </div>
+    </NutCell>
   </div>
 </template>
 

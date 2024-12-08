@@ -11,7 +11,7 @@ defineProps<{ title: string, content: string | number, unit: string }>()
       <div class="content font-bold text-2xl">
         {{ content }}
       </div>
-      <div class="unit">
+      <div class="unit" style="text-transform: capitalize">
         {{ unit }}
       </div>
     </div>

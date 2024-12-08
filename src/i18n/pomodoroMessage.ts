@@ -23,6 +23,9 @@ export const pomodoroMessage: DefaultLocaleMessageSchema = {
         title: '历史记录',
         deleteTip: '是否删除该记录？',
       },
+      totalDuration: '累计时长',
+      checkInDays: '打卡天数',
+      records: '总记录数',
     },
   },
   en: {
@@ -44,9 +47,12 @@ export const pomodoroMessage: DefaultLocaleMessageSchema = {
       },
       iconAndName: 'Icon and Name',
       history: {
-        title: 'History',
+        title: 'Records',
         deleteTip: 'Delete this record?',
       },
+      totalDuration: 'Total',
+      checkInDays: 'Days',
+      records: 'Records',
     },
   },
 }

@@ -2,7 +2,6 @@ import type { AxiosInstance } from 'axios'
 import axios from 'axios'
 import { buildWebStorage, setupCache } from 'axios-cache-interceptor'
 import { showNotify } from '@nutui/nutui'
-import { SignatureUtils } from '@/utils/SignatureUtils'
 import { AppConfig } from '@/common/AppConfig'
 import { useUserStore } from '@/stores/useUserStore'
 import { AndroidApi } from '@/api/android/AndroidApi'
@@ -28,14 +27,7 @@ function generateNonceStr() {
 
 function setupInterceptors(instance: AxiosInstance) {
   instance.interceptors.request.use((config) => {
-    const appKey = '1'
-    const nonce = generateNonceStr()
-    const timestamp = new Date().getTime()
-    config.headers.appKey = appKey
-    config.headers.nonce = nonce
     config.headers['content-type'] = 'application/json;charset=UTF-8'
-    config.headers.timestamp = timestamp
-    config.headers.sign = SignatureUtils.sign(config.params, appKey, timestamp.toString(), nonce)
     const token = AndroidApi.hasApi() ? AndroidApi.getAccessToken() : localStorage.getItem(AppConfig.KEY_TOKEN)
     if (token) {
       config.headers.set('itime-token', token)

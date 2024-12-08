@@ -8,6 +8,7 @@ export class AppUtils {
     }
     else {
       if (window.history.length == 1) {
+        // 这个是用于组件弹出界面，如果历史层级只有1，直接返回首页
         router.push('/')
       }
       else {

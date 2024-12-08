@@ -2,10 +2,12 @@
 import { computed, ref } from 'vue'
 import { useSortable } from '@vueuse/integrations/useSortable'
 import { storeToRefs } from 'pinia'
+import { useSound } from '@vueuse/sound'
 import TodoItem from '@/widgets/todo-list/components/TodoItem.vue'
 import { delay } from '@/utils/TimeUtils'
 import { useTodoStore } from '@/stores/useTodoStore'
 import type { Todo } from '@/data/Todo'
+import Ding from '@/assets/audio/ding.mp3'
 
 const props = defineProps({
   isCompleted: Boolean,
@@ -13,16 +15,14 @@ const props = defineProps({
 const listRef = ref<HTMLElement>()
 const todoStore = useTodoStore()
 const { completedTodos, todos: todoList } = storeToRefs(todoStore)
-const ringtone = ref<HTMLAudioElement>()
-
+const { play } = useSound(Ding)
 function finishTodo(todo: Todo) {
   if (todo.completedDateTime) {
     todoStore.reTodo(todo)
   }
   else {
     todoStore.finishTodo(todo)
-    const clone = ringtone.value!.cloneNode(true) as HTMLAudioElement
-    clone.play()
+    play()
   }
 }
 
@@ -44,7 +44,6 @@ const todos = computed(() => {
 
 <template>
   <div class="wrapper">
-    <audio ref="ringtone" src="./audio/ding.mp3" />
     <div ref="listRef" class="list">
       <div v-for="item in todos" :key="`${item.id}-${item.lastModifiedDateTime}`" class="draggable">
         <TodoItem

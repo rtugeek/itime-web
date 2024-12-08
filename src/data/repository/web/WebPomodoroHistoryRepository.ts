@@ -1,7 +1,9 @@
 import localforage from 'localforage'
 import dayjs from 'dayjs'
+import consola from 'consola'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 import type { IPomodoroHistoryRepository } from '@/data/repository/interface/IPomodoroHistoryRepository'
+import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 
 const pomodoroHistoryRepository = localforage.createInstance({ name: 'pomodoro' })
 export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository {
@@ -13,11 +15,6 @@ export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository 
     if (!value.id) {
       value.id = new Date().getTime() + Math.ceil(Math.random() * 1000)
     }
-    const updateTime = dayjs().toISOString()
-    if (!value.createTime) {
-      value.createTime = dayjs().toISOString()
-    }
-    value.updateTime = updateTime
     return pomodoroHistoryRepository.setItem(value.id.toString(), value)
   }
 
@@ -63,3 +60,31 @@ export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository 
     return histories
   }
 }
+
+async function migrate() {
+  const keys = await pomodoroHistoryRepository.keys()
+  for (const key of keys) {
+    const history = await pomodoroHistoryRepository.getItem<PomodoroHistory>(key)
+    if (history) {
+      if (history.startAt) {
+        history.startTime = dayjs(history.startAt).toISOString()
+        delete history.startAt
+      }
+      if (history.finishAt) {
+        history.finishTime = dayjs(history.finishAt).toISOString()
+        delete history.finishAt
+      }
+      if (history.updateAt) {
+        delete history.updateAt
+      }
+      if (history.createAt) {
+        delete history.createAt
+      }
+      await pomodoroHistoryRepository.setItem(key, history)
+      if (!history.sceneId || !history.finishTime) {
+        await PomodoroHistoryRepository.remove(history.id)
+      }
+    }
+  }
+}
+migrate().catch(e => consola.error(e))

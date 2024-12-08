@@ -11,6 +11,8 @@ import { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { AppUtils } from '@/utils/AppUtils'
 import { useI18n } from 'vue-i18n'
+import DateInput from '@/components/DateInput.vue'
+import FloatingActionButton from '@/components/FloatingActionButton.vue'
 
 BrowserWindowApi.setAlwaysOnTop(true)
 const router = useRouter()

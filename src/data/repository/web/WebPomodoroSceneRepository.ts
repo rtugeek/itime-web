@@ -5,7 +5,7 @@ import { DefaultScenes } from '@/data/PomodoroScene'
 import type { IPomodoroSceneRepository } from '@/data/repository/interface/IPomodoroSceneRepository'
 import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 
-const pomodoroSceneRepository = localforage.createInstance({ name: 'pomodoro-scene' })
+const pomodoroSceneRepository = localforage.createInstance({name: 'pomodoro-scene'})
 
 export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
   async get(key: string | number) {
@@ -20,6 +20,7 @@ export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
       value.createTime = new Date()
     }
     value.updateTime = new Date()
+    value.needSync = false
     return pomodoroSceneRepository.setItem(value.id.toString(), value)
   }
 

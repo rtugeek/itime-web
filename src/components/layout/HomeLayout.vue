@@ -38,7 +38,7 @@ const { height } = useWindowSize()
         <!--            <Check></Check> -->
         <!--          </template> -->
         <!--        </nut-tabbar-item> -->
-        <nut-tabbar-item :tab-title="t('countdown')">
+        <nut-tabbar-item :tab-title="t('countdown.title')">
           <template #icon>
             <HourglassNull />
           </template>

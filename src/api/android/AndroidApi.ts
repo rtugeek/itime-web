@@ -1,4 +1,3 @@
-
 export type AndroidApiType =
   'AndroidPomodoroSceneRepository'
   | 'AndroidApi'

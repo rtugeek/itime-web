@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
+import PomodoroSceneItem from '@/widgets/pomodoro/components/PomodoroSceneItem.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -19,13 +20,7 @@ pomodoroSceneStore.reload()
 <template>
   <div class="flex flex-col gap-4 w-full">
     <div v-for="scene in scenes" :key="scene.id" class="scene flex" @click="goDetail(scene)">
-      <div class="flex gap-2">
-        <div>{{ scene.icon }}</div>
-        <div>{{ scene.name }}</div>
-      </div>
-      <div class="ml-auto">
-        {{ Math.round(dayjs.duration(scene.duration ?? 0, 'second').as('minutes')) }}{{ t('minute') }}
-      </div>
+      <PomodoroSceneItem :scene="scene"/>
     </div>
   </div>
 </template>

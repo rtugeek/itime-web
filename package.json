@@ -24,6 +24,7 @@
     "@nutui/touch-emulator": "^1.0.0",
     "@vueuse/core": "^10.9.0",
     "@vueuse/integrations": "^10.9.0",
+    "@vueuse/sound": "^2.0.1",
     "@widget-js/core": "workspace:*",
     "@widget-js/vue3": "workspace:*",
     "axios": "^1.6.8",

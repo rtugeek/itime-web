@@ -1,9 +1,10 @@
 import { createI18n } from 'vue-i18n'
-import { todoMessage } from '@/i18n/todo'
-import { pomodoroMessage } from '@/i18n/pomodoro'
-import { countdownMessage } from '@/i18n/countdown'
+import { todoMessage } from '@/i18n/todoMessage'
+import { pomodoroMessage } from '@/i18n/pomodoroMessage'
+import { countdownMessage } from '@/i18n/countdownMessage'
 import { birthdayMessage } from '@/i18n/birthdayMessage'
 import { userMessage } from '@/i18n/userMessage'
+import { unitMessage } from '@/i18n/unitMessage'
 
 export const i18n = createI18n({
   locale: 'en',
@@ -21,7 +22,6 @@ export const i18n = createI18n({
   },
   messages: {
     zh: {
-      countdown: '倒计时',
       settings: '设置',
       appSettings: '应用设置',
       save: '保存',
@@ -31,12 +31,16 @@ export const i18n = createI18n({
       widgets: '小组件',
       copy: '复制',
       copied: '已复制',
+      view: '查看',
       recurrence: {
         title: '重复设置',
         none: '不重复',
         daily: '每天',
         weekly: '每周',
         monthly: '每月',
+      },
+      app: {
+        download: '下载APP',
       },
       week: {
         number: '第{week}周',
@@ -45,11 +49,6 @@ export const i18n = createI18n({
       debug: {
         title: '设备信息',
       },
-      ...todoMessage.zh,
-      ...pomodoroMessage.zh,
-      ...countdownMessage.zh,
-      ...birthdayMessage.zh,
-      ...userMessage.zh,
       ics: {
         title: '日历订阅',
         desc: '日历订阅功能是指将iTime中的事件订阅到其他日历应用中（如谷歌日历、苹果日历、微软日历等），或者将其他日历订阅到iTime中。',
@@ -58,10 +57,16 @@ export const i18n = createI18n({
         subscribeSuccess: '订阅成功',
         importPlaceholder: '输入ics链接',
       },
+      ...todoMessage.zh,
+      ...pomodoroMessage.zh,
+      ...countdownMessage.zh,
+      ...birthdayMessage.zh,
+      ...userMessage.zh,
+      ...unitMessage.zh,
     },
     en: {
-      countdown: 'Countdown',
       widgets: 'Widgets',
+      view: 'View',
       settings: 'Settings',
       appSettings: 'App Settings',
       copied: 'Copied',
@@ -70,7 +75,9 @@ export const i18n = createI18n({
       saving: 'Saving',
       minute: 'min',
       copy: 'Copy',
-
+      app: {
+        download: 'Download App',
+      },
       recurrence: {
         title: 'Recurrence',
         none: 'None',
@@ -98,6 +105,7 @@ export const i18n = createI18n({
       ...countdownMessage.en,
       ...birthdayMessage.en,
       ...userMessage.en,
+      ...unitMessage.en,
     },
   },
 })

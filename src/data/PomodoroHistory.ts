@@ -2,31 +2,25 @@ export interface PomodoroHistory {
   tableId?: string
   id: number
   duration: number
-  /**
-   * @deprecated
-   */
-  finishAt: Date
-  /**
-   * @deprecated
-   */
-  startAt: Date
+  sceneId: number
   userId?: number
   /**
    * @deprecated
    */
-  createAt: Date
-  sceneId: number
+  finishAt?: Date
   /**
    * @deprecated
    */
-  deleteAt?: Date
+  updateAt?: Date
   /**
    * @deprecated
    */
-  updateAt: Date
+  createAt?: Date
+  /**
+   * @deprecated
+   */
+  startAt?: Date
   finishTime: string
   startTime: string
-  updateTime: string
-  createTime: string
-  deleteTime?: string
+  needSync?: boolean
 }

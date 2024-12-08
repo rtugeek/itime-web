@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Delete } from '@icon-park/vue-next'
 import { showDialog, showToast } from '@nutui/nutui'
+import consola from 'consola'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 import { usePomodoroHistoryStore } from '@/stores/usePomodoroHistoryStore'
@@ -17,7 +18,7 @@ const histories = ref<PomodoroHistory[]>()
 if (id) {
   PomodoroHistoryRepository.findBySceneId(id).then((his) => {
     histories.value = his
-    console.log(histories.value)
+    consola.log(histories.value)
   })
 }
 

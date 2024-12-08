@@ -3,6 +3,7 @@ import type { DefaultLocaleMessageSchema } from 'vue-i18n'
 export const countdownMessage: DefaultLocaleMessageSchema = {
   zh: {
     countdown: {
+      title: '倒计时',
       add: '添加倒计时',
       edit: '编辑倒计时',
       deleteConfirm: '确定要删除 {name}?',
@@ -43,6 +44,7 @@ export const countdownMessage: DefaultLocaleMessageSchema = {
   },
   en: {
     countdown: {
+      title: 'Countdown',
       days: 'day | day | days',
       add: 'Add Countdown',
       edit: 'Edit Countdown',

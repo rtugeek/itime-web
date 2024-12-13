@@ -4,10 +4,10 @@
  */
 export type PomodoroStatus = 'stop' | 'running' | 'pause' | 'waiting' | 'resting'
 export interface PomodoroModel {
-  startAt?: Date
-  finishAt?: Date
-  pauseAt?: Date
-  createAt?: Date
+  startAt?: string
+  finishAt?: string
+  pauseAt?: string
+  createAt?: string
   /**
    * 单位秒
    */

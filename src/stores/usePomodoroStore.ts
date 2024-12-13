@@ -12,10 +12,12 @@ import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 
 export const usePomodoroStore = defineStore('pomodoroStore', () => {
+  const now = new Date()
+  const nowStr = now.toISOString()
   const model = useStorage<PomodoroModel>(AppConfig.KEY_POMODORO, {
     status: 'stop',
-    startAt: new Date(),
-    finishAt: new Date(),
+    startAt: nowStr,
+    finishAt: nowStr,
     duration: 0,
     restDuration: 0,
   })
@@ -35,11 +37,12 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   })
 
   function reset() {
+    const now = new Date()
     model.value = {
       status: 'stop',
       restDuration: 0,
-      startAt: new Date(),
-      finishAt: new Date(),
+      startAt: now.toISOString(),
+      finishAt: now.toISOString(),
       duration: 0,
     }
   }
@@ -87,8 +90,9 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
 
   function start() {
     if (model.value.status != 'pause') {
+      const now = new Date()
       model.value.duration = 0
-      model.value.startAt = new Date()
+      model.value.startAt = now.toISOString()
       model.value.finishAt = undefined
     }
     model.value.status = 'running'
@@ -108,17 +112,16 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
     }
     else {
       const now = new Date()
-      model.value.createAt = now
       const time = now.getTime()
       const nowISO = now.toISOString()
+      model.value.createAt = nowISO
+      const startAtStr = typeof model.value.startAt! == 'string' ? model.value.startAt! : (model.value.startAt! as unknown as Date).toISOString()
       pomodoroHistoryStore.save({
         sceneId: sceneId.value,
         duration: model.value.duration,
-        finishAt: now,
         finishTime: nowISO,
+        startTime: startAtStr,
         id: time,
-        startTime: model.value.startAt!.toISOString(),
-        startAt: model.value.startAt!,
       })
       PomodoroSceneRepository.get(sceneId.value).then((scene) => {
         if (scene) {

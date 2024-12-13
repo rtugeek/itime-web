@@ -4,10 +4,12 @@
   "author": "Wisdom LTD",
   "homepage": "",
   "title": {
-    "zh-CN": "iTime"
+    "zh-CN": "iTime",
+    "en-US": "iTime"
   },
   "description": {
-    "zh-CN": "修改成你的组件描述"
+    "zh-CN": "倒计时、纪念日、生日、日程管理，您的时间助理",
+    "en-US": "Countdowns, anniversaries, birthdays, and schedule management—your personal time assistant."
   },
   "entry": "index.html",
   "remoteEntry": "https://itime.fun/web",
@@ -17,6 +19,7 @@
     "base": "/web",
     "hostname": "itime.fun"
   },
+  "icon": "/favicon-96x96.png",
   "hash": true,
   "url": "",
   "widgets": [

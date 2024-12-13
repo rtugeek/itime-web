@@ -31,9 +31,7 @@ const router = createRouter({
         {
           name: 'Settings',
           path: 'settings',
-          children:[
-
-          ],
+          children: [],
           component: () => import('@/views/settings/Settings.vue'),
         },
       ],
@@ -131,7 +129,12 @@ const router = createRouter({
     {
       path: '/widget/gallery',
       name: 'WidgetGallery',
-      component: () => import('../widgets/WidgetGallery.vue'),
+      component: () => import('../widgets/WebWidgetGallery.vue'),
+    },
+    {
+      path: '/widget/gallery/android',
+      name: 'WidgetAndroidGallery',
+      component: () => import('../widgets/AndroidWidgetGallery.vue'),
     },
   ],
 })

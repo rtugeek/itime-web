@@ -8,6 +8,7 @@ import { SystemApiEvent } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
 import { type Almanac, PublicEventApi } from '@/api/PublicEventApi'
+import AlmanacInfo from '@/widgets/calendar/AlmanacInfo.vue'
 
 const today = ref(dayjs())
 const currentMonth = ref(dayjs())
@@ -56,6 +57,17 @@ useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
 })
 
 const weekKeyPath = ['week.short.sunday', 'week.short.monday', 'week.short.tuesday', 'week.short.wednesday', 'week.short.thursday', 'week.short.friday', 'week.short.saturday']
+const showDetail = ref(false)
+const selectedAlmanac = ref<Almanac>()
+const selectedSolar = ref<Solar>()
+
+const show = (solar: Solar) => {
+  selectedAlmanac.value = findAlmanac(solar)
+  selectedSolar.value = solar
+  if (selectedAlmanac.value) {
+    showDetail.value = true
+  }
+}
 </script>
 
 <template>
@@ -80,13 +92,14 @@ const weekKeyPath = ['week.short.sunday', 'week.short.monday', 'week.short.tuesd
       <div class="flex justify-around px-2 text-xs opacity-70">
         <div v-for="item in weekKeyPath" :key="`week-key-${item}`" v-t="item" />
       </div>
+      <AlmanacInfo v-model="showDetail" :solar="selectedSolar" :almanac="selectedAlmanac" />
       <div class="flex flex-col h-full justify-around px-2">
         <div v-for="week in weeks" :key="`week-${week.getIndex()}`" class="flex w-full justify-around">
           <div
             v-for="day in week.getDays()" :key="day.getDay()" class="flex w-full flex-col items-center content-center"
             :class="{ 'opacity-40': day.getMonth() != currentMonthIndex + 1 }"
           >
-            <CalendarDay :day="day" :almanac="findAlmanac(day)" />
+            <CalendarDay :day="day" :almanac="findAlmanac(day)" @click="show(day)" />
           </div>
         </div>
       </div>
@@ -105,7 +118,8 @@ const weekKeyPath = ['week.short.sunday', 'week.short.monday', 'week.short.tuesd
     background-color: rgba(0, 0, 0, 0.35);
     color: white;
   }
-  .btn{
+
+  .btn {
     width: 28px;
     height: 28px;
   }

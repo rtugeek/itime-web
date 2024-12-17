@@ -3,6 +3,7 @@ import { Solar } from 'lunar-typescript'
 import type { PropType } from 'vue'
 import { computed } from 'vue'
 import type { Almanac } from '@/api/PublicEventApi'
+import AlmanacInfo from '@/widgets/calendar/AlmanacInfo.vue'
 
 const props = defineProps({
   day: {
@@ -22,11 +23,22 @@ const isToday = computed<boolean>(() => {
 const festivals = computed(() => {
   return props.day.getFestivals()
 })
+
+const bottomText = computed(() => {
+  if (festivals.value.length > 0) {
+    const festivalName = festivals.value[0]
+    if (festivalName.length <= 6) {
+      return festivalName
+    }
+  }
+  return props.almanac?.term ?? ''
+})
 </script>
 
 <template>
   <div
-    class="calendar-day flex flex-col items-center relative content-center rounded-full size-11" :class="{
+    class="calendar-day flex flex-col items-center relative content-center rounded-full size-11"
+    :class="{
       today: isToday,
     }"
   >
@@ -34,8 +46,8 @@ const festivals = computed(() => {
       {{ day.getDay() }}
     </div>
     <div style="font-size: 10px" class="text-xs text-center">
-      <span v-if="festivals.length > 0" class="festival">
-        {{ festivals[0] }}
+      <span v-if="bottomText" class="festival">
+        {{ bottomText }}
       </span>
       <span v-else class="calendar-lunar" :class="{ today: !isToday }">
         {{ day.getLunar().getDayInChinese() }}
@@ -54,6 +66,12 @@ const festivals = computed(() => {
 
 <style scoped lang="scss">
 .calendar-day {
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--widget-primary-color) 100%, transparent 50%);
+  }
+
   color: var(--widget-color);
 
   &.today {

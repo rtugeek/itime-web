@@ -18,13 +18,6 @@ const cacheApi = setupCache(axios.create({ baseURL, withCredentials: true }), {
   },
 })
 
-/**
- * 生成10位随机字符串
- */
-function generateNonceStr() {
-  return Math.random().toString(36).substring(2, 12)
-}
-
 function setupInterceptors(instance: AxiosInstance) {
   instance.interceptors.request.use((config) => {
     config.headers['content-type'] = 'application/json;charset=UTF-8'

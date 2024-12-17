@@ -1,8 +1,8 @@
-import { cacheApi } from '@/api/Api'
+import { api } from '@/api/Api'
 
 export class PublicEventApi {
   static getCalendar(): Promise<Almanac[]> {
-    return cacheApi.get('/event/public/calendar')
+    return api.get('/event/public/calendar')
   }
 }
 

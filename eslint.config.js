@@ -10,6 +10,7 @@ export default antfu({
     'vue/require-prop-types': 'off',
     'vue/dot-location': 'off',
     'ts/prefer-ts-expect-error': 'off',
+    'antfu/top-level-function': 'off',
     'spaced-comment': ['error', 'always', { exceptions: ['#__PURE__'] }],
     'no-restricted-imports': [
       'error',

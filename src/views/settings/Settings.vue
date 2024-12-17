@@ -4,7 +4,7 @@ import { Android, Apple, User } from '@icon-park/vue-next'
 import { showDialog } from '@nutui/nutui'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { BrowserWindowApi } from '../../../../@widget-js/core'
+import { BrowserWindowApi } from '@widget-js/core'
 import PomodoroSettings from '@/views/settings/PomodoroSettings.vue'
 import { useUserStore } from '@/stores/useUserStore'
 

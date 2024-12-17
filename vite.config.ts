@@ -18,6 +18,10 @@ export default defineConfig((config: UserConfig) => {
     mode = 'production'
     base = '/assets'
   }
+  else if (mode == 'ios') {
+    mode = 'production'
+    base = '/'
+  }
   consola.info(`config:`, config)
   return {
     mode,

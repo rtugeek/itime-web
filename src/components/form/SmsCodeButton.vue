@@ -3,7 +3,6 @@ import { useIntervalFn, useStorage } from '@vueuse/core'
 import { nextTick, onMounted, ref } from 'vue'
 import { showNotify, showToast } from '@nutui/nutui'
 import { AppConfig } from '@/common/AppConfig'
-import { UserApi } from '@/api/UserApi'
 import { SmsApi } from '@/api/SmsApi'
 
 const props = defineProps({
@@ -11,7 +10,16 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  captchaUuid: {
+    type: String,
+  },
+  imageCode: {
+    type: String,
+  },
 })
+
+const emits = defineEmits(['onFailed'])
+const countdownText = ref(`60`)
 const countdown = useStorage<Date | undefined>(AppConfig.KEY_GET_SMS_CODE_TIME, undefined, undefined, {
   serializer: {
     read(str) {
@@ -28,29 +36,8 @@ const countdown = useStorage<Date | undefined>(AppConfig.KEY_GET_SMS_CODE_TIME, 
     },
   },
 })
-const countdownText = ref(`60`)
-async function getCode() {
-  // 检测是否是有效手机
-  if (!/^1[3-9]\d{9}$/.test(props.phone)) {
-    showNotify.danger('请输入正确手机号')
-    return
-  }
-  showToast.loading('请等待')
-  const isPhoneUsed = await UserApi.isPhoneUsed(props.phone)
-  if (isPhoneUsed) {
-    showNotify.danger('手机号已被注册')
-    showToast.hide()
-    return
-  }
-  await SmsApi.getCode(props.phone)
-  showNotify.success('验证码已发送')
-  countdownText.value = '60'
-  countdown.value = new Date()
-  showToast.hide()
-  resume()
-}
 
-const { resume } = useIntervalFn(() => {
+const { resume: startCountdown } = useIntervalFn(() => {
   if (countdown.value) {
     const now = new Date()
     const diff = now.getTime() - countdown.value.getTime()
@@ -63,10 +50,37 @@ const { resume } = useIntervalFn(() => {
   }
 }, 1000, { immediate: false })
 
+async function getCode() {
+  if (!props.imageCode) {
+    showNotify.danger('请先输入图片验证码')
+    return
+  }
+  // 检测是否是有效手机
+  if (!/^1[3-9]\d{9}$/.test(props.phone)) {
+    showNotify.danger('请输入正确手机号')
+    return
+  }
+  showToast.loading('请等待', { id: 'get-sms-code' })
+  SmsApi.getCode(props.phone, props.imageCode, props.captchaUuid).then(() => {
+    showNotify.success('验证码已发送')
+    countdownText.value = '60'
+    countdown.value = new Date()
+    startCountdown()
+  }).catch(() => {
+    emits('onFailed')
+  }).finally(() => {
+    showToast.hide('get-sms-code')
+  })
+}
+
+defineExpose({
+  startCountdown,
+})
+
 onMounted(async () => {
   await nextTick()
   if (countdown.value != undefined) {
-    resume()
+    startCountdown()
   }
 })
 </script>

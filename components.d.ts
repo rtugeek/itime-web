@@ -45,5 +45,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SmsCodeButton: typeof import('./src/components/form/SmsCodeButton.vue')['default']
+    SmsFormItem: typeof import('./src/components/form/SmsFormItem.vue')['default']
   }
 }

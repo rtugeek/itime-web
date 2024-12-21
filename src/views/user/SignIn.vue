@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { showToast } from '@nutui/nutui'
+import { Mail, Phone, Wechat } from '@icon-park/vue-next'
 import consola from 'consola'
 import { useRouter } from 'vue-router'
-import SmsCodeButton from '@/components/form/SmsCodeButton.vue'
 import { useUserStore } from '@/stores/useUserStore'
 
 const userStore = useUserStore()
@@ -14,18 +14,13 @@ const formData = ref({
   password: '',
   code: '',
 })
-
-const loginType = ref<'password' | 'sms'>('password')
-
 function signIn() {
   showToast.loading('登录中')
   formRef.value?.validate().then(async ({ valid, errors }) => {
     if (valid) {
-      if (loginType.value == 'password') {
-        const user = await userStore.loginByPassword(formData.value.phone, formData.value.password)
-        if (user) {
-          router.back()
-        }
+      const user = await userStore.loginByPassword(formData.value.phone, formData.value.password)
+      if (user) {
+        router.back()
       }
     }
     else {
@@ -33,6 +28,15 @@ function signIn() {
     }
     showToast.hide()
   })
+}
+
+function otherSignIn(type: 'sms' | 'wechat' | 'mail') {
+  if (type == 'sms') {
+    router.push({ name: 'SmsSignIn' })
+  }
+  else {
+    showToast.warn('开发中')
+  }
 }
 
 const rules = {
@@ -51,26 +55,8 @@ const rules = {
       <nut-form-item label="手机号" prop="phone" label-width="50">
         <nut-input v-model="formData.phone" placeholder="请输入手机号" type="text" />
       </nut-form-item>
-      <nut-form-item v-if="loginType == 'password'" label-width="50" label="密码" prop="password">
-        <nut-input v-model="formData.password" placeholder="8-16位，必须包含字母和数字" type="password">
-          <template #right>
-            <nut-button size="small" @click="loginType = 'sms'">
-              验证码登录
-            </nut-button>
-          </template>
-        </nut-input>
-      </nut-form-item>
-      <nut-form-item v-if="loginType == 'sms'" label-width="50" label="验证码" prop="password">
-        <nut-input v-model="formData.password" placeholder="请输入验证码" type="text">
-          <template #right>
-            <div class="flex gap-2">
-              <nut-button size="small" @click="loginType = 'password'">
-                密码登录
-              </nut-button>
-              <SmsCodeButton />
-            </div>
-          </template>
-        </nut-input>
+      <nut-form-item label-width="50" label="密码" prop="password">
+        <nut-input v-model="formData.password" placeholder="8-16位，必须包含字母和数字" type="password" />
       </nut-form-item>
     </nut-form>
     <div class="flex flex-col gap-4">
@@ -83,9 +69,40 @@ const rules = {
         </nut-button>
       </router-link>
     </div>
+    <div class="sso flex w-full items-center gap-4 justify-center mt-8">
+      <div class="line" />
+      <div class="icon" @click="otherSignIn('sms')">
+        <Phone size="20" />
+      </div>
+      <div class="icon disable" @click="otherSignIn('mail')">
+        <Mail size="20" />
+      </div>
+      <div class="icon disable" @click="otherSignIn('wechat')">
+        <Wechat size="20" />
+      </div>
+      <div class="line" />
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-
+.icon {
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  &.disable{
+    background: darkgrey;
+  }
+  background: #478EF2;
+  border-radius: 50%;
+  color: white;
+}
+.sso{
+  .line{
+    width: 24px;
+    height: 1px;
+    border-radius: 50%;
+    background: rgba(145, 145, 145, 0.55);
+  }
+}
 </style>

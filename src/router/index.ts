@@ -50,6 +50,14 @@ const router = createRouter({
           component: SignIn,
         },
         {
+          path: 'sign/in/sms',
+          meta: {
+            title: '登录',
+          },
+          name: 'SmsSignIn',
+          component: () => import('@/views/user/SmsSignIn.vue'),
+        },
+        {
           meta: {
             title: '注册',
           },

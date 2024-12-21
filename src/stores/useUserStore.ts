@@ -40,7 +40,12 @@ export const useUserStore = defineStore('userStore', () => {
 
   const loginByPassword = async (phone: string, password: string) => {
     const remoteUser = await UserApi.loginByPassword(phone, password)
-    console.log(remoteUser)
+    latestUsername.value = phone
+    return login(remoteUser)
+  }
+
+  const loginBySms = async (phone: string, code: string) => {
+    const remoteUser = await UserApi.loginBySms(phone, code)
     latestUsername.value = phone
     return login(remoteUser)
   }
@@ -64,5 +69,5 @@ export const useUserStore = defineStore('userStore', () => {
     const remoteUser = await UserApi.register(phone, password, code)
     return login(remoteUser)
   }
-  return { user, isLogin, latestUsername, loginByPassword, register, logout }
+  return { user, isLogin, latestUsername, loginByPassword, loginBySms, register, logout }
 })

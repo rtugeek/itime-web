@@ -55,9 +55,11 @@ function viewApp() {
         </template>
       </div>
     </NutCell>
-    {{ t('pomodoro.settings') }}
+    <h4> {{ t('pomodoro.settings') }}</h4>
     <PomodoroSettings />
-    <div class="flex items-center gap-2">{{t('app.download')}} <Android /> /  <Apple /></div>
+    <h4 class="flex items-center gap-2">
+      {{ t('app.download') }} <Android /> /  <Apple />
+    </h4>
     <NutCell>
       <div class="flex gap-2 items-center w-full">
         <nut-avatar shape="round">
@@ -65,7 +67,7 @@ function viewApp() {
         </nut-avatar>
         <span>iTime</span>
         <nut-button class="ml-auto" size="small" @click="viewApp">
-          {{t('view')}}
+          {{ t('view') }}
         </nut-button>
       </div>
     </NutCell>

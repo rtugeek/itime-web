@@ -5,7 +5,9 @@ import { Mail, Phone, Wechat } from '@icon-park/vue-next'
 import consola from 'consola'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/useUserStore'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const userStore = useUserStore()
 const router = useRouter()
 const formRef = ref()
@@ -15,7 +17,7 @@ const formData = ref({
   code: '',
 })
 function signIn() {
-  showToast.loading('登录中')
+  showToast.loading(t('signIn.signingIn'))
   formRef.value?.validate().then(async ({ valid, errors }) => {
     if (valid) {
       const user = await userStore.loginByPassword(formData.value.phone, formData.value.password)
@@ -35,16 +37,16 @@ function otherSignIn(type: 'sms' | 'wechat' | 'mail') {
     router.push({ name: 'SmsSignIn' })
   }
   else {
-    showToast.warn('开发中')
+    showToast.warn(t('signIn.inDevelopment'))
   }
 }
 
 const rules = {
   phone: [
-    { regex: /^1[3-9]\d{9}$/, message: '请输入正确手机号' },
+    { regex: /^1[3-9]\d{9}$/, message: t('signIn.validation.phoneFormat') },
   ],
   code: [
-    { regex: /\d{4}/, message: '请输入正确验证码' },
+    { regex: /\d{4}/, message: t('signIn.validation.codeFormat') },
   ],
 }
 </script>
@@ -52,20 +54,28 @@ const rules = {
 <template>
   <div class="flex flex-col gap-2 p-4">
     <nut-form ref="formRef" :rules="rules" :model-value="formData">
-      <nut-form-item label="手机号" prop="phone" label-width="50">
-        <nut-input v-model="formData.phone" placeholder="请输入手机号" type="text" />
+      <nut-form-item :label="t('signIn.phone')" prop="phone" label-width="50">
+        <nut-input
+          v-model="formData.phone"
+          :placeholder="t('signIn.phonePlaceholder')"
+          type="text"
+        />
       </nut-form-item>
-      <nut-form-item label-width="50" label="密码" prop="password">
-        <nut-input v-model="formData.password" placeholder="8-16位，必须包含字母和数字" type="password" />
+      <nut-form-item label-width="50" :label="t('signIn.password')" prop="password">
+        <nut-input
+          v-model="formData.password"
+          :placeholder="t('signIn.passwordPlaceholder')"
+          type="password"
+        />
       </nut-form-item>
     </nut-form>
     <div class="flex flex-col gap-4">
       <nut-button class="flex-1" type="primary" @click="signIn">
-        登录
+        {{ t('signIn.signInButton') }}
       </nut-button>
       <router-link class="flex-1" :to="{ name: 'UserSignUp' }">
         <nut-button style="width:100%">
-          注册
+          {{ t('signIn.signUpButton') }}
         </nut-button>
       </router-link>
     </div>

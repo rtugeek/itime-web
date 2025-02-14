@@ -5,7 +5,7 @@ const DeadlineWidget = new Widget({
   title: { 'zh-CN': 'Deadline', 'en-US': 'Deadline' },
   description: { 'zh-CN': '最后期限进度条', 'en-US': 'Deadline countdown progress bar' },
   keywords: [WidgetKeyword.RECOMMEND],
-  categories: ['fun', 'countdown'],
+  categories: ['fun', 'countdown', 'time'],
   lang: 'zh-CN',
   width: 4,
   height: 2,

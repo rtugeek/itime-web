@@ -12,7 +12,7 @@ const BirthdayListWidget = new Widget({
   minWidth: 3,
   maxWidth: 4,
   minHeight: 3,
-  categories: ['countdown'],
+  categories: ['time', 'countdown'],
   maxHeight: 6,
   path: '/widget/birthday_list',
   configPagePath: '/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400',

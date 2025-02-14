@@ -12,7 +12,7 @@ const CountdownWidget = new Widget({
   name,
   title: { 'zh-CN': '倒计时', 'en-US': 'Countdown' },
   description: { 'zh-CN': '日历样式的倒计时组件', 'en-US': 'Countdown widget with calendar style' },
-  categories: ['countdown'],
+  categories: ['time','countdown'],
   keywords,
   previewImage: '/images/preview_countdown.png',
   lang: 'zh-CN',

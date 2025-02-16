@@ -21,24 +21,16 @@ function onItemClick() {
     ],
   })
 }
+
+const isToday = computed(() => birthdayWrapper.value.isToday())
 </script>
 
 <template>
-  <div class="list" :class="{ active: birthdayWrapper.isToday() }" @click="onItemClick">
+  <div class="list" :class="{ active: isToday }" @click="onItemClick">
     <div class="left">
       <div class="name">
-        <template v-if="birthdayWrapper.isOverDDL()&&birthday.single_event">
-          <div class="name-yuqivalue">
-          {{ birthday.name }} ---已逾期---
-          </div>
-        </template>
-        <template v-else>
-          <div class="name-value">
+        <div class="name-value">
           {{ birthday.name }}
-          </div>
-        </template>
-        <div class="intro-value">
-          {{ birthday.introduction }}
         </div>
       </div>
       <div class="dates flex items-center">
@@ -50,76 +42,27 @@ function onItemClick() {
             {{ birthdayWrapper.toString() }}
           </div>
         </div>
-        <template v-if="birthday.single_event">
-          <div class="date">
-            <div class="date-type">
-              公
-            </div>
-            <div class="date-value">
-              {{ birthdayWrapper.toString(2) }}
-            </div>
+        <div class="date">
+          <div class="date-type">
+            公
           </div>
-        </template>
-        <template v-else>
-          <div class="date">
-            <div class="date-type">
-              公
-            </div>
-            <div class="date-value">
-              {{ birthdayWrapper.toString(0) }}
-            </div>
+          <div class="date-value">
+            {{ birthdayWrapper.toString(0) }}
           </div>
-        </template>
-
-
+        </div>
       </div>
     </div>
-    <div class="right" :class="{ active: birthday.qty == 0 }">
-      <template v-if="birthday.single_event">
-        <template v-if="birthdayWrapper.isOverDDL()">
-          <div class="qtyuqiy">
-              {{ birthdayWrapper.countdownsingle() }}
-            </div>
-            <div class="unit">
-              天
-            </div>
-        </template>
-        <template v-else>
-          <template v-if="birthdayWrapper.isTenDayLeft()">
-            <div class="qt10y">
-              {{ birthdayWrapper.countdownsingle() }}
-            </div>
-            <div class="unit">
-              天
-            </div>
-          </template>
-          <template v-else>
-            <div class="qty">
-              {{ birthdayWrapper.countdownsingle() }}
-            </div>
-            <div class="unit">
-              天
-            </div>
-          </template>
-        </template>
+    <div class="right" :class="{ active: isToday }">
+      <template v-if="isToday">
+        <BirthdayCake class="icon color-white" />
       </template>
       <template v-else>
-        <template v-if="birthdayWrapper.isTenDayLeft()">
-          <div class="qt10y">
-            {{ birthdayWrapper.countdown() }}
-          </div>
-          <div class="unit">
-            天
-          </div>
-        </template>
-        <template v-else>
-          <div class="qty">
-            {{ birthdayWrapper.countdown() }}
-          </div>
-          <div class="unit">
-            天
-          </div>
-        </template>
+        <div class="qty">
+          {{ birthdayWrapper.countdown() }}
+        </div>
+        <div class="unit">
+          天
+        </div>
       </template>
     </div>
   </div>
@@ -166,17 +109,6 @@ function onItemClick() {
       .name-value {
         font-size: 16px;
         font-weight: bold;
-        margin-right: 10px;
-      }
-      .name-yuqivalue {
-        color: #a40e0e;
-        font-size: 16px;
-        font-weight: bold;
-        margin-right: 10px;
-      }
-      .intro-value {
-        font-size: 16px;
-        font-weight: normal;
         margin-right: 10px;
       }
 
@@ -233,24 +165,7 @@ function onItemClick() {
     }
 
     .qty {
-      color: #470a0e;
-      font-size: 24px;
-      font-weight: 400;
-      margin: 2px;
-    }
-
-    .qt10y {
-      color: #000000;
-      background-color: #ba3a3a;
-      font-weight: bold;
-      font-size: 24px;
-      font-weight: 400;
-      margin: 2px;
-    }
-    .qtyuqiy {
-      color: #000000;
-      background-color: #686767;
-      font-weight: bold;
+      color: #47310A;
       font-size: 24px;
       font-weight: 400;
       margin: 2px;

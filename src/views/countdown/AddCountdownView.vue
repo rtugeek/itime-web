@@ -4,15 +4,16 @@ import { computed, reactive, toRaw } from 'vue'
 import 'vue3-emoji-picker/css'
 import { useRoute, useRouter } from 'vue-router'
 import { showDialog, showNotify } from '@nutui/nutui'
-import { Calendar, Delete, Time } from '@icon-park/vue-next'
+import { Calendar, Delete, Notes, Time } from '@icon-park/vue-next'
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
 import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
 import { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { AppUtils } from '@/utils/AppUtils'
-import { useI18n } from 'vue-i18n'
 import DateInput from '@/components/DateInput.vue'
 import FloatingActionButton from '@/components/FloatingActionButton.vue'
+import RecurrenceFormItem from '@/components/form/RecurrenceFormItem.vue'
 
 BrowserWindowApi.setAlwaysOnTop(true)
 const router = useRouter()
@@ -31,8 +32,7 @@ if (id) {
   CountdownEventRepository.get(id).then((res) => {
     event.id = id
     if (res) {
-      event.createTime = res.createTime
-      event.name = res.name
+      Object.assign(event, res)
     }
   })
 }
@@ -86,12 +86,20 @@ const dateTimeModel = computed<Date>({
           </nut-input>
         </nut-form-item>
         <nut-form-item>
-          <DateInput v-model="dateTimeModel">
+          <nut-input v-model="event.note" :placeholder="t('countdown.note')">
+            <template #left>
+              <Notes />
+            </template>
+          </nut-input>
+        </nut-form-item>
+        <nut-form-item>
+          <DateInput v-model="dateTimeModel" v-model:date-type="event.dateType">
             <template #left>
               <Time />
             </template>
           </DateInput>
         </nut-form-item>
+        <RecurrenceFormItem v-show="event.dateType == 0" v-model="event.recurrence" />
       </nut-form>
     </div>
     <div class="fixed-right-bottom gap-2 flex">

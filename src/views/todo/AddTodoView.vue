@@ -1,24 +1,22 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Calendar, CloseOne, Flag, PlayCycle } from '@icon-park/vue-next'
+import { Calendar, CloseOne, Flag } from '@icon-park/vue-next'
 import consola from 'consola'
 import { showToast } from '@nutui/nutui'
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
 import BaseView from '@/components/BaseView.vue'
-import { RRuleUtils } from '@/utils/RRuleUtils'
-import NutRecurrentPicker from '@/components/NutRecurrentPicker.vue'
 import { useTodoStore } from '@/stores/useTodoStore'
 import { TodoUtils } from '@/utils/TodoUtils'
 import DateTimePicker from '@/components/DateTimePicker.vue'
+import RecurrenceFormItem from '@/components/form/RecurrenceFormItem.vue'
 
 const { t } = useI18n()
 const todoStore = useTodoStore()
 const route = useRoute()
 const showDatePicker = ref(false)
 // const showReminderDatePicker = ref(false)
-const showRRulePicker = ref(false)
 const id = Number.parseInt((route.query.id ?? '0') as string)
 const title = ref(t('todo.title'))
 const todo = ref(TodoUtils.new())
@@ -42,8 +40,6 @@ const dueDateTimeText = computed(() => {
   }
   return ''
 })
-
-const rruleTxt = computed(() => RRuleUtils.toString(todo.value.recurrence))
 
 const dueDateTime = computed<string | undefined>({
   get: () => {
@@ -103,15 +99,7 @@ async function save() {
             </template>
           </nut-input>
         </nut-form-item>
-        <nut-form-item :label-width="30" label-align="center" @click="showRRulePicker = true">
-          <template #label>
-            <PlayCycle />
-          </template>
-          <nut-input
-            v-model="rruleTxt" readonly class="w-full cursor-pointer" :placeholder="t('recurrence.title')"
-            @click="showRRulePicker = true"
-          />
-        </nut-form-item>
+        <RecurrenceFormItem v-model="todo.recurrence" />
         <!--        <nut-form-item v-show="todo.dueDateTime" :label-width="30" label-align="center"> -->
         <!--          <template #label> -->
         <!--            <div class="flex items-center justify-center content-center h-full"> -->
@@ -133,7 +121,6 @@ async function save() {
         <!--          </nut-input> -->
         <!--        </nut-form-item> -->
       </nut-form>
-      <NutRecurrentPicker v-model="showRRulePicker" v-model:rrule="todo.recurrence" />
       <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" />
       <!--      <DateTimePicker v-model="showReminderDatePicker" v-model:date-time="todo.reminderDateTime" /> -->
       <nut-button class="mt-4" block type="primary" @click="save">

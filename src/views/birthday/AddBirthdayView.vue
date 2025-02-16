@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Calendar, User,Word } from '@icon-park/vue-next'
+import { Calendar, User } from '@icon-park/vue-next'
 import consola from 'consola'
 import { showNotify, showToast } from '@nutui/nutui'
 import { useI18n } from 'vue-i18n'
@@ -72,12 +72,6 @@ async function save() {
           </template>
           <nut-input v-model="birthday.name" :placeholder="t('birthday.placeholder.contact')" />
         </nut-form-item>
-        <nut-form-item :label-width="30" label-align="center">
-          <template #label>
-            <Word />
-          </template>
-          <nut-input v-model="birthday.introduction" :placeholder="t('birthday.placeholder.introduction')" />
-        </nut-form-item>
         <nut-form-item :label-width="30" label-align="center" @click="showDatePicker = true">
           <template #label>
             <div class="flex items-center justify-center content-center h-full">
@@ -86,22 +80,6 @@ async function save() {
           </template>
           <DateInput v-model="sourceSolarDate" v-model:date-type="dateTypeModel" lunar />
         </nut-form-item>
-
-        <nut-form-item :label-width="30" label-align="center">
-          <template #label>
-              <Word />
-          </template>
-          <nut-radio-group v-model="birthday.single_event" direction="horizontal" @click.stop="">
-            <nut-radio :label="true">
-              单一事件
-            </nut-radio>
-            <nut-radio :label="false">
-              循环事件
-            </nut-radio>
-          </nut-radio-group>
-        </nut-form-item>
-        
-        
       </nut-form>
       <nut-button class="mt-4" block type="primary" @click="save">
         {{ t('save') }}

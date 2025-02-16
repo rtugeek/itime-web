@@ -1,31 +1,52 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useBroadcastChannel } from '@vueuse/core'
+import { useBroadcastChannel, watchDebounced } from '@vueuse/core'
+import { useWidgetStorage } from '@widget-js/vue3'
+import consola from 'consola'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { CountdownEvent } from '@/data/CountdownEvent'
-import { delay } from '@/utils/TimeUtils'
 
+export type ListSort = 'asc' | 'desc'
 export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   const events = ref<CountdownEvent[]>([])
-
+  const sort = useWidgetStorage<ListSort>('countdownEventSort', 'asc')
   async function reload() {
-    const countdownEvents = (await CountdownEventRepository.all()).map(it => CountdownEvent.fromObject(it))
-    events.value = countdownEvents
+    const newEvents = (await CountdownEventRepository.all()).map(it => CountdownEvent.fromObject(it))
+    newEvents.sort((a, b) => {
+      if (sort.value === 'asc') {
+        return a.countdown() - b.countdown()
+      }
+      else {
+        return b.countdown() - a.countdown()
+      }
+    })
+    for (const newEvent of newEvents) {
+      if (newEvent.getRecurrence() && newEvent.isPast()) {
+        const nextSolarDate = newEvent.getNextSolarDate()
+        consola.log('recurrence:', newEvent.name, nextSolarDate.toISOString())
+        newEvent.dateTime = nextSolarDate.toISOString()
+        await CountdownEventRepository.save(newEvent)
+      }
+    }
+    events.value = newEvents
   }
 
   CountdownEventRepository.createDefaultCountdown()
 
   const { post, data } = useBroadcastChannel({ name: 'countdownEventStore' })
-  watch(data, async () => {
-    await delay(1000)
-    console.log('asdf')
+  watchDebounced(data, async () => {
     reload()
-  })
+  }, { debounce: 1000 })
 
   async function deleteCountdown(id: string) {
     await CountdownEventRepository.remove(id)
     await reload()
     post({ type: 'delete', id })
+  }
+
+  function toggleSort() {
+    sort.value = sort.value === 'asc' ? 'desc' : 'asc'
+    reload()
   }
 
   const save = async (event: CountdownEvent) => {
@@ -36,6 +57,7 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   reload()
   return {
     events,
+    toggleSort,
     reload,
     deleteCountdown,
     save,

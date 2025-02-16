@@ -60,6 +60,10 @@ export class LunarUtils {
     return dayjs(this.lunarToDate(lunar))
   }
 
+  static isBeforeNow(lunar: Lunar) {
+    return this.lunarToDayJS(lunar).isBefore(dayjs())
+  }
+
   static solarToDate(solar: Solar): Date {
     return new Date(solar.getYear(), solar.getMonth() - 1, solar.getDay())
   }
@@ -71,6 +75,13 @@ export class LunarUtils {
     return this.fromYmd(year + 1, month, dayOfMonth)
   }
 
+  static addMonth(lunar: Lunar) {
+    const year = lunar.getYear()
+    const month = lunar.getMonth()
+    const dayOfMonth = lunar.getDay()
+    return this.fromYmd(year, month + 1, dayOfMonth)
+  }
+
   static isToday(lunar: Lunar) {
     const today = Lunar.fromDate(new Date())
     return lunar.getYear() == today.getYear()
@@ -79,9 +90,15 @@ export class LunarUtils {
   }
 
   static fromYmd(year: number, month: number, dayOfMonth: number) {
-    const lunarMonth = LunarMonth.fromYm(year, month)
+    let addYear = 0
+    let addMonth = month
+    if (month > 12) {
+      addYear = Math.floor(month / 12)
+      addMonth = month % 12
+    }
+    const lunarMonth = LunarMonth.fromYm(year, addMonth)
     const lastDay = lunarMonth!.getDayCount()
-    return Lunar.fromYmd(year, month, dayOfMonth > lastDay ? lastDay : dayOfMonth)
+    return Lunar.fromYmd(year + addYear, addMonth, dayOfMonth > lastDay ? lastDay : dayOfMonth)
   }
 
   static dateToLunar(date: Date) {

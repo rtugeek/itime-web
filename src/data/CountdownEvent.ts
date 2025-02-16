@@ -1,13 +1,17 @@
 import dayjs from 'dayjs'
 import { Lunar } from 'lunar-typescript'
-import { BaseData } from '@/data/base/BaseData'
+import { BaseRecurrentEvent } from '@/data/base/BaseRecurrentEvent'
 
-export class CountdownEvent extends BaseData {
+export class CountdownEvent extends BaseRecurrentEvent {
   name: string
   /**
    * 当前公历日期 ISO格式
    */
   dateTime!: string
+  /**
+   * 备注
+   */
+  note: string
   /**
    * 最开始的公历日期 ISO格式
    */
@@ -18,20 +22,23 @@ export class CountdownEvent extends BaseData {
    * -1 - 按周重复
    * -2 - 按月重复
    * -3 - 按年重复
+   * @deprecated
    */
   periodType: number = 0
+  recurrence?: string
   /**
    * 0-公历
    * 1-农历
    */
   dateType: number = 0
 
-  constructor(name: string, sourceDateTime: Date, dateType: number = 0, periodType: number = 0) {
-    super()
+  constructor(name: string, sourceDateTime: Date, dateType: number = 0, recurrence?: string, note?: string) {
+    super(dateType)
     this.name = name
     this.setSourceDateTime(sourceDateTime)
-    this.periodType = periodType
+    this.recurrence = recurrence
     this.dateType = dateType
+    this.note = note || ''
   }
 
   setSourceDateTime(value: Date) {
@@ -57,10 +64,21 @@ export class CountdownEvent extends BaseData {
     const dateTime = dayjs(this.dateTime)
     return Math.ceil(dateTime.diff(now, 'day', true))
   }
-// /**
-  //  * 计算下一个日期
-  //  */
-  // calcNextDateTime():Date {
-  //
-  // }
+
+  getRecurrence(): string | undefined {
+    return this.recurrence
+  }
+
+  getSourceLunar(): Lunar {
+    const sourceSolarDate = this.getSourceSolarDate()
+    return Lunar.fromDate(sourceSolarDate)
+  }
+
+  getSourceSolarDate(): Date {
+    return dayjs(this.sourceDateTime).toDate()
+  }
+
+  getCurrentSolarDate(): Date {
+    return dayjs(this.dateTime).toDate()
+  }
 }

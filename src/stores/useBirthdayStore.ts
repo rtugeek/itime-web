@@ -9,7 +9,7 @@ import { BirthdayWrapper } from '@/data/BirthdayWrapper'
 
 interface BirthdayEvent {
   type: 'insert' | 'update' | 'delete'
-  birthday: Birthday
+  data: Birthday
 }
 
 export const useBirthdayStore = defineStore('birthday-store', () => {
@@ -62,18 +62,7 @@ export const useBirthdayStore = defineStore('birthday-store', () => {
 
   const sortBirthdayList = () => {
     birthdayList.sort((a, b) => {
-      if (a.single_event && !b.single_event) {
-        return new BirthdayWrapper(a).countdownsingle() - new BirthdayWrapper(b).countdown()
-      }
-      if (a.single_event && b.single_event) {
-        return new BirthdayWrapper(a).countdownsingle() - new BirthdayWrapper(b).countdownsingle()
-      }
-      if (!a.single_event && b.single_event) {
-        return new BirthdayWrapper(a).countdown() - new BirthdayWrapper(b).countdownsingle()
-      }
-      if (!a.single_event && !b.single_event) {
-        return new BirthdayWrapper(a).countdown() - new BirthdayWrapper(b).countdown()
-      }
+      return new BirthdayWrapper(a).countdown() - new BirthdayWrapper(b).countdown()
     })
   }
 
@@ -86,7 +75,7 @@ export const useBirthdayStore = defineStore('birthday-store', () => {
   }
 
   function removeById(id: string) {
-    const index = birthdayList.findIndex(it => it.id == id)
+    const index = birthdayList.findIndex(it => it.id.toString() == id)
     if (index > -1) {
       birthdayList.splice(index, 1)
     }

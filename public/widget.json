@@ -106,6 +106,44 @@
       }
     },
     {
+      "name": "itime.fun.countdown_list",
+      "title": {
+        "zh-CN": "倒计时列表",
+        "en-US": "Countdown List"
+      },
+      "description": {
+        "zh-CN": "自动排序的倒计时列表",
+        "en-US": "Automatically sorted countdown list"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 3,
+      "minHeight": 3,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/countdown/list",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_countdown_list.png",
+      "categories": [
+        "time",
+        "countdown"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/countdown/list?frame=true&transparent=false&width=600&height=400",
+      "routes": []
+    },
+    {
       "name": "itime.fun.deadline",
       "title": {
         "zh-CN": "Deadline",
@@ -222,12 +260,12 @@
     {
       "name": "itime.fun.birthday_list",
       "title": {
-        "zh-CN": "时间列表",
-        "en-US": "Time List"
+        "zh-CN": "生日列表",
+        "en-US": "Birthday List"
       },
       "description": {
-        "zh-CN": "自动排序倒计时的时间列表",
-        "en-US": "Time list with countdown"
+        "zh-CN": "自动倒计时的生日列表",
+        "en-US": "Birthday list with countdown"
       },
       "keywords": [
         "recommend"
@@ -237,7 +275,7 @@
       "lang": "zh-CN",
       "width": 4,
       "height": 4,
-      "maxWidth": 6,
+      "maxWidth": 4,
       "webviewTag": false,
       "maxHeight": 6,
       "minWidth": 3,

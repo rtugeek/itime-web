@@ -1,7 +1,7 @@
 import { WidgetPackage } from '@widget-js/core'
 
 export default new WidgetPackage({
-  author: 'Wisdom LTD',
+  author: 'LYP',
   description: {
     'zh-CN': '倒计时、纪念日、生日、日程管理，您的时间助理',
     'en-US': 'Countdowns, anniversaries, birthdays, and schedule management—your personal time assistant.',

@@ -1,7 +1,7 @@
 {
   "name": "itime.fun",
   "version": "0.6.1",
-  "author": "Wisdom LTD",
+  "author": "LYP",
   "homepage": "",
   "title": {
     "zh-CN": "iTime",
@@ -222,12 +222,12 @@
     {
       "name": "itime.fun.birthday_list",
       "title": {
-        "zh-CN": "生日列表",
-        "en-US": "Birthday List"
+        "zh-CN": "时间列表",
+        "en-US": "Time List"
       },
       "description": {
-        "zh-CN": "自动倒计时的生日列表",
-        "en-US": "Birthday list with countdown"
+        "zh-CN": "自动排序倒计时的时间列表",
+        "en-US": "Time list with countdown"
       },
       "keywords": [
         "recommend"
@@ -237,7 +237,7 @@
       "lang": "zh-CN",
       "width": 4,
       "height": 4,
-      "maxWidth": 4,
+      "maxWidth": 6,
       "webviewTag": false,
       "maxHeight": 6,
       "minWidth": 3,

@@ -14,6 +14,8 @@ export class BirthdayUtils {
       dayOfMonth: now.getDate(),
       updateTime: nowStr,
       id: now.getTime(),
+      introduction: '',
+      single_event: false,
     }
   }
 }

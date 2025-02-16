@@ -3,21 +3,23 @@ import type { DefaultLocaleMessageSchema } from 'vue-i18n'
 export const birthdayMessage: DefaultLocaleMessageSchema = {
   zh: {
     birthday: {
-      list: '生日列表',
-      add: '添加生日',
-      edit: '编辑生日',
+      list: '事件列表',
+      add: '添加事件',
+      edit: '编辑事件',
       placeholder: {
-        contact: '请输入联系人',
+        contact: '事件名称',
+        introduction: '事件简介',
       },
     },
   },
   en: {
     birthday: {
-      list: 'Birthday',
-      add: 'Add Birthday',
-      edit: 'Edit Birthday',
+      list: 'Event List',
+      add: 'Add Event',
+      edit: 'Edit Event',
       placeholder: {
-        contact: 'Please enter contact',
+        contact: 'Please enter event name',
+        introduction: 'Please enter event introduction',
       },
     },
   },

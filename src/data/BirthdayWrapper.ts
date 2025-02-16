@@ -6,6 +6,8 @@ import { LunarUtils } from '@/utils/LunarUtils'
 export class BirthdayWrapper {
   birthday: Birthday
   private _isToday?: boolean
+  private _isTenDayLeft?: boolean
+  private _isOverDDL?: boolean
   constructor(birthday: Birthday) {
     this.birthday = birthday
   }
@@ -58,12 +60,33 @@ export class BirthdayWrapper {
     return this._isToday
   }
 
+  isTenDayLeft() {
+    if (!this._isTenDayLeft) {
+      const leftday=this.countdown()
+      this._isTenDayLeft = leftday<=10
+    }
+    return this._isTenDayLeft
+  }
+  isOverDDL() {
+    if (!this._isOverDDL) {
+      const leftday=this.countdownsingle()
+      this._isOverDDL = leftday<0
+    }
+    return this._isOverDDL
+  }
+
   toString(dateType?: number) {
     const type = dateType ?? this.birthday.dateType
     if (type == 1) {
       return this.getNextLunar().toString().split('年')[1]
     }
-    return dayjs(this.getNextSolarDate()).format('MM月DD日')
+    else if (type == 0) {
+      return dayjs(this.getNextSolarDate()).format('YYYY年MM月DD日')
+    }
+    else if (type == 2) {
+      return dayjs(this.getExcDay()).format('YYYY年MM月DD日')+"--DDL"
+    }
+    
   }
 
   setSolarDate(solarDate: Date) {
@@ -95,6 +118,8 @@ export class BirthdayWrapper {
       this.setLunar(lunar)
     }
     this._isToday = undefined
+    this._isTenDayLeft= undefined
+    this._isOverDDL=undefined
   }
 
   /**
@@ -107,6 +132,30 @@ export class BirthdayWrapper {
     }
     const today = dayjs()
     return Math.ceil(solarDate.diff(today, 'day', true))
+  }
+  countdownsingle(): number {
+    const solarDate = dayjs(this.getExcDay())
+    if (solarDate.isToday()) {
+      return 0
+    }
+    const today = dayjs()
+    return Math.ceil(solarDate.diff(today, 'day', true))
+  }
+  getExcDay(): Date {
+    if (this.birthday.dateType == 1) {
+      return LunarUtils.lunarToDate(this.getLunar())
+    }
+    else
+    {
+      const { year,month, dayOfMonth } = this.birthday
+      const DDLday =dayjs(new Date(year, month - 1, dayOfMonth))
+      return DDLday.toDate()
+    }  
+  }
+  getLunar(): Lunar {
+    const { year,month, dayOfMonth } = this.birthday
+    let nextBirthday = LunarUtils.fromYmd(year, month, dayOfMonth)
+    return nextBirthday
   }
 
   setDateType(dateType: number) {
@@ -129,5 +178,7 @@ export class BirthdayWrapper {
       this.setLunar(lunar)
     }
     this._isToday = undefined
+    this._isTenDayLeft= undefined
+    this._isOverDDL=undefined
   }
 }

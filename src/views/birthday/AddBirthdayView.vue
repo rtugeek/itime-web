@@ -9,6 +9,7 @@ import BaseView from '@/components/BaseView.vue'
 import { useBirthdayStore } from '@/stores/useBirthdayStore'
 import { BirthdayUtils } from '@/utils/BirthdayUtils'
 import { BirthdayWrapper } from '@/data/BirthdayWrapper'
+import DateInput from '@/components/DateInput.vue'
 
 const birthdayStore = useBirthdayStore()
 const route = useRoute()
@@ -42,6 +43,7 @@ const dateTypeModel = computed({
     return birthday.value.dateType
   },
   set: (val) => {
+    birthday.value.dateType = val
     birthdayWrapper.value.setDateType(val)
   },
 })
@@ -78,7 +80,7 @@ async function save() {
               <Calendar />
             </div>
           </template>
-          <DateInput v-model="sourceSolarDate" v-model:date-type="dateTypeModel" lunar />
+          <DateInput v-model="sourceSolarDate" v-model:date-type="dateTypeModel" />
         </nut-form-item>
       </nut-form>
       <nut-button class="mt-4" block type="primary" @click="save">

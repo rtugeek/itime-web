@@ -77,27 +77,24 @@ const dateTimeModel = computed<Date>({
       </nut-button>
     </template>
     <div class="section p-4">
-      <nut-form label-position="top">
-        <nut-form-item>
-          <nut-input v-model="event.name" :placeholder="t('countdown.namePlaceholder')" :max-length="15">
-            <template #left>
-              <Calendar />
-            </template>
-          </nut-input>
+      <nut-form>
+        <nut-form-item :label-width="30">
+          <template #label>
+            <Calendar />
+          </template>
+          <nut-input v-model="event.name" :placeholder="t('countdown.namePlaceholder')" :max-length="15" />
         </nut-form-item>
-        <nut-form-item>
-          <nut-input v-model="event.note" :placeholder="t('countdown.note')">
-            <template #left>
-              <Notes />
-            </template>
-          </nut-input>
+        <nut-form-item :label-width="30">
+          <template #label>
+            <Notes />
+          </template>
+          <nut-input v-model="event.note" :placeholder="t('countdown.note')" />
         </nut-form-item>
-        <nut-form-item>
-          <DateInput v-model="dateTimeModel" v-model:date-type="event.dateType">
-            <template #left>
-              <Time />
-            </template>
-          </DateInput>
+        <nut-form-item :label-width="30">
+          <template #label>
+            <Time />
+          </template>
+          <DateInput v-model="dateTimeModel" v-model:date-type="event.dateType" />
         </nut-form-item>
         <RecurrenceFormItem v-show="event.dateType == 0" v-model="event.recurrence" />
       </nut-form>

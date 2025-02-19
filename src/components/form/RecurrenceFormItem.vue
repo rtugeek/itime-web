@@ -13,14 +13,13 @@ const rruleTxt = computed(() => RRuleUtils.toString(model.value))
 
 <template>
   <nut-form-item :label-width="30" label-align="center" @click="showRRulePicker = true">
+    <template #label>
+      <PlayCycle />
+    </template>
     <nut-input
       v-model="rruleTxt" readonly class="w-full cursor-pointer" :placeholder="t('recurrence.title')"
       @click="showRRulePicker = true"
-    >
-      <template #left>
-        <PlayCycle />
-      </template>
-    </nut-input>
+    />
     <NutRecurrentPicker v-model="showRRulePicker" v-model:rrule="model" />
   </nut-form-item>
 </template>

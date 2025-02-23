@@ -9,6 +9,7 @@ import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import { WindowUtils } from '@/utils/WindowUtils'
 import { useTodoStore } from '@/stores/useTodoStore'
 import UserIcon from '@/widgets/todo-list/components/UserIcon.vue'
+import { useTodoReminder } from '@/common/composition/useTodoReminder'
 
 const { t } = useI18n()
 type ViewType = 'default' | 'history'
@@ -25,6 +26,7 @@ function openAddPage() {
 const todoStore = useTodoStore()
 todoStore.sync()
 useWidget()
+useTodoReminder()
 useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMenuClick: (menu: WidgetMenuItem) => {
   if (menu.id == 'app-settings') {
     WindowUtils.open('/settings')

@@ -1,80 +1,59 @@
 import { defineStore } from 'pinia'
-import { reactive, toRaw, watch } from 'vue'
+import { reactive, toRaw } from 'vue'
 import consola from 'consola'
-import { useBroadcastChannel } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { completeStorage, todoListStorage } from '@/data/db'
 import type { Todo } from '@/data/Todo'
 import { useUserStore } from '@/stores/useUserStore'
 import { TodoApi } from '@/api/TodoApi'
-import { AppConfig } from '@/common/AppConfig'
 import { TodoUtils } from '@/utils/TodoUtils'
+import { TodoRepository } from '@/data/repository/TodoRepository'
+import { useTodoBroadcast } from '@/common/broadcast/useTodoBroadcast'
 
-interface TodoEvent {
-  type: 'insert' | 'update' | 'delete'
-  todo: Todo
-}
+const MIGRATION_KEY = 'todo_repository_migrated'
+
 export const useTodoStore = defineStore('todo-store', () => {
   const todos = reactive<Todo[]>([])
   const completedTodos = reactive<Todo[]>([])
   const userStore = useUserStore()
-  const broadcastChannel = useBroadcastChannel({
-    name: AppConfig.CHANNEL_TODO,
-  })
-
-  watch(broadcastChannel.data, () => {
-    consola.info('broadcastChannel.data', broadcastChannel.data.value)
-    const payload = broadcastChannel.data.value as (TodoEvent | undefined)
-    if (payload) {
-      const todo = payload.todo
-      if (payload.type == 'update') {
-        const findIndex = todos.findIndex(it => it.id == todo.id)
-        if (findIndex > -1) {
-          todos[findIndex] = todo
-        }
-        else {
-          todos.splice(0, 0, todo)
-          sortTodos()
-        }
+  const todoRepository = new TodoRepository()
+  const { postEvent } = useTodoBroadcast({
+    onUpdated: (todo) => {
+      const findIndex = todos.findIndex(it => it.id === todo.id)
+      if (findIndex > -1) {
+        todos[findIndex] = todo
       }
-      else if (payload.type == 'delete') {
-        todos.splice(todos.findIndex(it => it.id == todo.id), 1)
+      else {
+        todos.splice(0, 0, todo)
+        sortTodos()
       }
-    }
+    },
+    onInserted: (todo) => {
+      todos.splice(0, 0, todo)
+      sortTodos()
+    },
+    onDeleted: (todo) => {
+      const index = todos.findIndex(it => it.id === todo.id)
+      if (index > -1) {
+        todos.splice(index, 1)
+      }
+    },
   })
 
   const find = async (id: string, includeCompleted: boolean = true) => {
-    let todo = await todoListStorage.getItem<Todo>(id)
-    if (todo) {
-      return todo
-    }
-    if (includeCompleted) {
-      todo = await completeStorage.getItem<Todo>(id)
-      if (todo) {
-        return todo
-      }
-    }
-    return undefined
+    return todoRepository.findOne({ id, includeComplete: includeCompleted })
   }
 
   const loadTodo = async () => {
     completedTodos.splice(0, completedTodos.length)
     todos.splice(0, todos.length)
-    const keys = await completeStorage.keys()
-    for (const key of keys) {
-      const todo = await completeStorage.getItem<Todo>(key)
-      if (todo) {
-        completedTodos.push(todo)
-      }
-    }
 
-    const todoListKeys = await todoListStorage.keys()
-    for (const key of todoListKeys) {
-      const todo = await todoListStorage.getItem<Todo>(key)
-      if (todo) {
-        todos.push(todo)
-      }
-    }
+    const completedList = await todoRepository.findCompleted()
+    completedTodos.push(...completedList)
+
+    const uncompletedList = await todoRepository.findUncompleted()
+    todos.push(...uncompletedList)
+
     sortTodos()
   }
 
@@ -82,18 +61,20 @@ export const useTodoStore = defineStore('todo-store', () => {
     if (!userStore.isLogin) {
       return
     }
-    const todos = await TodoApi.getTodos()
-    // 先不处理已经完成的任务
-    const uncompletedTodos = todos.data.filter(it => !it.completedDateTime)
+    const response = await TodoApi.getTodos()
+    // 先不处理服务器上，已经完成的todo
+    const uncompletedTodos = response.data.filter(it => !it.completedDateTime)
     let changed = false
     for (const todo of uncompletedTodos) {
-      // 先判断本地是否存在
       if (todo) {
-        const localTodo = await find(todo.id, false)
+        const localTodo = await find(todo.id.toString(), false)
         if (localTodo) {
           if (dayjs(localTodo.lastModifiedDateTime).isBefore(dayjs(todo.lastModifiedDateTime))) {
-            const index = todos.findIndex(it => it.id == todo.id)
-            todos.splice(index, 1, localTodo)
+            await todoRepository.update(todo)
+            const index = todos.findIndex(it => it.id === todo.id)
+            if (index > -1) {
+              todos[index] = todo
+            }
             consola.info('update todo from server', todo)
             changed = true
           }
@@ -101,9 +82,14 @@ export const useTodoStore = defineStore('todo-store', () => {
         else {
           changed = true
           consola.info('create todo from server', todo)
-          await saveTodo(todo, { sort: false, broadcast: false })
+          await saveTodo(todo, { sync: false, sort: false, broadcast: false })
         }
       }
+    }
+    // 将本地的todo同步到服务器
+    const needUploadTodos = await todoRepository.findTableIdIsNull()
+    for (const needUploadTodo of needUploadTodos) {
+      updateRemoteTodo(needUploadTodo)
     }
     if (changed) {
       sortTodos()
@@ -113,27 +99,27 @@ export const useTodoStore = defineStore('todo-store', () => {
   const sortTodos = () => {
     todos.sort((a, b) => {
       const diff = a.order - b.order
-      if (diff == 0) {
+      if (diff === 0) {
         return dayjs(b.createdDateTime).diff(dayjs(a.createdDateTime), 'seconds')
       }
       return diff
     })
   }
 
-  function deleteTodo(todo: Todo) {
-    const todoIndex = todos.findIndex(it => it.id == todo.id)
+  async function deleteTodo(todo: Todo) {
+    const todoIndex = todos.findIndex(it => it.id === todo.id)
     if (todoIndex > -1) {
       todos.splice(todoIndex, 1)
     }
-    const completedIndex = completedTodos.findIndex(it => it.id == todo.id)
+    const completedIndex = completedTodos.findIndex(it => it.id === todo.id)
     if (completedIndex > -1) {
       completedTodos.splice(completedIndex, 1)
     }
-    todoListStorage.removeItem(`${todo.id}`)
-    completeStorage.removeItem(`${todo.id}`)
+    await todoRepository.remove(todo)
     if (userStore.isLogin) {
-      TodoApi.delete(todo.id)
+      await TodoApi.delete(todo.id)
     }
+    postEvent({ type: 'delete', todo: { ...todo } })
   }
 
   async function updateRemoteTodo(todo: Todo) {
@@ -141,19 +127,23 @@ export const useTodoStore = defineStore('todo-store', () => {
       const webTodo = await TodoApi.save(todo)
       if (!todo.tableId) {
         todo.tableId = webTodo.tableId
-        await completeStorage.setItem(`${todo.id}`, todo)
+        consola.info('update tableId', todo)
+        await todoRepository.update(todo)
       }
     }
   }
 
   async function finishTodo(rawTodo: Todo) {
     const todo = toRaw(rawTodo)
-    todos.splice(todos.findIndex(it => it.id == rawTodo.id), 1)
-    todo.completedDateTime = new Date().toISOString()
-    completedTodos.splice(0, 0, todo)
-    await completeStorage.setItem(`${todo.id}`, todo)
-    await todoListStorage.removeItem(`${todo.id}`)
-    updateRemoteTodo(todo).catch()
+    const index = todos.findIndex(it => it.id === todo.id)
+    if (index > -1) {
+      todos.splice(index, 1)
+    }
+    const completedTodo = await todoRepository.complete(todo)
+    completedTodos.splice(0, 0, completedTodo)
+
+    updateRemoteTodo(completedTodo).catch(consola.error)
+
     if (todo.recurrence) {
       const nextTodo = TodoUtils.recurrent(todo)
       if (nextTodo) {
@@ -164,15 +154,13 @@ export const useTodoStore = defineStore('todo-store', () => {
 
   async function reTodo(rawTodo: Todo) {
     const todo = toRaw(rawTodo)
-    todo.completedDateTime = undefined
-    todo.order = 0
-    const index = completedTodos.findIndex(it => it.id == rawTodo.id)
-    completedTodos.splice(index, 1)
-    todos.splice(0, 0, todo)
-    const id = todo.id
-    await completeStorage.removeItem(`${id}`)
-    await todoListStorage.setItem(`${id}`, todo)
-    updateRemoteTodo(todo).catch()
+    const uncompletedTodo = await todoRepository.undoComplete(todo)
+    const index = completedTodos.findIndex(it => it.id === todo.id)
+    if (index > -1) {
+      completedTodos.splice(index, 1)
+    }
+    todos.splice(0, 0, uncompletedTodo)
+    updateRemoteTodo(uncompletedTodo).catch(consola.error)
   }
 
   async function saveTodo(rawTodo: Todo, options?: {
@@ -184,11 +172,23 @@ export const useTodoStore = defineStore('todo-store', () => {
     const sort = options?.sort ?? true
     const broadcast = options?.broadcast ?? true
     const todo = toRaw(rawTodo)
-    await todoListStorage.setItem(`${todo.id}`, todo)
-    todos.splice(0, 0, todo)
-    if (broadcast) {
-      broadcastChannel.post({ type: 'update', todo })
+
+    await todoRepository.update(todo)
+    const index = todos.findIndex(it => it.id === todo.id)
+    if (index > -1) {
+      todos[index] = todo
     }
+    else {
+      todos.splice(0, 0, todo)
+    }
+
+    if (broadcast) {
+      postEvent({
+        type: index > -1 ? 'update' : 'insert',
+        todo,
+      })
+    }
+
     if (sync) {
       try {
         await updateRemoteTodo(todo)
@@ -197,6 +197,7 @@ export const useTodoStore = defineStore('todo-store', () => {
         consola.error('updateRemoteTodo', e)
       }
     }
+
     if (sort) {
       sortTodos()
     }
@@ -204,10 +205,76 @@ export const useTodoStore = defineStore('todo-store', () => {
 
   async function save() {
     for (const todo of todos) {
-      await todoListStorage.setItem(`${todo.id}`, toRaw(todo))
+      await todoRepository.update(toRaw(todo))
     }
   }
 
+  /**
+   * 迁移旧数据到新的 Dexie 数据库
+   */
+  const migrate = async () => {
+    // 检查是否已经迁移过
+    if (localStorage.getItem(MIGRATION_KEY)) {
+      consola.info('Data already migrated to Dexie')
+      return
+    }
+
+    consola.info('Starting migration to Dexie...')
+
+    try {
+      // 迁移未完成的任务
+      const todoListKeys = await todoListStorage.keys()
+      for (const key of todoListKeys) {
+        const todo = await todoListStorage.getItem<Todo>(key)
+        if (todo) {
+          const { id, createdDateTime, lastModifiedDateTime, ...todoData } = todo
+          await todoRepository.add({
+            ...todoData,
+            order: todo.order || 0,
+            isReminderOn: todo.isReminderOn || false,
+            sync: false,
+          })
+          consola.info(`Migrated uncompleted todo: ${todo.id}`)
+        }
+      }
+
+      // 迁移已完成的任务
+      const completedKeys = await completeStorage.keys()
+      for (const key of completedKeys) {
+        const todo = await completeStorage.getItem<Todo>(key)
+        if (todo) {
+          const { id, createdDateTime, lastModifiedDateTime, ...todoData } = todo
+          await todoRepository.add({
+            ...todoData,
+            order: todo.order || 0,
+            isReminderOn: todo.isReminderOn || false,
+            sync: false,
+          })
+          consola.info(`Migrated completed todo: ${todo.id}`)
+        }
+      }
+
+      // 标记迁移完成
+      localStorage.setItem(MIGRATION_KEY, 'true')
+      consola.info('Migration to Dexie completed successfully')
+
+      // 清理旧数据
+      await todoListStorage.clear()
+      await completeStorage.clear()
+      consola.info('Old storage cleared')
+    }
+    catch (error) {
+      consola.error('Migration failed:', error)
+      // 迁移失败时删除标记，以便下次重试
+      localStorage.removeItem(MIGRATION_KEY)
+      throw error
+    }
+  }
+
+  // 在 store 初始化时执行迁移
+  migrate().catch(e => consola.error('Migration error:', e))
+
+  // 迁移完成后加载数据
   loadTodo()
 
   return {

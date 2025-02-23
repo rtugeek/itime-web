@@ -2,10 +2,16 @@ import localforage from 'localforage'
 import TodoListWidget from '@/widgets/todo-list/TodoList.widget'
 import BirthdayListWidget from '@/widgets/birthday-list/BirthdayList.widget'
 
+/**
+ * @deprecated
+ */
 const todoListStorage = localforage.createInstance({
   name: `${TodoListWidget.name}`,
   storeName: 'todo-list-v1',
 })
+/**
+ * @deprecated
+ */
 const completeStorage = localforage.createInstance({
   name: `${TodoListWidget.name}`,
   storeName: 'complete-list-v1',

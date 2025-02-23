@@ -16,7 +16,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['update:modelValue', 'update:dateTime'])
+const emits = defineEmits(['update:modelValue', 'update:dateTime', 'cancel', 'confirm'])
 const max = new Date(2099, 10, 1)
 
 const model = useVModel(props, 'modelValue', emits)
@@ -27,9 +27,11 @@ function onConfirm() {
   model.value = false
   if (dateModel.value) {
     emits('update:dateTime', dateModel.value)
+    emits('confirm', dateModel.value)
   }
   else {
     emits('update:dateTime', undefined)
+    emits('confirm', undefined)
   }
 }
 
@@ -55,6 +57,11 @@ function formatter(type: string, option: any) {
   }
   return option
 }
+
+function cancel() {
+  model.value = false
+  emits('cancel')
+}
 </script>
 
 <template>
@@ -62,12 +69,12 @@ function formatter(type: string, option: any) {
     <nut-date-picker
       v-model="dateModel"
       :min-date="now"
-      type="date"
+      :type="type"
       :max-date="max"
       :formatter="formatter"
       :three-dimensional="false"
       @confirm="onConfirm"
-      @cancel="model = false"
+      @cancel="cancel"
     />
   </nut-popup>
 </template>

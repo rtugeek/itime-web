@@ -43,6 +43,7 @@ declare module 'vue' {
     NutTabbarItem: typeof import('@nutui/nutui')['TabbarItem']
     ProgressBar: typeof import('./src/components/ProgressBar.vue')['default']
     RecurrenceFormItem: typeof import('./src/components/form/RecurrenceFormItem.vue')['default']
+    ReminderTimeFormItem: typeof import('./src/components/form/ReminderTimeFormItem.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SmsCodeButton: typeof import('./src/components/form/SmsCodeButton.vue')['default']

@@ -1,6 +1,7 @@
 {
   "name": "itime.fun",
   "version": "0.6.1",
+  "requiredAppVersion": "",
   "author": "LYP",
   "homepage": "",
   "title": {
@@ -12,8 +13,6 @@
     "en-US": "Countdowns, anniversaries, birthdays, and schedule management—your personal time assistant."
   },
   "entry": "index.html",
-  "remoteEntry": "https://itime.fun/web",
-  "remotePackage": "https://itime.fun/web/widget.json",
   "remote": {
     "entry": "https://itime.fun/web",
     "base": "/web",
@@ -24,14 +23,14 @@
   "url": "",
   "widgets": [
     {
-      "name": "itime.fun.deadline",
+      "name": "itime.fun.todo_list",
       "title": {
-        "zh-CN": "Deadline",
-        "en-US": "Deadline"
+        "zh-CN": "待办事项（Pro）",
+        "en-US": "To-Do"
       },
       "description": {
-        "zh-CN": "最后期限进度条",
-        "en-US": "Deadline countdown progress bar"
+        "zh-CN": "带数据同步功能的待办事项",
+        "en-US": "To-Do list with data synchronization"
       },
       "keywords": [
         "recommend"
@@ -40,26 +39,25 @@
       "permissions": [],
       "lang": "zh-CN",
       "width": 4,
-      "height": 2,
-      "maxWidth": 4,
+      "height": 4,
+      "maxWidth": 6,
       "webviewTag": false,
-      "maxHeight": 2,
-      "minWidth": 4,
-      "minHeight": 2,
+      "maxHeight": 6,
+      "minWidth": 3,
+      "minHeight": 3,
       "movable": true,
       "singleton": false,
       "resizable": true,
-      "path": "/widget/deadline",
+      "path": "/widget/todo_list",
       "meta": {},
       "backgroundThrottling": true,
-      "previewImage": "/images/preview_deadline.png",
+      "previewImage": "/images/preview_todo_list.png",
       "categories": [
-        "fun",
-        "countdown",
-        "time"
+        "productivity",
+        "utilities"
       ],
       "supportDeployMode": 17,
-      "configPagePath": "/widget/config/deadline?width=400&height=700&frame=true&transparent=false",
+      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
       "routes": []
     },
     {
@@ -107,14 +105,14 @@
       }
     },
     {
-      "name": "itime.fun.todo_list",
+      "name": "itime.fun.deadline",
       "title": {
-        "zh-CN": "待办事项（Pro）",
-        "en-US": "To-Do"
+        "zh-CN": "Deadline",
+        "en-US": "Deadline"
       },
       "description": {
-        "zh-CN": "带数据同步功能的待办事项",
-        "en-US": "To-Do list with data synchronization"
+        "zh-CN": "最后期限进度条",
+        "en-US": "Deadline countdown progress bar"
       },
       "keywords": [
         "recommend"
@@ -123,25 +121,26 @@
       "permissions": [],
       "lang": "zh-CN",
       "width": 4,
-      "height": 4,
-      "maxWidth": 6,
+      "height": 2,
+      "maxWidth": 4,
       "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 3,
-      "minHeight": 3,
+      "maxHeight": 2,
+      "minWidth": 4,
+      "minHeight": 2,
       "movable": true,
       "singleton": false,
       "resizable": true,
-      "path": "/widget/todo_list",
+      "path": "/widget/deadline",
       "meta": {},
       "backgroundThrottling": true,
-      "previewImage": "/images/preview_todo_list.png",
+      "previewImage": "/images/preview_deadline.png",
       "categories": [
-        "productivity",
-        "utilities"
+        "fun",
+        "countdown",
+        "time"
       ],
       "supportDeployMode": 17,
-      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
+      "configPagePath": "/widget/config/deadline?width=400&height=700&frame=true&transparent=false",
       "routes": []
     },
     {

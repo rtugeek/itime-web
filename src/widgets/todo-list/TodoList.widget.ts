@@ -18,6 +18,9 @@ const TodoListWidget = new Widget({
   minHeight: 3,
   maxHeight: 6,
   path: '/widget/todo_list',
+  browserWindowOptions: {
+    backgroundThrottling: false,
+  },
   configPagePath: '/widget/todo_list/config?frame=true&transparent=false&width=600&height=500',
 })
 

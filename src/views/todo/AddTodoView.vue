@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Calendar, CloseOne, Flag } from '@icon-park/vue-next'
+import { AlarmClock, Calendar, CloseOne, Flag } from '@icon-park/vue-next'
 import consola from 'consola'
 import { showToast } from '@nutui/nutui'
 import dayjs from 'dayjs'
@@ -11,12 +11,12 @@ import { useTodoStore } from '@/stores/useTodoStore'
 import { TodoUtils } from '@/utils/TodoUtils'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import RecurrenceFormItem from '@/components/form/RecurrenceFormItem.vue'
+import ReminderTimeFormItem from '@/components/form/ReminderTimeFormItem.vue'
 
 const { t } = useI18n()
 const todoStore = useTodoStore()
 const route = useRoute()
 const showDatePicker = ref(false)
-// const showReminderDatePicker = ref(false)
 const id = Number.parseInt((route.query.id ?? '0') as string)
 const title = ref(t('todo.title'))
 const todo = ref(TodoUtils.new())
@@ -81,9 +81,7 @@ async function save() {
         </nut-form-item>
         <nut-form-item :label-width="30" label-align="center" @click="showDatePicker = true">
           <template #label>
-            <div class="flex items-center justify-center content-center h-full">
-              <Calendar />
-            </div>
+            <Calendar />
           </template>
           <nut-input
             v-model="dueDateTimeText" readonly class="w-full cursor-pointer" :placeholder="t('todo.dueDateTime')"
@@ -106,23 +104,9 @@ async function save() {
         <!--              <AlarmClock :size="14" /> -->
         <!--            </div> -->
         <!--          </template> -->
-        <!--          <nut-input -->
-        <!--            v-model="reminderDateTimeText" readonly class="w-full cursor-pointer" placeholder="提醒" -->
-        <!--            @click="showDatePicker = true" -->
-        <!--          > -->
-        <!--            <template #right> -->
-        <!--              <div -->
-        <!--                class="w-6 h-6 flex items-center cursor-pointer text-center" -->
-        <!--                @click.stop="todo.reminderDateTime = undefined" -->
-        <!--              > -->
-        <!--                <CloseOne v-if="todo.reminderDateTime" /> -->
-        <!--              </div> -->
-        <!--            </template> -->
-        <!--          </nut-input> -->
-        <!--        </nut-form-item> -->
+        <ReminderTimeFormItem v-model:enable="todo.isReminderOn" v-model="todo.reminderDateTime" />
       </nut-form>
       <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" />
-      <!--      <DateTimePicker v-model="showReminderDatePicker" v-model:date-time="todo.reminderDateTime" /> -->
       <nut-button class="mt-4" block type="primary" @click="save">
         {{ t('save') }}
       </nut-button>

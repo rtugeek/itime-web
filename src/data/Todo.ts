@@ -10,13 +10,16 @@ export interface Todo {
   id: number
   createdDateTime: string
   title: string
+  /**
+   * 排序位置
+   */
   order: number
   /**
    *  任务要完成的指定时区中的日期和时间。
    */
   dueDateTime?: string
   /**
-   * 任务预计完成的时间。
+   * 提醒时间
    */
   reminderDateTime?: string
   /**
@@ -44,4 +47,5 @@ export interface Todo {
    * 如果设置警报以提醒用户有任务，则设置为 true。
    */
   isReminderOn: boolean
+
 }

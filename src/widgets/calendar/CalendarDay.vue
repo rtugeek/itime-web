@@ -3,7 +3,6 @@ import { Solar } from 'lunar-typescript'
 import type { PropType } from 'vue'
 import { computed } from 'vue'
 import type { Almanac } from '@/api/PublicEventApi'
-import AlmanacInfo from '@/widgets/calendar/AlmanacInfo.vue'
 
 const props = defineProps({
   day: {
@@ -45,11 +44,11 @@ const bottomText = computed(() => {
     <div class="font-bold">
       {{ day.getDay() }}
     </div>
-    <div style="font-size: 10px" class="text-xs text-center">
-      <span v-if="bottomText" class="festival">
+    <div style="font-size: 10px" class="text-xs text-center" :class="{ today: isToday }">
+      <span v-if="bottomText" class="bottom-text">
         {{ bottomText }}
       </span>
-      <span v-else class="calendar-lunar" :class="{ today: !isToday }">
+      <span v-else class="calendar-lunar">
         {{ day.getLunar().getDayInChinese() }}
       </span>
     </div>
@@ -102,8 +101,13 @@ const bottomText = computed(() => {
     }
   }
 
-  .festival {
+  .bottom-text {
     color: var(--widget-primary-color);
+  }
+  .today{
+    .bottom-text{
+      color:var(--widget-color);
+    }
   }
 
 }

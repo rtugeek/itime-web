@@ -4,7 +4,7 @@ import type { PageResult } from '@/api/ApiResult'
 
 export class TodoApi {
   static async getTodos(page: number = 1, size: number = 50): Promise<PageResult<Todo>> {
-    return (await api.get(`/todo?page=${page}&size=${size}`)) as Todo[]
+    return (await api.get(`/todo?page=${page}&size=${size}`)) as PageResult<Todo>
   }
 
   static save(todo: Todo): Promise<Todo> {

@@ -31,7 +31,8 @@ export interface Birthday {
   updateTime: string
 
   introduction: string
-
-  single_event: boolean
-
+  /**
+   * 本地字段
+   */
+  needSync?: boolean
 }

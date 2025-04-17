@@ -15,7 +15,6 @@ export class BirthdayUtils {
       updateTime: nowStr,
       id: now.getTime(),
       introduction: '',
-      single_event: false,
     }
   }
 }

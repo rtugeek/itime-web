@@ -144,44 +144,6 @@
       "routes": []
     },
     {
-      "name": "itime.fun.countdown",
-      "title": {
-        "zh-CN": "倒计时",
-        "en-US": "Countdown"
-      },
-      "description": {
-        "zh-CN": "日历样式的倒计时组件",
-        "en-US": "Countdown widget with calendar style"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 2,
-      "height": 2,
-      "maxWidth": 4,
-      "webviewTag": false,
-      "maxHeight": 4,
-      "minWidth": 2,
-      "minHeight": 2,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/countdown",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_countdown.png",
-      "categories": [
-        "time",
-        "countdown"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
-      "routes": []
-    },
-    {
       "name": "itime.fun.countdown_list",
       "title": {
         "zh-CN": "倒计时列表",
@@ -217,6 +179,44 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/countdown/list?frame=true&transparent=false&width=600&height=400",
+      "routes": []
+    },
+    {
+      "name": "itime.fun.countdown",
+      "title": {
+        "zh-CN": "倒计时",
+        "en-US": "Countdown"
+      },
+      "description": {
+        "zh-CN": "日历样式的倒计时组件",
+        "en-US": "Countdown widget with calendar style"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 2,
+      "height": 2,
+      "maxWidth": 4,
+      "webviewTag": false,
+      "maxHeight": 4,
+      "minWidth": 2,
+      "minHeight": 2,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/countdown",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_countdown.png",
+      "categories": [
+        "time",
+        "countdown"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
       "routes": []
     },
     {

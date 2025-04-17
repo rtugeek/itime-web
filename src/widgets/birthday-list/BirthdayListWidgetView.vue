@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
-import { useMenuListener, useWidget } from '@widget-js/vue3'
+import { useContextMenu, useMenuListener, useWidget } from '@widget-js/vue3'
 import { AddOne } from '@icon-park/vue-next'
 import { useWindowSize } from '@vueuse/core'
-import { MenuApiEvent } from '@widget-js/core'
+import { MenuApiEvent, type WidgetMenuItem } from '@widget-js/core'
+import { useI18n } from 'vue-i18n'
 import { WindowUtils } from '@/utils/WindowUtils'
 import { useBirthdayStore } from '@/stores/useBirthdayStore'
 import BirthdayItem from '@/widgets/birthday-list/BirthdayItem.vue'
 
 const birthdayStore = useBirthdayStore()
 useWidget()
+const { t } = useI18n()
 const { birthdayList } = storeToRefs(birthdayStore)
 function add() {
   WindowUtils.open('/birthday/add')
@@ -29,6 +31,12 @@ useMenuListener((eventType, menu) => {
     }
   }
 })
+
+useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMenuClick: (menu: WidgetMenuItem) => {
+  if (menu.id == 'app-settings') {
+    WindowUtils.open('/settings')
+  }
+} })
 </script>
 
 <template>

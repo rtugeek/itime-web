@@ -4,8 +4,10 @@ import consola from 'consola'
 import { useBroadcastChannel } from '@vueuse/core'
 import { AppConfig } from '@/common/AppConfig'
 import type { Birthday } from '@/data/Birthday'
-import { birthdayStorage } from '@/data/db'
+import { migrateBirthday } from '@/data/db'
 import { BirthdayWrapper } from '@/data/BirthdayWrapper'
+import { BirthdayRepository } from '@/data/repository/BirthdayRepository'
+import { BirthdaySync } from '@/data/sync/BirthdaySync'
 
 interface BirthdayEvent {
   type: 'insert' | 'update' | 'delete'
@@ -17,7 +19,6 @@ export const useBirthdayStore = defineStore('birthday-store', () => {
   const broadcastChannel = useBroadcastChannel({
     name: AppConfig.CHANNEL_BIRTHDAY,
   })
-
   watch(broadcastChannel.data, () => {
     consola.info('broadcastChannel.data', broadcastChannel.data.value)
     const payload = broadcastChannel.data.value as (BirthdayEvent | undefined)
@@ -41,22 +42,14 @@ export const useBirthdayStore = defineStore('birthday-store', () => {
   })
 
   const find = async (id: string) => {
-    const birthday = await birthdayStorage.getItem<Birthday>(id)
-    if (birthday) {
-      return birthday
-    }
-    return undefined
+    return await BirthdayRepository.findOne({ id })
   }
 
   const load = async () => {
+    await migrateBirthday()
     birthdayList.splice(0, birthdayList.length)
-    const keys = await birthdayStorage.keys()
-    for (const key of keys) {
-      const birthday = await birthdayStorage.getItem<Birthday>(key)
-      if (birthday) {
-        birthdayList.push(birthday)
-      }
-    }
+    const birthdays = await BirthdayRepository.findAll()
+    birthdayList.push(...birthdays)
     sortBirthdayList()
   }
 
@@ -66,20 +59,20 @@ export const useBirthdayStore = defineStore('birthday-store', () => {
     })
   }
 
-  function remove(birthday: Birthday) {
+  async function remove(birthday: Birthday) {
     const index = birthdayList.findIndex(it => it.id == birthday.id)
     if (index > -1) {
       birthdayList.splice(index, 1)
     }
-    birthdayStorage.removeItem(`${birthday.id}`)
+    await BirthdayRepository.remove(birthday)
   }
 
-  function removeById(id: string) {
+  async function removeById(id: string) {
     const index = birthdayList.findIndex(it => it.id.toString() == id)
     if (index > -1) {
       birthdayList.splice(index, 1)
     }
-    birthdayStorage.removeItem(id)
+    await BirthdayRepository.remove(id)
   }
 
   async function save(birthday: Birthday, options?: {
@@ -87,23 +80,23 @@ export const useBirthdayStore = defineStore('birthday-store', () => {
     sort: boolean
     broadcast: boolean
   }) {
-    // const sync = options?.sync ?? true
     const sort = options?.sort ?? true
     const broadcast = options?.broadcast ?? true
     const rawBirthday = toRaw(birthday)
-    await birthdayStorage.setItem(`${rawBirthday.id}`, rawBirthday)
-    birthdayList.splice(0, 0, rawBirthday)
+    rawBirthday.needSync = true
+    await BirthdayRepository.save(rawBirthday, true)
     if (broadcast) {
       broadcastChannel.post({ type: 'update', data: rawBirthday })
     }
-    // if (sync) {
-    // }
     if (sort) {
       sortBirthdayList()
     }
+    BirthdaySync.sync()
   }
 
   load()
+
+  BirthdaySync.sync()
 
   return {
     remove,

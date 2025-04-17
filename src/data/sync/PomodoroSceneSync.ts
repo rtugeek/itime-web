@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 import { PomodoroSceneApi } from '@/api/PomodoroSceneApi'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 

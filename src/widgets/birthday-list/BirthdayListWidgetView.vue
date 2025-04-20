@@ -37,6 +37,7 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
     WindowUtils.open('/settings')
   }
 } })
+
 </script>
 
 <template>

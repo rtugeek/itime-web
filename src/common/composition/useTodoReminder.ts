@@ -35,7 +35,7 @@ export function useTodoReminder() {
   // 监听todo变化
   useTodoBroadcast({
     onUpdated: async (todo) => {
-      const existingTodo = await todoRepository.findOne({ id: todo.id.toString() })
+      const existingTodo = await TodoRepository.findOne({ id: todo.id.toString() })
       // 只有在提醒相关的字段变化时才更新提醒
       if (hasReminderChanged(existingTodo, todo)) {
         updateReminder(todo.id)
@@ -153,7 +153,7 @@ export function useTodoReminder() {
    * 初始化所有提醒
    */
   async function initializeReminders() {
-    const todos = await todoRepository.findReminderOn()
+    const todos = await TodoRepository.findReminderOn()
     for (const todo of todos) {
       setReminder(todo)
     }

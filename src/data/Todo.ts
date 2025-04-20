@@ -15,7 +15,7 @@ export interface Todo {
    */
   order: number
   /**
-   *  任务要完成的指定时区中的日期和时间。
+   *  任务计划要完成的指定时区中的日期和时间。
    */
   dueDateTime?: string
   /**

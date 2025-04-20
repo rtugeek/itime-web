@@ -23,7 +23,7 @@
     "@icon-park/vue-next": "^1.4.2",
     "@nutui/nutui": "^4.3.13",
     "@nutui/touch-emulator": "^1.0.0",
-    "@vueuse/core": "^10.9.0",
+    "@vueuse/core": "^13.1.0",
     "@vueuse/integrations": "^10.9.0",
     "@vueuse/sound": "^2.0.1",
     "@widget-js/core": "^24.1.1-beta.48",

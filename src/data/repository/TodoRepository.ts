@@ -15,7 +15,7 @@ export class TodoDatabase extends Dexie {
 
 const db = new TodoDatabase()
 export class TodoRepository {
-  async findOne(options: { id: string, includeComplete?: boolean }): Promise<Todo | undefined> {
+  static async findOne(options: { id: string, includeComplete?: boolean }): Promise<Todo | undefined> {
     const todo = await db.todos.get(Number(options.id))
     if (!todo) { return undefined }
 
@@ -26,26 +26,26 @@ export class TodoRepository {
     return todo
   }
 
-  async findUncompleted(): Promise<Todo[]> {
+  static async findUncompleted(): Promise<Todo[]> {
     return db.todos
       .filter(todo => !todo.completedDateTime)
       .sortBy('order')
   }
 
-  async findCompleted(): Promise<Todo[]> {
+  static async findCompleted(): Promise<Todo[]> {
     return db.todos
       .filter(todo => !!todo.completedDateTime)
       .reverse()
       .sortBy('completedDateTime')
   }
 
-  async findReminderOn(): Promise<Todo[]> {
+  static async findReminderOn(): Promise<Todo[]> {
     return db.todos
       .filter(todo => todo.isReminderOn && !todo.completedDateTime)
       .sortBy('reminderDateTime')
   }
 
-  async complete(todo: Todo): Promise<Todo> {
+  static async complete(todo: Todo): Promise<Todo> {
     const now = new Date().toISOString()
     const updatedTodo = {
       ...todo,
@@ -56,7 +56,7 @@ export class TodoRepository {
     return updatedTodo
   }
 
-  async undoComplete(todo: Todo): Promise<Todo> {
+  static async undoComplete(todo: Todo): Promise<Todo> {
     const updatedTodo = {
       ...todo,
       completedDateTime: undefined,
@@ -70,7 +70,7 @@ export class TodoRepository {
    * remove todo if it is a string, otherwise remove todo.id
    * @param todo
    */
-  async remove(todo: Todo | string): Promise<Todo> {
+  static async remove(todo: Todo | string): Promise<Todo> {
     const id = typeof todo === 'string' ? Number(todo) : todo.id
     const todoToDelete = await db.todos.get(id)
     if (!todoToDelete) {
@@ -80,7 +80,7 @@ export class TodoRepository {
     return todoToDelete
   }
 
-  async add(todo: Omit<Todo, 'id' | 'createdDateTime' | 'lastModifiedDateTime'>): Promise<Todo> {
+  static async add(todo: Omit<Todo, 'id' | 'createdDateTime' | 'lastModifiedDateTime'>): Promise<Todo> {
     const now = new Date().toISOString()
     const newTodo: Todo = {
       ...todo,
@@ -95,7 +95,7 @@ export class TodoRepository {
     return newTodo
   }
 
-  async update(todo: Todo): Promise<Todo> {
+  static async update(todo: Todo): Promise<Todo> {
     const updatedTodo = {
       ...todo,
       lastModifiedDateTime: new Date().toISOString(),
@@ -104,7 +104,7 @@ export class TodoRepository {
     return updatedTodo
   }
 
-  async findTableIdIsNull(): Promise<Todo[]> {
+  static async findTableIdIsNull(): Promise<Todo[]> {
     return db.todos
       .filter(todo => !todo.tableId)
       .sortBy('order')

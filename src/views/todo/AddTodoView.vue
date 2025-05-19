@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { AlarmClock, Calendar, CloseOne, Flag } from '@icon-park/vue-next'
+import { useRoute, useRouter } from 'vue-router'
+import { Calendar, CloseOne, Flag } from '@icon-park/vue-next'
 import consola from 'consola'
-import { showToast } from '@nutui/nutui'
+import { showDialog, showToast } from '@nutui/nutui'
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
 import BaseView from '@/components/BaseView.vue'
@@ -12,6 +12,7 @@ import { TodoUtils } from '@/utils/TodoUtils'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import RecurrenceFormItem from '@/components/form/RecurrenceFormItem.vue'
 import ReminderTimeFormItem from '@/components/form/ReminderTimeFormItem.vue'
+import { AppUtils } from '@/utils/AppUtils'
 
 const { t } = useI18n()
 const todoStore = useTodoStore()
@@ -20,7 +21,8 @@ const showDatePicker = ref(false)
 const id = Number.parseInt((route.query.id ?? '0') as string)
 const title = ref(t('todo.title'))
 const todo = ref(TodoUtils.new())
-
+const router = useRouter()
+const isEdit = ref(false)
 if (id > 0) {
   title.value = t('todo.edit')
   todoStore.find(id.toString()).then((res) => {
@@ -28,6 +30,12 @@ if (id > 0) {
       todo.value = reactive(res)
     }
   })
+  isEdit.value = true
+}
+else {
+  if (route.query.dueDateTime) {
+    todo.value.dueDateTime = dayjs(route.query.dueDateTime as string).toISOString()
+  }
 }
 
 watch(() => todo.value.recurrence, (val) => {
@@ -57,7 +65,7 @@ watch(() => todo.value.recurrence, () => {
 })
 
 async function save() {
-  showToast.loading('保存中', { id: 'loading' })
+  showToast.loading(t('saving'), { id: 'loading' })
   try {
     await todoStore.saveTodo(todo.value)
   }
@@ -66,6 +74,18 @@ async function save() {
   }
   showToast.hide('loading')
   window.close()
+}
+
+async function deleteTodo() {
+  showDialog({
+    title: t('todo.deleteConfirm'),
+    content: todo.value.title,
+    okText: t('confirm'),
+    onOk: async () => {
+      await todoStore.deleteTodo(todo.value)
+      AppUtils.back(router, true)
+    },
+  })
 }
 </script>
 
@@ -109,6 +129,9 @@ async function save() {
       <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" />
       <nut-button class="mt-4" block type="primary" @click="save">
         {{ t('save') }}
+      </nut-button>
+      <nut-button v-if="isEdit" class="mt-2" type="danger" @click="deleteTodo">
+        {{ t('delete') }}
       </nut-button>
     </div>
   </BaseView>

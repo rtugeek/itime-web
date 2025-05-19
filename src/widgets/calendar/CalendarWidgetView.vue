@@ -7,7 +7,7 @@ import { Left, Right } from '@icon-park/vue-next'
 import { SystemApiEvent } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
-import { type Almanac, PublicEventApi } from '@/api/PublicEventApi'
+import { type HuangLi, PublicEventApi } from '@/api/PublicEventApi'
 import AlmanacInfo from '@/widgets/calendar/AlmanacInfo.vue'
 
 const today = ref(dayjs())
@@ -33,7 +33,7 @@ function previous() {
   currentMonthIndex.value = currentMonth.value.month()
 }
 
-const almanac = ref<Almanac[]>([])
+const almanac = ref<HuangLi[]>([])
 PublicEventApi.getCalendar().then((it) => {
   almanac.value = it
 })
@@ -58,7 +58,7 @@ useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
 
 const weekKeyPath = ['week.short.sunday', 'week.short.monday', 'week.short.tuesday', 'week.short.wednesday', 'week.short.thursday', 'week.short.friday', 'week.short.saturday']
 const showDetail = ref(false)
-const selectedAlmanac = ref<Almanac>()
+const selectedAlmanac = ref<HuangLi>()
 const selectedSolar = ref<Solar>()
 
 const show = (solar: Solar) => {

@@ -1,6 +1,6 @@
 {
   "name": "itime-web",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -20,6 +20,12 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/icalendar": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/rrule": "^6.1.17",
+    "@fullcalendar/vue3": "^6.1.17",
     "@icon-park/vue-next": "^1.4.2",
     "@nutui/nutui": "^4.3.13",
     "@nutui/touch-emulator": "^1.0.0",
@@ -34,6 +40,7 @@
     "dayjs": "^1.11.10",
     "dexie": "^4.0.11",
     "element-plus": "^2.8.3",
+    "ical.js": "^2.1.0",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
     "lunar-typescript": "^1.7.5",

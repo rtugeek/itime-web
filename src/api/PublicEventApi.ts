@@ -1,12 +1,12 @@
 import { api } from '@/api/Api'
 
 export class PublicEventApi {
-  static getCalendar(): Promise<Almanac[]> {
+  static getCalendar(): Promise<HuangLi[]> {
     return api.get('/event/public/calendar')
   }
 }
 
-export interface Almanac {
+export interface HuangLi {
   id: number
   year: number
   month: number

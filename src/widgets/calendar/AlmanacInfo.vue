@@ -2,11 +2,11 @@
 import { Close } from '@icon-park/vue-next'
 import { type PropType, computed } from 'vue'
 import type { Solar } from 'lunar-typescript'
-import type { Almanac } from '@/api/PublicEventApi'
+import type { HuangLi } from '@/api/PublicEventApi'
 
 const props = defineProps({
   almanac: {
-    type: Object as PropType<Almanac>,
+    type: Object as PropType<HuangLi>,
   },
   solar: {
     type: Object as PropType<Solar>,

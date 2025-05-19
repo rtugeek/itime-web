@@ -2,7 +2,7 @@
 import { Solar } from 'lunar-typescript'
 import type { PropType } from 'vue'
 import { computed } from 'vue'
-import type { Almanac } from '@/api/PublicEventApi'
+import type { HuangLi } from '@/api/PublicEventApi'
 
 const props = defineProps({
   day: {
@@ -10,7 +10,7 @@ const props = defineProps({
     required: true,
   },
   almanac: {
-    type: Object as PropType<Almanac>,
+    type: Object as PropType<HuangLi>,
   },
 })
 

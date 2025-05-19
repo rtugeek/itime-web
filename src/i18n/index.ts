@@ -32,6 +32,8 @@ export const i18n = createI18n({
       copy: '复制',
       copied: '已复制',
       view: '查看',
+      confirm: '确定',
+      delete: '删除',
       recurrence: {
         title: '重复设置',
         none: '不重复',
@@ -71,10 +73,12 @@ export const i18n = createI18n({
       appSettings: 'App Settings',
       copied: 'Copied',
       save: 'Save',
+      confirm: 'OK',
       deleting: 'Deleting',
       saving: 'Saving',
       minute: 'min',
       copy: 'Copy',
+      delete: 'Delete',
       app: {
         download: 'Download App',
       },

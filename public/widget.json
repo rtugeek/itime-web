@@ -1,6 +1,6 @@
 {
   "name": "itime.fun",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "requiredAppVersion": "",
   "author": "LYP",
   "homepage": "",
@@ -217,6 +217,41 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
+      "routes": []
+    },
+    {
+      "name": "itime.fun.calendar_large",
+      "title": {
+        "zh-CN": "大号日历"
+      },
+      "description": {
+        "zh-CN": "大尺寸日历，方便用户对整月日程进行安排"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 8,
+      "height": 8,
+      "maxWidth": 12,
+      "webviewTag": false,
+      "maxHeight": 12,
+      "minWidth": 8,
+      "minHeight": 8,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar_large",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar_large.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar_large?width=600&height=500&frame=true&transparent=false",
       "routes": []
     },
     {

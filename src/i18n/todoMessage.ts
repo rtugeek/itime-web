@@ -8,6 +8,7 @@ export const todoMessage: DefaultLocaleMessageSchema = {
       edit: '编辑事项',
       content: '待办内容',
       dueDateTime: '目标日期',
+      deleteConfirm: '确定要删除？',
     },
   },
   en: {
@@ -17,6 +18,7 @@ export const todoMessage: DefaultLocaleMessageSchema = {
       edit: 'Edit To-Do',
       content: 'Content',
       dueDateTime: 'Due Date',
+      deleteConfirm: 'Delete To-Do?',
     },
   },
 }

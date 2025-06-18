@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { type PropType, computed } from 'vue'
+import { type PropType, computed, ref } from 'vue'
 import { MenuApi } from '@widget-js/core'
+import { useIntervalFn } from '@vueuse/core'
+import dayjs from 'dayjs'
 import type { CountdownEvent } from '@/data/CountdownEvent'
 
 const props = defineProps({ event: { type: Object as PropType<CountdownEvent>, required: true } })
+
 function onItemClick() {
   MenuApi.showMenu({
     menuItems: [
@@ -22,6 +25,11 @@ function onItemClick() {
 const isToday = computed(() => {
   return props.event.isToday()
 })
+
+const days = ref('')
+useIntervalFn(() => {
+  days.value = `${Math.abs(props.event?.countdown())}`
+}, 60 * 1000, { immediate: true, immediateCallback: true })
 </script>
 
 <template>
@@ -41,7 +49,7 @@ const isToday = computed(() => {
     </div>
     <div class="countdown">
       <div class="days">
-        {{ Math.abs(event.countdown()) }}
+        {{ days }}
       </div>
       <div class="unit">
         天
@@ -62,18 +70,21 @@ const isToday = computed(() => {
   z-index: 1;
   transition: all 0.5s ease;
 
-  .info{
+  .info {
     padding: 6px 0;
   }
-  .date, .note{
+
+  .date, .note {
     display: none;
   }
+
   &:hover {
-    .date, .note{
+    .date, .note {
       display: block;
     }
   }
-  .countdown{
+
+  .countdown {
     color: white;
     margin-left: auto;
     background-color: #478EFF;
@@ -82,7 +93,7 @@ const isToday = computed(() => {
     vertical-align: middle;
     font-size: 1.2rem;
 
-    .days,.unit{
+    .days, .unit {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -95,7 +106,7 @@ const isToday = computed(() => {
     }
 
     .unit {
-      margin-left:auto;
+      margin-left: auto;
       height: 100%;
       width: 2.5rem;
       background-color: rgba(0, 0, 0, 0.15);
@@ -103,13 +114,13 @@ const isToday = computed(() => {
   }
 
   &.today {
-    .countdown{
+    .countdown {
       background-color: #ffcd16;
     }
   }
 
   &.past {
-    .countdown{
+    .countdown {
       background-color: #ff3916;
     }
   }

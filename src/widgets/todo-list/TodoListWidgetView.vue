@@ -41,7 +41,7 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
         <div class="title">
           {{ viewType === 'history' ? t('todo.history') : title }}
         </div>
-        <div class="actions flex gap-4">
+        <div class="actions flex gap-4 pr-2">
           <UserIcon />
           <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
           <History v-if="viewType !== 'history'" class="icon" @click="viewType = 'history'" />

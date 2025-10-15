@@ -5,7 +5,8 @@ import { RRuleUtils } from '@/utils/RRuleUtils'
 export class TodoUtils {
   static recurrent(todo: Todo): Todo | undefined {
     if (todo.recurrence) {
-      const date = RRuleUtils.next(todo.recurrence, dayjs(todo.dueDateTime).toDate())
+      const dueDate = dayjs(todo.dueDateTime)
+      const date = RRuleUtils.next(todo.recurrence, dueDate.toDate(), dueDate.isToday() ? undefined : dueDate.toDate())
       if (date) {
         const now = new Date()
         return this.fromObject({

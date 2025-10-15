@@ -1,3 +1,5 @@
+import type { DefaultLocaleMessageSchema } from 'vue-i18n'
+
 export const todoMessage: DefaultLocaleMessageSchema = {
   zh: {
     todo: {
@@ -9,6 +11,7 @@ export const todoMessage: DefaultLocaleMessageSchema = {
       saving: '保存中...',
       delete: '删除',
       confirm: '确定',
+      save: '保存',
     },
   },
   en: {
@@ -21,6 +24,7 @@ export const todoMessage: DefaultLocaleMessageSchema = {
       saving: 'Saving...',
       delete: 'Delete',
       confirm: 'Confirm',
+      save: 'Save',
     },
   },
 }

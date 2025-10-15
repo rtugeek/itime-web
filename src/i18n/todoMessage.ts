@@ -1,5 +1,3 @@
-import type { DefaultLocaleMessageSchema } from 'vue-i18n'
-
 export const todoMessage: DefaultLocaleMessageSchema = {
   zh: {
     todo: {
@@ -8,7 +6,9 @@ export const todoMessage: DefaultLocaleMessageSchema = {
       edit: '编辑事项',
       content: '待办内容',
       dueDateTime: '目标日期',
-      deleteConfirm: '确定要删除？',
+      saving: '保存中...',
+      delete: '删除',
+      confirm: '确定',
     },
   },
   en: {
@@ -18,7 +18,9 @@ export const todoMessage: DefaultLocaleMessageSchema = {
       edit: 'Edit To-Do',
       content: 'Content',
       dueDateTime: 'Due Date',
-      deleteConfirm: 'Delete To-Do?',
+      saving: 'Saving...',
+      delete: 'Delete',
+      confirm: 'Confirm',
     },
   },
 }

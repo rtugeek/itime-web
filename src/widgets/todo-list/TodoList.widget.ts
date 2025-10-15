@@ -1,7 +1,4 @@
-import {
-  Widget,
-  WidgetKeyword,
-} from '@widget-js/core'
+import { DeployMode, Widget, WidgetKeyword } from '@widget-js/core'
 
 const TodoListWidget = new Widget({
   name: '.todo_list',
@@ -17,6 +14,7 @@ const TodoListWidget = new Widget({
   maxWidth: 6,
   minHeight: 3,
   maxHeight: 6,
+  supportDeployMode: DeployMode.TRAY | DeployMode.OVERLAP | DeployMode.NORMAL,
   path: '/widget/todo_list',
   browserWindowOptions: {
     backgroundThrottling: false,

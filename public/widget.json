@@ -56,7 +56,7 @@
         "productivity",
         "utilities"
       ],
-      "supportDeployMode": 17,
+      "supportDeployMode": 273,
       "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
       "routes": []
     },

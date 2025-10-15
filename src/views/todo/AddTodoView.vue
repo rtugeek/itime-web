@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { Calendar, CloseOne, Flag } from '@icon-park/vue-next'
 import consola from 'consola'
 import { showDialog, showToast } from '@nutui/nutui'
@@ -12,7 +12,6 @@ import { TodoUtils } from '@/utils/TodoUtils'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import RecurrenceFormItem from '@/components/form/RecurrenceFormItem.vue'
 import ReminderTimeFormItem from '@/components/form/ReminderTimeFormItem.vue'
-import { AppUtils } from '@/utils/AppUtils'
 
 const { t } = useI18n()
 const todoStore = useTodoStore()
@@ -21,8 +20,7 @@ const showDatePicker = ref(false)
 const id = Number.parseInt((route.query.id ?? '0') as string)
 const title = ref(t('todo.title'))
 const todo = ref(TodoUtils.new())
-const router = useRouter()
-const isEdit = ref(false)
+
 if (id > 0) {
   title.value = t('todo.edit')
   todoStore.find(id.toString()).then((res) => {
@@ -30,7 +28,6 @@ if (id > 0) {
       todo.value = reactive(res)
     }
   })
-  isEdit.value = true
 }
 else {
   if (route.query.dueDateTime) {
@@ -65,7 +62,7 @@ watch(() => todo.value.recurrence, () => {
 })
 
 async function save() {
-  showToast.loading(t('saving'), { id: 'loading' })
+  showToast.loading(t('todo.saving'), { id: 'loading' })
   try {
     await todoStore.saveTodo(todo.value)
   }
@@ -78,12 +75,11 @@ async function save() {
 
 async function deleteTodo() {
   showDialog({
-    title: t('todo.deleteConfirm'),
+    title: t('todo.confirm'),
     content: todo.value.title,
-    okText: t('confirm'),
-    onOk: async () => {
-      await todoStore.deleteTodo(todo.value)
-      AppUtils.back(router, true)
+    okText: t('todo.confirm'),
+    onOk: () => {
+      todoStore.deleteTodo(todo.value)
     },
   })
 }
@@ -128,10 +124,10 @@ async function deleteTodo() {
       </nut-form>
       <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" />
       <nut-button class="mt-4" block type="primary" @click="save">
-        {{ t('save') }}
+        {{ t('todo.save') }}
       </nut-button>
-      <nut-button v-if="isEdit" class="mt-2" type="danger" @click="deleteTodo">
-        {{ t('delete') }}
+      <nut-button class="mt-2" type="danger" @click="deleteTodo">
+        {{ t('todo.delete') }}
       </nut-button>
     </div>
   </BaseView>

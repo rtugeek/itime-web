@@ -5,9 +5,11 @@ import { useWidgetStorage } from '@widget-js/vue3'
 import consola from 'consola'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { CountdownEvent } from '@/data/CountdownEvent'
+import { CountdownSync } from '@/data/sync/CountdownSync'
 
 export type ListSort = 'asc' | 'desc'
 export const useCountdownEventStore = defineStore('countdownEventStore', () => {
+  const countdownSync = new CountdownSync()
   const events = ref<CountdownEvent[]>([])
   const sort = useWidgetStorage<ListSort>('countdownEventSort', 'asc')
   async function reload() {
@@ -39,9 +41,10 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   }, { debounce: 1000 })
 
   async function deleteCountdown(id: string) {
-    await CountdownEventRepository.remove(id)
+    await CountdownEventRepository.softRemove(id)
     await reload()
     post({ type: 'delete', id })
+    countdownSync.sync()
   }
 
   function toggleSort() {
@@ -53,6 +56,7 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
     await CountdownEventRepository.save(event)
     await reload()
     post({ type: 'save', event, time: Date.now() })
+    countdownSync.sync()
   }
   reload()
   return {

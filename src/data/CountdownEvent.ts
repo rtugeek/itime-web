@@ -25,6 +25,9 @@ export class CountdownEvent extends BaseRecurrentEvent {
    * @deprecated
    */
   periodType: number = 0
+  /**
+   * rrule格式的重复规则
+   */
   recurrence?: string
   /**
    * 0-公历

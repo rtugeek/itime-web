@@ -23,44 +23,6 @@
   "url": "",
   "widgets": [
     {
-      "name": "itime.fun.todo_list",
-      "title": {
-        "zh-CN": "待办事项（Pro）",
-        "en-US": "To-Do"
-      },
-      "description": {
-        "zh-CN": "带数据同步功能的待办事项",
-        "en-US": "To-Do list with data synchronization"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 3,
-      "minHeight": 3,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/todo_list",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_todo_list.png",
-      "categories": [
-        "productivity",
-        "utilities"
-      ],
-      "supportDeployMode": 273,
-      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
-      "routes": []
-    },
-    {
       "name": "itime.fun.pomodoro",
       "title": {
         "zh-CN": "番茄钟",
@@ -103,6 +65,44 @@
         "backgroundMaterial": "acrylic",
         "backgroundThrottling": false
       }
+    },
+    {
+      "name": "itime.fun.todo_list",
+      "title": {
+        "zh-CN": "待办事项（Pro）",
+        "en-US": "To-Do"
+      },
+      "description": {
+        "zh-CN": "带数据同步功能的待办事项",
+        "en-US": "To-Do list with data synchronization"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 3,
+      "minHeight": 3,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/todo_list",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_todo_list.png",
+      "categories": [
+        "productivity",
+        "utilities"
+      ],
+      "supportDeployMode": 273,
+      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
+      "routes": []
     },
     {
       "name": "itime.fun.deadline",
@@ -216,6 +216,7 @@
         "countdown"
       ],
       "supportDeployMode": 17,
+      "synchronizable": true,
       "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
       "routes": []
     },
@@ -255,43 +256,6 @@
       "routes": []
     },
     {
-      "name": "itime.fun.calendar",
-      "title": {
-        "zh-CN": "日历",
-        "en-US": "Calendar"
-      },
-      "description": {
-        "zh-CN": "简单的日历，支持节假日显示",
-        "en-US": "Simple calendar with holiday display"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 4,
-      "minHeight": 4,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/calendar",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_calendar.png",
-      "categories": [
-        "calendar"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
-      "routes": []
-    },
-    {
       "name": "itime.fun.birthday_list",
       "title": {
         "zh-CN": "生日列表",
@@ -327,6 +291,43 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
+      "routes": []
+    },
+    {
+      "name": "itime.fun.calendar",
+      "title": {
+        "zh-CN": "日历",
+        "en-US": "Calendar"
+      },
+      "description": {
+        "zh-CN": "简单的日历，支持节假日显示",
+        "en-US": "Simple calendar with holiday display"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 4,
+      "minHeight": 4,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
       "routes": []
     }
   ],

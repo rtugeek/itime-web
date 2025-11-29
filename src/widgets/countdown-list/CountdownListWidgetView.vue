@@ -7,6 +7,8 @@ import { DefaultWidgetTheme, MenuApiEvent } from '@widget-js/core'
 import { WindowUtils } from '@/utils/WindowUtils'
 import CountdownItem from '@/widgets/countdown-list/CountdownListWidgetItem.vue'
 import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
+import { CountdownSync } from '@/data/sync/CountdownSync'
+import { useSupabaseSync } from '@/common/composition/useSupabaseSync'
 
 const countdownStore = useCountdownEventStore()
 const theme = DefaultWidgetTheme.copy({
@@ -33,6 +35,9 @@ useMenuListener((eventType, menu) => {
     }
   }
 })
+
+const countdownSync = new CountdownSync()
+useSupabaseSync(countdownSync)
 </script>
 
 <template>

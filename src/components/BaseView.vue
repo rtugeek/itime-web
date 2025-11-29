@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { BrowserWindowApi } from '@widget-js/core'
 import { Close, Left } from '@icon-park/vue-next'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { usePreferredDark } from '@vueuse/core'
 import { AppUtils } from '@/utils/AppUtils'
 
@@ -31,20 +31,18 @@ function mouseUp() {
 function close() {
   window.close()
 }
-
-const route = useRoute()
 </script>
 
 <template>
   <NutConfigProvider :theme="isDark ? 'dark' : 'light'">
     <div class="base-view flex flex-col w-full">
       <div class="div" @mousedown="mouseDown" @mouseup="mouseUp">
-        <nut-navbar fixed v-bind="{ ...props, leftShow: false }" style="height: 56px;font-size: 24px" @click-back="goBack">
+        <nut-navbar class="widget-drag-region" fixed v-bind="{ ...props, leftShow: false }" style="height: 56px;font-size: 24px" @click-back="goBack">
           <template #left>
-            <Left size="26" @click="goBack" />
+            <Left size="26" class="widget-no-drag-region" @click="goBack" />
           </template>
           <template #right>
-            <div class="flex gap-2">
+            <div class="flex gap-2 widget-no-drag-region">
               <slot name="actions" />
               <nut-button v-electron plain size="small" @click="close">
                 <Close />

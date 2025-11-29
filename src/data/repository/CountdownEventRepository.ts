@@ -25,17 +25,32 @@ export class CountdownEventRepository {
     return countdownEventRepository.removeItem(key)
   }
 
+  static async softRemove(key: string) {
+    const event = await this.get(key)
+    if (event) {
+      event.deleteTime = new Date()
+      await this.save(event)
+    }
+  }
+
   static async clear() {
     return countdownEventRepository.clear()
   }
 
-  static async all(): Promise<CountdownEvent[]> {
+  static async all(includeRemoved?: boolean): Promise<CountdownEvent[]> {
     const events: CountdownEvent[] = []
     const keys = await countdownEventRepository.keys()
     for (const key of keys) {
       const event = await countdownEventRepository.getItem<CountdownEvent>(key)
       if (event) {
-        events.push(event)
+        if (event.deleteTime) {
+          if (includeRemoved) {
+            events.push(event)
+          }
+        }
+        else {
+          events.push(event)
+        }
       }
     }
     return events

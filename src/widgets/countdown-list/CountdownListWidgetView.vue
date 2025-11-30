@@ -36,8 +36,7 @@ useMenuListener((eventType, menu) => {
   }
 })
 
-const countdownSync = new CountdownSync()
-useSupabaseSync(countdownSync)
+useSupabaseSync(CountdownSync)
 </script>
 
 <template>
@@ -47,9 +46,9 @@ useSupabaseSync(countdownSync)
     >
       <div class="title">
         <div v-t="'countdown.list'" />
-        <div class="actions flex gap-2 ml-auto">
+        <div class="actions flex gap-3 ml-auto">
           <AddOne size="22" class="add cursor-pointer" @click="add" />
-          <SortAmountDown size="22" class="add cursor-pointer" @click="countdownStore.toggleSort" />
+          <SortAmountDown size="22" class="add cursor-pointer mr-2" @click="countdownStore.toggleSort" />
         </div>
       </div>
       <el-scrollbar :height="height - 72">

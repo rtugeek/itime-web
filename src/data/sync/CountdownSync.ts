@@ -14,13 +14,19 @@ export interface RemoteCountdown extends BaseRemoteData {
   date_type: number
 }
 
-export class CountdownSync extends BaseSync<CountdownEvent, RemoteCountdown> {
+class CountdownSyncImpl extends BaseSync<CountdownEvent, RemoteCountdown> {
   constructor() {
     super('countdown')
   }
 
   getLocalItems(): Promise<CountdownEvent[]> {
     return CountdownEventRepository.all(true)
+  }
+
+  async isLogin(): Promise<boolean> {
+    const supabaseClient = getSupabaseClient()
+    const user = await supabaseClient.auth.getUser()
+    return !user.error
   }
 
   async getRemoteItems(): Promise<RemoteCountdown[]> {
@@ -36,47 +42,64 @@ export class CountdownSync extends BaseSync<CountdownEvent, RemoteCountdown> {
     }
   }
 
-  async pushChanges(items: RemoteCountdown[]): Promise<void> {
-    const supabaseClient = getSupabaseClient()
-    const upsertResult = await supabaseClient.from('countdown').upsert(items)
-    if (upsertResult.error) {
-      consola.info('pushChanges error', upsertResult.error)
+  async pushToRemote(items: RemoteCountdown[]): Promise<RemoteCountdown[]> {
+    if (items.length > 0) {
+      const supabaseClient = getSupabaseClient()
+      const upsertItems = items.filter(it => it.uuid)
+      const insertItems = items.filter(it => !it.uuid)
+      consola.info('pushToRemote', { insertItems, upsertItems })
+      const insertResult = await supabaseClient.from('countdown').insert(insertItems).select()
+      const upsertResult = await supabaseClient.from('countdown').upsert(upsertItems).select()
+
+      const results: any[] = []
+      if (insertResult.data) {
+        results.push(...insertResult.data)
+      }
+      if (upsertResult.data) {
+        results.push(...upsertResult.data)
+      }
+      return results
     }
-    else {
-      consola.info(upsertResult.data)
-    }
+    return []
   }
 
   saveItem(item: CountdownEvent): Promise<CountdownEvent> {
-    return CountdownEventRepository.save(item)
+    return CountdownEventRepository.save(item, false)
   }
 
-  mapLocalToRemote(it: CountdownEvent): RemoteCountdown {
-    const item: RemoteCountdown = {
-      id: it.id,
-      name: it.name,
-      note: it.note,
-      date_time: it.dateTime,
-      source_date_time: it.sourceDateTime,
-      recurrence: it.recurrence,
-      date_type: it.dateType,
-      update_time: it.updateTime?.toISOString() ?? new Date().toISOString(),
-      create_time: it.createTime?.toISOString() ?? new Date().toISOString(),
-      delete_time: it.deleteTime?.toISOString(),
-    }
-    if (item.uuid) {
-      item.uuid = it.uuid
-    }
-    return item
+  mapLocalToRemote(localItems: CountdownEvent[]): RemoteCountdown[] {
+    return localItems.map((localItem) => {
+      const remoteItem: RemoteCountdown = {
+        id: localItem.id,
+        name: localItem.name,
+        note: localItem.note,
+        date_time: localItem.dateTime,
+        source_date_time: localItem.sourceDateTime,
+        recurrence: localItem.recurrence,
+        date_type: localItem.dateType,
+        update_time: localItem.updateTime?.toISOString() ?? new Date().toISOString(),
+        create_time: localItem.createTime?.toISOString() ?? new Date().toISOString(),
+        delete_time: localItem.deleteTime?.toISOString(),
+      }
+      if (localItem.uuid) {
+        remoteItem.uuid = localItem.uuid
+      }
+      return remoteItem
+    })
   }
 
-  mapRemoteToLocal(item: RemoteCountdown): CountdownEvent {
-    const countdown = new CountdownEvent(item.name, new Date(item.source_date_time), item.date_type, item.recurrence, item.note)
-    countdown.id = item.id
-    countdown.uuid = item.uuid
-    countdown.updateTime = item.update_time ? new Date(item.update_time) : new Date()
-    countdown.createTime = item.create_time ? new Date(item.create_time) : new Date()
-    countdown.deleteTime = item.delete_time ? new Date(item.delete_time) : undefined
-    return countdown
+  mapRemoteToLocal(remotes: RemoteCountdown[]): CountdownEvent[] {
+    return remotes.map((item) => {
+      const countdown = new CountdownEvent(item.name, new Date(item.source_date_time), item.date_type, item.recurrence, item.note)
+      countdown.id = item.id
+      countdown.uuid = item.uuid
+      countdown.updateTime = item.update_time ? new Date(item.update_time) : new Date()
+      countdown.createTime = item.create_time ? new Date(item.create_time) : new Date()
+      countdown.deleteTime = item.delete_time ? new Date(item.delete_time) : undefined
+      return countdown
+    })
   }
 }
+
+const CountdownSync = new CountdownSyncImpl()
+export { CountdownSync }

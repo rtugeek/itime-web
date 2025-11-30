@@ -7,6 +7,7 @@ export class BaseData {
   createTime?: Date
   updateTime?: Date
   deleteTime?: Date
+  needSync?: boolean
 }
 
 export interface BaseRemoteData {

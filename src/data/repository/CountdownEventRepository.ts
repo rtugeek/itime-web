@@ -10,7 +10,7 @@ export class CountdownEventRepository {
     return countdownEventRepository.getItem<CountdownEvent>(key)
   }
 
-  static async save(value: CountdownEvent) {
+  static async save(value: CountdownEvent, needSync: boolean = true): Promise<CountdownEvent> {
     if (!value.id) {
       value.id = nanoid()
     }
@@ -18,6 +18,7 @@ export class CountdownEventRepository {
       value.createTime = new Date()
     }
     value.updateTime = new Date()
+    value.needSync = needSync
     return countdownEventRepository.setItem(value.id, value)
   }
 
@@ -28,6 +29,7 @@ export class CountdownEventRepository {
   static async softRemove(key: string) {
     const event = await this.get(key)
     if (event) {
+      event.needSync = true
       event.deleteTime = new Date()
       await this.save(event)
     }

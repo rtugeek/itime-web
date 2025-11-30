@@ -9,7 +9,6 @@ import { CountdownSync } from '@/data/sync/CountdownSync'
 
 export type ListSort = 'asc' | 'desc'
 export const useCountdownEventStore = defineStore('countdownEventStore', () => {
-  const countdownSync = new CountdownSync()
   const events = ref<CountdownEvent[]>([])
   const sort = useWidgetStorage<ListSort>('countdownEventSort', 'asc')
   async function reload() {
@@ -44,7 +43,7 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
     await CountdownEventRepository.softRemove(id)
     await reload()
     post({ type: 'delete', id })
-    countdownSync.sync()
+    CountdownSync.sync()
   }
 
   function toggleSort() {
@@ -53,10 +52,11 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
   }
 
   const save = async (event: CountdownEvent) => {
+    event.needSync = true
     await CountdownEventRepository.save(event)
     await reload()
     post({ type: 'save', event, time: Date.now() })
-    countdownSync.sync()
+    CountdownSync.sync()
   }
   reload()
   return {

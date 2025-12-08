@@ -8,14 +8,14 @@ export class TodoDatabase extends Dexie {
     super('todo-v1')
 
     this.version(1).stores({
-      todos: '++id, title, createdDateTime, tableId, lastModifiedDateTime, completedDateTime, isReminderOn, dueDateTime, reminderDateTime, importance, order',
+      todos: '++id, title, createdDateTime, uuid, needSync,updateTime, completedDateTime, isReminderOn, dueDateTime, importance, order',
     })
   }
 }
 
 const db = new TodoDatabase()
 export class TodoRepository {
-  static async findOne(options: { id: string, includeComplete?: boolean }): Promise<Todo | undefined> {
+  static async findOne(options: { id: string | number, includeComplete?: boolean }): Promise<Todo | undefined> {
     const todo = await db.todos.get(Number(options.id))
     if (!todo) { return undefined }
 
@@ -29,12 +29,14 @@ export class TodoRepository {
   static async findUncompleted(): Promise<Todo[]> {
     return db.todos
       .filter(todo => !todo.completedDateTime)
+      .filter(todo => !todo.deleteTime)
       .sortBy('order')
   }
 
   static async findCompleted(): Promise<Todo[]> {
     return db.todos
       .filter(todo => !!todo.completedDateTime)
+      .filter(todo => !todo.deleteTime)
       .reverse()
       .sortBy('completedDateTime')
   }
@@ -42,28 +44,12 @@ export class TodoRepository {
   static async findReminderOn(): Promise<Todo[]> {
     return db.todos
       .filter(todo => todo.isReminderOn && !todo.completedDateTime)
+      .filter(todo => !todo.deleteTime)
       .sortBy('reminderDateTime')
   }
 
-  static async complete(todo: Todo): Promise<Todo> {
-    const now = new Date().toISOString()
-    const updatedTodo = {
-      ...todo,
-      completedDateTime: now,
-      lastModifiedDateTime: now,
-    }
-    await db.todos.put(updatedTodo)
-    return updatedTodo
-  }
-
-  static async undoComplete(todo: Todo): Promise<Todo> {
-    const updatedTodo = {
-      ...todo,
-      completedDateTime: undefined,
-      lastModifiedDateTime: new Date().toISOString(),
-    }
-    await db.todos.put(updatedTodo)
-    return updatedTodo
+  static async findAll(): Promise<Todo[]> {
+    return db.todos.toArray()
   }
 
   /**
@@ -80,33 +66,29 @@ export class TodoRepository {
     return todoToDelete
   }
 
-  static async add(todo: Omit<Todo, 'id' | 'createdDateTime' | 'lastModifiedDateTime'>): Promise<Todo> {
-    const now = new Date().toISOString()
-    const newTodo: Todo = {
-      ...todo,
-      createdDateTime: now,
-      lastModifiedDateTime: now,
-      id: await db.todos.add({
-        ...todo,
-        createdDateTime: now,
-        lastModifiedDateTime: now,
-      } as Todo) as number,
+  static async softRemove(todo: Todo | string): Promise<Todo> {
+    const id = typeof todo === 'string' ? Number(todo) : todo.id
+    const todoToDelete = await db.todos.get(id)
+    if (!todoToDelete) {
+      throw new Error(`Todo with id ${id} not found`)
     }
-    return newTodo
+    todoToDelete.deleteTime = new Date()
+    todoToDelete.needSync = true
+    await db.todos.put(todoToDelete, todoToDelete.id)
+    return todoToDelete
   }
 
-  static async update(todo: Todo): Promise<Todo> {
+  static async save(todo: Todo, needSync: boolean = true): Promise<Todo> {
+    const now = new Date()
+    const nowStr = now.toISOString()
     const updatedTodo = {
       ...todo,
-      lastModifiedDateTime: new Date().toISOString(),
+      id: todo.id ? todo.id : now.valueOf(),
+      updateTime: now,
+      lastModifiedDateTime: nowStr,
     }
-    await db.todos.put(updatedTodo)
+    updatedTodo.needSync = needSync
+    await db.todos.put(updatedTodo, todo.id)
     return updatedTodo
-  }
-
-  static async findTableIdIsNull(): Promise<Todo[]> {
-    return db.todos
-      .filter(todo => !todo.tableId)
-      .sortBy('order')
   }
 }

@@ -1,5 +1,5 @@
 export class BaseData {
-  id?: string
+  id?: string | number
   /**
    * UUID 标识符，用于跨系统唯一标识实体，由服务器创建
    */
@@ -11,7 +11,7 @@ export class BaseData {
 }
 
 export interface BaseRemoteData {
-  id?: string
+  id?: string | number
   /**
    * UUID 标识符，用于跨系统唯一标识实体，由服务器创建
    */

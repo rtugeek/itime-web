@@ -14,6 +14,7 @@ const TodoListWidget = new Widget({
   maxWidth: 6,
   minHeight: 3,
   maxHeight: 6,
+  synchronizable: true,
   supportDeployMode: DeployMode.TRAY | DeployMode.OVERLAP | DeployMode.NORMAL,
   path: '/widget/todo_list',
   browserWindowOptions: {

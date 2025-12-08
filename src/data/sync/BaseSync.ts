@@ -1,11 +1,11 @@
 import { WidgetApi, delay } from '@widget-js/core'
 import consola from 'consola'
 import type { BaseData, BaseRemoteData } from '@/data/base/BaseData'
-import type { RemoteCountdown } from '@/data/sync/CountdownSync'
 
 export interface SyncOptions {
   delay?: number
 }
+
 export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
   private name: string
   private isSync = false
@@ -48,10 +48,11 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
         await delay(options.delay)
       }
       const localItems = await this.getLocalItems()
-
+      consola.info('localItems', localItems)
       const needSyncItems = localItems.filter((it) => {
         return it.needSync == undefined || it.needSync
       })
+      consola.info('needSyncItems', needSyncItems)
 
       const needUploadItems: T[] = []
       const needDownloadItems: R[] = []
@@ -88,15 +89,20 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
             needUploadItems.push(needSyncItem)
           }
         }
+        else {
+          needUploadItems.push(needSyncItem)
+        }
       }
 
       const remoteCountdowns = await this.pushToRemote(this.mapLocalToRemote(needUploadItems))
       for (const remoteItem of remoteCountdowns) {
         const find = localItems.find(it => it.id == remoteItem.id)
-        if (find && !find.uuid) {
-          find.uuid = remoteItem.uuid
+        if (find) {
           find.needSync = false
-          consola.info('update uuid', find.id, find.uuid)
+          if (!find.uuid) {
+            find.uuid = remoteItem.uuid
+            consola.info('update uuid', find.id, find.uuid)
+          }
           await this.saveItem(find)
         }
       }
@@ -112,13 +118,15 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
 
   abstract saveItem(item: T, updateNeedSync?: boolean): Promise<T>
 
-  abstract pushToRemote(remoteItems: R[]): Promise<RemoteCountdown[]>
+  abstract pushToRemote(remoteItems: R[]): Promise<R[]>
 
   abstract getLocalItems(): Promise<T[]>
 
   abstract getRemoteItems(): Promise<R[]>
 
   abstract mapRemoteToLocal(item: R[]): T[]
+
   abstract mapLocalToRemote(item: T[]): R[]
+
   abstract isLogin(): Promise<boolean>
 }

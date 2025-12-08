@@ -1,6 +1,6 @@
 {
   "name": "itime.fun",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "requiredAppVersion": "",
   "author": "LYP",
   "homepage": "",
@@ -101,6 +101,7 @@
         "utilities"
       ],
       "supportDeployMode": 273,
+      "synchronizable": true,
       "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
       "routes": []
     },
@@ -144,6 +145,44 @@
       "routes": []
     },
     {
+      "name": "itime.fun.countdown_list",
+      "title": {
+        "zh-CN": "倒计时列表",
+        "en-US": "Countdown List"
+      },
+      "description": {
+        "zh-CN": "自动排序的倒计时列表",
+        "en-US": "Automatically sorted countdown list"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 3,
+      "minHeight": 3,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/countdown/list",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_countdown_list.png",
+      "categories": [
+        "time",
+        "countdown"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/countdown/list?frame=true&transparent=false&width=600&height=400",
+      "routes": []
+    },
+    {
       "name": "itime.fun.countdown",
       "title": {
         "zh-CN": "倒计时",
@@ -183,44 +222,6 @@
       "routes": []
     },
     {
-      "name": "itime.fun.countdown_list",
-      "title": {
-        "zh-CN": "倒计时列表",
-        "en-US": "Countdown List"
-      },
-      "description": {
-        "zh-CN": "自动排序的倒计时列表",
-        "en-US": "Automatically sorted countdown list"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 3,
-      "minHeight": 3,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/countdown/list",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_countdown_list.png",
-      "categories": [
-        "time",
-        "countdown"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/countdown/list?frame=true&transparent=false&width=600&height=400",
-      "routes": []
-    },
-    {
       "name": "itime.fun.calendar_large",
       "title": {
         "zh-CN": "大号日历"
@@ -253,6 +254,43 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/calendar_large?width=600&height=500&frame=true&transparent=false",
+      "routes": []
+    },
+    {
+      "name": "itime.fun.calendar",
+      "title": {
+        "zh-CN": "日历",
+        "en-US": "Calendar"
+      },
+      "description": {
+        "zh-CN": "简单的日历，支持节假日显示",
+        "en-US": "Simple calendar with holiday display"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 4,
+      "minHeight": 4,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
       "routes": []
     },
     {
@@ -291,43 +329,6 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
-      "routes": []
-    },
-    {
-      "name": "itime.fun.calendar",
-      "title": {
-        "zh-CN": "日历",
-        "en-US": "Calendar"
-      },
-      "description": {
-        "zh-CN": "简单的日历，支持节假日显示",
-        "en-US": "Simple calendar with holiday display"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 4,
-      "minHeight": 4,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/calendar",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_calendar.png",
-      "categories": [
-        "calendar"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
       "routes": []
     }
   ],

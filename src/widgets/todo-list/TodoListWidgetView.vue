@@ -7,9 +7,9 @@ import type { WidgetMenuItem } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
 import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import { WindowUtils } from '@/utils/WindowUtils'
-import { useTodoStore } from '@/stores/useTodoStore'
-import UserIcon from '@/widgets/todo-list/components/UserIcon.vue'
 import { useTodoReminder } from '@/common/composition/useTodoReminder'
+import { useSupabaseSync } from '@/common/composition/useSupabaseSync'
+import { TodoSync } from '@/data/sync/TodoSync'
 
 const { t } = useI18n()
 type ViewType = 'default' | 'history'
@@ -23,8 +23,6 @@ const { height } = useElementSize(root)
 function openAddPage() {
   WindowUtils.open('/todo/add')
 }
-const todoStore = useTodoStore()
-todoStore.sync()
 useWidget()
 useTodoReminder()
 useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMenuClick: (menu: WidgetMenuItem) => {
@@ -32,6 +30,8 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
     WindowUtils.open('/settings')
   }
 } })
+
+useSupabaseSync(TodoSync)
 </script>
 
 <template>
@@ -42,7 +42,7 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
           {{ viewType === 'history' ? t('todo.history') : title }}
         </div>
         <div class="actions flex gap-4 pr-2">
-          <UserIcon />
+          <!--          <UserIcon /> -->
           <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
           <History v-if="viewType !== 'history'" class="icon" @click="viewType = 'history'" />
           <AddOne class="icon" @click="openAddPage" />

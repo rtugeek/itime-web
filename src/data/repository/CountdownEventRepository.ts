@@ -19,7 +19,7 @@ export class CountdownEventRepository {
     }
     value.updateTime = new Date()
     value.needSync = needSync
-    return countdownEventRepository.setItem(value.id, value)
+    return countdownEventRepository.setItem(value.id.toString(), value)
   }
 
   static async remove(key: string) {

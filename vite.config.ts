@@ -22,13 +22,17 @@ export default defineConfig((config: UserConfig) => {
     mode = 'production'
     base = '/'
   }
+  else if (mode == 'offline') {
+    mode = 'production'
+    base = './'
+  }
   consola.info(`config:`, config)
   return {
     mode,
     base,
     plugins: [
       vue(),
-      widget(),
+      widget({ generateZip: config.mode == 'offline' }),
       AutoImport({
         resolvers: [ElementPlusResolver()],
       }),

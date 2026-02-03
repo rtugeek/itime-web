@@ -5,6 +5,10 @@ import { Locale } from '@nutui/nutui'
 import enUS from '@nutui/nutui/dist/packages/locale/lang/en-US'
 import { i18n } from '@/i18n'
 import { AndroidApi } from '@/api/android/AndroidApi'
+import { useSupabaseStore } from '@/stores/useSupabaseStore'
+
+const supabaseStore = useSupabaseStore()
+supabaseStore.init()
 
 function updateLang(lang: string) {
   i18n.global.locale = lang

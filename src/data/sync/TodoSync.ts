@@ -2,7 +2,7 @@ import consola from 'consola'
 import { BaseSync } from '@/data/sync/BaseSync'
 import { Todo, type TodoImportance } from '@/data/Todo'
 import { TodoRepository } from '@/data/repository/TodoRepository'
-import { getSupabaseClient } from '@/api/supabase'
+import { useSupabaseStore } from '@/stores/useSupabaseStore'
 import type { BaseRemoteData } from '@/data/base/BaseData'
 
 export interface RemoteTodo extends BaseRemoteData {
@@ -25,13 +25,13 @@ class TodoSyncImpl extends BaseSync<Todo, RemoteTodo> {
   }
 
   async isLogin(): Promise<boolean> {
-    const supabaseClient = getSupabaseClient()
+    const supabaseClient = useSupabaseStore().client
     const user = await supabaseClient.auth.getUser()
     return !user.error
   }
 
   async getRemoteItems(): Promise<RemoteTodo[]> {
-    const supabaseClient = getSupabaseClient()
+    const supabaseClient = useSupabaseStore().client
     const res = await supabaseClient.from('todo').select('*')
     if (res.error) {
       return []
@@ -44,7 +44,7 @@ class TodoSyncImpl extends BaseSync<Todo, RemoteTodo> {
   async pushToRemote(items: RemoteTodo[]): Promise<RemoteTodo[]> {
     if (items.length > 0) {
       consola.info('pushToRemote', items)
-      const supabaseClient = getSupabaseClient()
+      const supabaseClient = useSupabaseStore().client
       const upsertItems = items.filter(it => it.uuid)
       const insertItems = items.filter(it => !it.uuid)
       const insertResult = await supabaseClient.from('todo').insert(insertItems).select()
@@ -63,7 +63,7 @@ class TodoSyncImpl extends BaseSync<Todo, RemoteTodo> {
   }
 
   saveItem(item: Todo): Promise<Todo> {
-    return TodoRepository.save(item)
+    return TodoRepository.save(item, item.needSync)
   }
 
   mapLocalToRemote(localItems: Todo[]): RemoteTodo[] {

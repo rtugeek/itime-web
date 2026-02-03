@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { reactive, toRaw } from 'vue'
+import { reactive, ref, toRaw } from 'vue'
 import dayjs from 'dayjs'
 import type { Todo } from '@/data/Todo'
 import { TodoUtils } from '@/utils/TodoUtils'
@@ -32,7 +32,7 @@ export const useTodoStore = defineStore('todo-store', () => {
       }
     },
   })
-
+  const syncing = ref(false)
   const find = async (id: string | number, includeCompleted: boolean = true) => {
     return TodoRepository.findOne({ id, includeComplete: includeCompleted })
   }
@@ -82,7 +82,7 @@ export const useTodoStore = defineStore('todo-store', () => {
     }
     await TodoRepository.softRemove(todo)
     postEvent({ type: 'delete', todo: { ...todo } })
-    await TodoSync.sync()
+    await sync()
   }
 
   async function finishTodo(rawTodo: Todo) {
@@ -103,7 +103,17 @@ export const useTodoStore = defineStore('todo-store', () => {
         await saveTodo(nextTodo)
       }
     }
-    await TodoSync.sync()
+    await sync()
+  }
+
+  async function sync() {
+    syncing.value = true
+    try {
+      await TodoSync.sync()
+    }
+    finally {
+      syncing.value = false
+    }
   }
 
   async function reTodo(rawTodo: Todo) {
@@ -115,7 +125,8 @@ export const useTodoStore = defineStore('todo-store', () => {
       completedTodos.splice(index, 1)
     }
     todos.splice(0, 0, uncompletedTodo)
-    await TodoSync.sync()
+    await sync()
+
     // updateRemoteTodo(uncompletedTodo).catch(consola.error)
   }
 
@@ -146,14 +157,14 @@ export const useTodoStore = defineStore('todo-store', () => {
       sortTodos()
     }
 
-    await TodoSync.sync()
+    await sync()
   }
 
   async function save() {
     for (const todo of todos) {
       await TodoRepository.save(toRaw(todo))
     }
-    await TodoSync.sync()
+    await sync()
   }
 
   // 在 store 初始化时执行迁移
@@ -167,6 +178,7 @@ export const useTodoStore = defineStore('todo-store', () => {
     find,
     save,
     reTodo,
+    syncing,
     completedTodos,
     finishTodo,
   }

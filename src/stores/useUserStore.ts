@@ -5,8 +5,6 @@ import consola from 'consola'
 import type { User } from '@/data/User'
 import { UserApi } from '@/api/UserApi'
 import { AppConfig } from '@/common/AppConfig'
-import { AndroidApi } from '@/api/android/AndroidApi'
-import { AndroidUserApi } from '@/api/android/AndroidUserApi'
 
 export const useUserStore = defineStore('userStore', () => {
   const latestUsername = useStorage(AppConfig.KEY_LATEST_USER, '')
@@ -53,14 +51,6 @@ export const useUserStore = defineStore('userStore', () => {
   const logout = () => {
     user.value = undefined
     localStorage.removeItem(AppConfig.KEY_TOKEN)
-  }
-
-  if (AndroidApi.hasApi()) {
-    const androidUser = AndroidUserApi.getUser()
-    if (androidUser) {
-      consola.info(androidUser)
-      login(androidUser)
-    }
   }
 
   const isLogin = computed(() => user.value != undefined)

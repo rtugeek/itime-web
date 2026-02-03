@@ -1,7 +1,8 @@
-import { createClient } from '@supabase/supabase-js'
+import { type User, createClient } from '@supabase/supabase-js'
 import type { BroadcastEvent } from '@widget-js/core'
 import { BroadcastApi, Channel, ElectronApi, UserApi, UserApiEvent } from '@widget-js/core'
 import consola from 'consola'
+import { computed, ref } from 'vue'
 import { CountdownSync } from '@/data/sync/CountdownSync'
 
 const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzY0MDAwMDAwLCJleHAiOjE5MjE3NjY0MDB9.3nGFAW2q2bzxWmx1T-ycnmklITh9OcEvA1kZPXz4dBs'
@@ -19,6 +20,7 @@ function getSupabaseClient() {
   return supabase
 }
 
+const supabaseUser = ref<User | null>(null)
 function setupBroadcast() {
   BroadcastApi.register(UserApiEvent.SIGNED_IN, UserApiEvent.TOKEN_REFRESHED, UserApiEvent.SIGNED_OUT)
   UserApi.getSession().then(async (session) => {
@@ -41,6 +43,7 @@ function setupBroadcast() {
       consola.info('User token updated', event)
       supabase = newClient()
       const res = await supabase.auth.setSession(event.payload)
+      supabaseUser.value = res.data.user
       if (res.data) {
         CountdownSync.sync()
       }
@@ -49,4 +52,7 @@ function setupBroadcast() {
 }
 setupBroadcast()
 
-export { getSupabaseClient }
+const isLogin = computed(() => {
+  return !!supabaseUser.value
+})
+export { getSupabaseClient, supabaseUser, isLogin }

@@ -48,11 +48,11 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
         await delay(options.delay)
       }
       const localItems = await this.getLocalItems()
-      consola.info('localItems', localItems)
+      consola.info('localItems')
       const needSyncItems = localItems.filter((it) => {
         return it.needSync == undefined || it.needSync
       })
-      consola.info('needSyncItems', needSyncItems)
+      consola.info('needSyncItems')
 
       const needUploadItems: T[] = []
       const needDownloadItems: R[] = []
@@ -94,8 +94,8 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
         }
       }
 
-      const remoteCountdowns = await this.pushToRemote(this.mapLocalToRemote(needUploadItems))
-      for (const remoteItem of remoteCountdowns) {
+      const pushedRemoteItems = await this.pushToRemote(this.mapLocalToRemote(needUploadItems))
+      for (const remoteItem of pushedRemoteItems) {
         const find = localItems.find(it => it.id == remoteItem.id)
         if (find) {
           find.needSync = false
@@ -105,6 +105,9 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
           }
           await this.saveItem(find)
         }
+      }
+      for (const needUploadItem of needUploadItems) {
+        await this.saveItem(needUploadItem, false)
       }
       WidgetApi.updateSyncInfo().catch()
     }

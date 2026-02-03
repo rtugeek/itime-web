@@ -45,8 +45,8 @@ dependencies:
     specifier: ^2.0.1
     version: 2.1.3(vue@3.5.25)
   '@widget-js/core':
-    specifier: ^24.1.1-beta.78
-    version: 24.1.1-beta.78
+    specifier: ^24.1.1-beta.82
+    version: 24.1.1-beta.82
   '@widget-js/vue3':
     specifier: ^24.1.1-beta.74
     version: 24.1.1-beta.74(axios@1.13.2)(vue@3.5.25)
@@ -3869,6 +3869,21 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    dev: true
+
+  /@widget-js/core@24.1.1-beta.82:
+    resolution: {integrity: sha512-0Md0tUkn9c2dBC1an0YyQqCnzeT4HSbvbA2Db6zZU9bgvnEXsQgz1KG7n+MHtHn1m9+fzzc825V2f16vBIaLKg==}
+    dependencies:
+      '@supabase/supabase-js': 2.86.0
+      '@types/css-tree': 2.3.11
+      css-tree: 2.3.1
+      localforage: 1.10.0
+      lodash: 4.17.21
+      path-normalize: 6.0.13
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: false
 
   /@widget-js/utils@24.1.1-beta.72:
     resolution: {integrity: sha512-tY+i5iFLiLi2+FO2X5WgGqELbpuAeG3a1dqyJQfY4kf2uc+jDjNOTBli8llxGbx8IEN7R1O0O/tQLF4XJJcYrw==}

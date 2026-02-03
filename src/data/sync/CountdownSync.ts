@@ -2,7 +2,7 @@ import consola from 'consola'
 import { BaseSync } from '@/data/sync/BaseSync'
 import { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
-import { getSupabaseClient } from '@/api/supabase'
+import { useSupabaseStore } from '@/stores/useSupabaseStore'
 import type { BaseRemoteData } from '@/data/base/BaseData'
 
 export interface RemoteCountdown extends BaseRemoteData {
@@ -24,13 +24,13 @@ class CountdownSyncImpl extends BaseSync<CountdownEvent, RemoteCountdown> {
   }
 
   async isLogin(): Promise<boolean> {
-    const supabaseClient = getSupabaseClient()
+    const supabaseClient = useSupabaseStore().client
     const user = await supabaseClient.auth.getUser()
     return !user.error
   }
 
   async getRemoteItems(): Promise<RemoteCountdown[]> {
-    const supabaseClient = getSupabaseClient()
+    const supabaseClient = useSupabaseStore().client
     const res = await supabaseClient.from('countdown').select('*')
     if (res.error) {
       consola.error('getRemoteItems', res.error)
@@ -44,7 +44,7 @@ class CountdownSyncImpl extends BaseSync<CountdownEvent, RemoteCountdown> {
 
   async pushToRemote(items: RemoteCountdown[]): Promise<RemoteCountdown[]> {
     if (items.length > 0) {
-      const supabaseClient = getSupabaseClient()
+      const supabaseClient = useSupabaseStore().client
       const upsertItems = items.filter(it => it.uuid)
       const insertItems = items.filter(it => !it.uuid)
       consola.info('pushToRemote', { insertItems, upsertItems })

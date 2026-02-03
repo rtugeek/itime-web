@@ -10,6 +10,7 @@ import { WindowUtils } from '@/utils/WindowUtils'
 import { useTodoReminder } from '@/common/composition/useTodoReminder'
 import { useSupabaseSync } from '@/common/composition/useSupabaseSync'
 import { TodoSync } from '@/data/sync/TodoSync'
+import UserIcon from '@/widgets/todo-list/components/UserIcon.vue'
 
 const { t } = useI18n()
 type ViewType = 'default' | 'history'
@@ -42,7 +43,7 @@ useSupabaseSync(TodoSync)
           {{ viewType === 'history' ? t('todo.history') : title }}
         </div>
         <div class="actions flex gap-4 pr-2">
-          <!--          <UserIcon /> -->
+          <UserIcon />
           <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
           <History v-if="viewType !== 'history'" class="icon" @click="viewType = 'history'" />
           <AddOne class="icon" @click="openAddPage" />

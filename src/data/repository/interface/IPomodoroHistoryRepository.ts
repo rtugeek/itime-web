@@ -4,6 +4,7 @@ export interface IPomodoroHistoryRepository {
   get: (id: string) => Promise<PomodoroHistory | null>
   save: (value: PomodoroHistory) => Promise<PomodoroHistory>
   remove: (key: number) => Promise<void>
+  softRemove: (history: PomodoroHistory) => Promise<void>
   removeBySceneId: (sceneId: number | string) => Promise<void>
   all: () => Promise<PomodoroHistory[]>
   clear: () => Promise<void>

@@ -5,7 +5,7 @@ import { DefaultScenes } from '@/data/PomodoroScene'
 import type { IPomodoroSceneRepository } from '@/data/repository/interface/IPomodoroSceneRepository'
 import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 
-const pomodoroSceneRepository = localforage.createInstance({name: 'pomodoro-scene'})
+const pomodoroSceneRepository = localforage.createInstance({ name: 'pomodoro-scene' })
 
 export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
   async get(key: string | number) {
@@ -20,12 +20,18 @@ export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
       value.createTime = new Date()
     }
     value.updateTime = new Date()
-    value.needSync = false
     return pomodoroSceneRepository.setItem(value.id.toString(), value)
   }
 
   remove(id: string | number) {
     return pomodoroSceneRepository.removeItem(id.toString())
+  }
+
+  async softRemove(scene: PomodoroScene) {
+    scene.deleteTime = new Date()
+    scene.needSync = true
+    await this.save(scene)
+    return scene
   }
 
   clear() {
@@ -55,7 +61,7 @@ export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
     }
     for (const key of keys) {
       const scene = await pomodoroSceneRepository.getItem<PomodoroScene>(key)
-      if (scene) {
+      if (scene && !scene.deleteTime) {
         scenes.push(scene)
       }
     }

@@ -8,7 +8,7 @@ import { showDialog, showToast } from '@nutui/nutui'
 import consola from 'consola'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
-import { usePomodoroHistoryStore } from '@/stores/usePomodoroHistoryStore'
+import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import BaseView from '@/components/BaseView.vue'
 
 const route = useRoute()
@@ -22,7 +22,7 @@ if (id) {
   })
 }
 
-const pomodoroHistoryStore = usePomodoroHistoryStore()
+const pomodoroStore = usePomodoroStore()
 function deleteHistory(history: PomodoroHistory) {
   // 提示是否删除任务
   showDialog({
@@ -30,7 +30,7 @@ function deleteHistory(history: PomodoroHistory) {
     footerDirection: 'vertical',
     onOk: () => {
       showToast.loading(t('deleting'), { id: 'loading' })
-      pomodoroHistoryStore.deleteHistory(history).then(() => {
+      pomodoroStore.deleteHistory(history).then(() => {
         histories.value = histories.value?.filter(item => item.id !== history.id)
       }).finally(() => {
         showToast.hide('loading')

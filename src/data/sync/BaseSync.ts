@@ -9,6 +9,11 @@ export interface SyncOptions {
 export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
   private name: string
   private isSync = false
+
+  log(...message: any[]) {
+    consola.info(`[${this.name} Sync] `, ...message)
+  }
+
   private debouncedSync: (options?: SyncOptions) => Promise<void>
 
   private customDebounce(func: (...args: any[]) => Promise<void>, wait: number): (...args: any[]) => Promise<void> {
@@ -48,11 +53,11 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
         await delay(options.delay)
       }
       const localItems = await this.getLocalItems()
-      consola.info('localItems')
+      this.log('localItems')
       const needSyncItems = localItems.filter((it) => {
         return it.needSync == undefined || it.needSync
       })
-      consola.info('needSyncItems')
+      this.log('needSyncItems')
 
       const needUploadItems: T[] = []
       const needDownloadItems: R[] = []
@@ -101,7 +106,7 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
           find.needSync = false
           if (!find.uuid) {
             find.uuid = remoteItem.uuid
-            consola.info('update uuid', find.id, find.uuid)
+            this.log('update uuid', find.id, find.uuid)
           }
           await this.saveItem(find)
         }

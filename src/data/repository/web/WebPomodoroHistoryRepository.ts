@@ -15,11 +15,21 @@ export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository 
     if (!value.id) {
       value.id = new Date().getTime() + Math.ceil(Math.random() * 1000)
     }
+    if (!value.createTime) {
+      value.createTime = new Date()
+    }
+    value.updateTime = new Date()
     return pomodoroHistoryRepository.setItem(value.id.toString(), value)
   }
 
   remove(key: number) {
     return pomodoroHistoryRepository.removeItem(key.toString())
+  }
+
+  async softRemove(history: PomodoroHistory) {
+    history.deleteTime = new Date()
+    history.needSync = true
+    await this.save(history)
   }
 
   async removeBySceneId(sceneId: number | string) {
@@ -37,7 +47,7 @@ export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository 
     const keys = await pomodoroHistoryRepository.keys()
     for (const key of keys) {
       const history = await pomodoroHistoryRepository.getItem<PomodoroHistory>(key)
-      if (history) {
+      if (history && !history.deleteTime) {
         histories.push(history)
       }
     }
@@ -53,7 +63,7 @@ export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository 
     const keys = await pomodoroHistoryRepository.keys()
     for (const key of keys) {
       const history = await pomodoroHistoryRepository.getItem<PomodoroHistory>(key)
-      if (history && history.sceneId === sceneId) {
+      if (history && history.sceneId === sceneId && !history.deleteTime) {
         histories.push(history)
       }
     }

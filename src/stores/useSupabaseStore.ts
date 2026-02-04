@@ -3,6 +3,10 @@ import { BroadcastApi, type BroadcastEvent, Channel, ElectronApi, UserApi, UserA
 import consola from 'consola'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { CountdownSync } from '@/data/sync/CountdownSync'
+import { TodoSync } from '@/data/sync/TodoSync'
+import { PomodoroHistorySync } from '@/data/sync/PomodoroHistorySync'
+import { PomodoroSceneSync } from '@/data/sync/PomodoroSceneSync'
 
 const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzY0MDAwMDAwLCJleHAiOjE5MjE3NjY0MDB9.3nGFAW2q2bzxWmx1T-ycnmklITh9OcEvA1kZPXz4dBs'
 const supabaseUrl = 'https://supabase.widgetjs.cn'
@@ -25,6 +29,13 @@ export const useSupabaseStore = defineStore('supabase', () => {
     return !!user.value
   })
 
+  function syncAllData() {
+    CountdownSync.sync()
+    TodoSync.sync()
+    PomodoroSceneSync.sync()
+    PomodoroHistorySync.sync()
+  }
+
   async function init() {
     BroadcastApi.register(UserApiEvent.SIGNED_IN, UserApiEvent.TOKEN_REFRESHED, UserApiEvent.SIGNED_OUT)
 
@@ -38,6 +49,8 @@ export const useSupabaseStore = defineStore('supabase', () => {
       else {
         consola.info('Supabase session restored on app start', res.data)
         user.value = res.data.user
+        consola.info('isLogin', isLogin.value)
+        syncAllData()
       }
     }
 
@@ -54,7 +67,7 @@ export const useSupabaseStore = defineStore('supabase', () => {
         const res = await client.value.auth.setSession(event.payload)
         user.value = res.data.user
         if (res.data) {
-          CountdownSync.sync()
+          syncAllData()
         }
       }
     })

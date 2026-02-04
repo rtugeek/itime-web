@@ -33,11 +33,9 @@ class CountdownSyncImpl extends BaseSync<CountdownEvent, RemoteCountdown> {
     const supabaseClient = useSupabaseStore().client
     const res = await supabaseClient.from('countdown').select('*')
     if (res.error) {
-      consola.error('getRemoteItems', res.error)
       return []
     }
     else {
-      consola.info('remoteItems', res.data)
       return res.data
     }
   }

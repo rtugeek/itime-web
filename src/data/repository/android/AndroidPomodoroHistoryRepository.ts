@@ -15,6 +15,10 @@ export class AndroidPomodoroHistoryRepository implements IPomodoroHistoryReposit
     AndroidApi.request('AndroidPomodoroHistoryRepository', 'remove', key.toString())
   }
 
+  async softRemove(history: PomodoroHistory) {
+    await this.remove(history.id)
+  }
+
   async removeBySceneId(sceneId: number | string) {
     AndroidApi.request('AndroidPomodoroHistoryRepository', 'removeBySceneId', sceneId.toString())
   }

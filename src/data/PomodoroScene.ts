@@ -1,11 +1,15 @@
-export interface PomodoroScene {
+import type { BaseData } from '@/data/base/BaseData'
+
+export interface PomodoroScene extends BaseData {
   tableId?: string
   id?: number
   createTime?: Date
   updateTime?: Date
+  deleteTime?: Date
   name: string
   duration: number
   icon: string
+  userId?: string
   needSync?: boolean
 }
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BrowserWindowApi, MenuApi, type WidgetMenuItem } from '@widget-js/core'
+import { BrowserWindowApi, MenuApi, TrayApi, type WidgetMenuItem } from '@widget-js/core'
 import { useMenuListener, useWidget } from '@widget-js/vue3'
 import { nextTick, onMounted } from 'vue'
 import { useStorage } from '@vueuse/core'
@@ -8,25 +8,23 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { AppConfig } from '@/common/AppConfig'
 
-import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import { usePomodoroWindowStateStore } from '@/widgets/pomodoro/usePomodoroWindowStateStore'
 import PomodoroProgressBar from '@/widgets/pomodoro/components/PomodoroProgressBar.vue'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
+import { useTray } from '@/common/composition/useTray'
 
 useWidget({ defaultOverlapMenu: false })
 const { t } = useI18n()
-const sceneStore = usePomodoroSceneStore()
-const pomodoro = usePomodoroStore()
+const pomodoroStore = usePomodoroStore()
 
-usePomodoroWindowStateStore()
+const { stickScreenEdge } = usePomodoroWindowStateStore()
 
-const { scenes, currentScene } = storeToRefs(sceneStore)
-const { remindText, isRunning, status } = storeToRefs(pomodoro)
+const { scenes, currentScene, remindText, isRunning, status, currentSceneId } = storeToRefs(pomodoroStore)
 
 const defaultPomodoro = useStorage(AppConfig.KEY_POMODORO_INIT, false)
 
-sceneStore.reload()
+pomodoroStore.loadScenes()
 onMounted(async () => {
   await nextTick()
   if (!defaultPomodoro.value) {
@@ -44,7 +42,7 @@ function onSceneClick() {
       id: it.id!.toString(),
       label: `${it.icon} ${it.name}`,
       type: 'radio',
-      checked: sceneStore.currentSceneId == it.id,
+      checked: currentSceneId.value == it.id,
     }
     return menu
   })
@@ -54,9 +52,20 @@ function onSceneClick() {
 }
 
 useMenuListener((type, menu) => {
-  const scene = scenes.value.find(it => it.id?.toString() == menu.id)
-  if (scene) {
-    sceneStore.currentSceneId = scene.id!
+  if (menu.id == 'exit') {
+    BrowserWindowApi.close()
+  }
+  else if (menu.id == 'reposition') {
+    BrowserWindowApi.center()
+  }
+  else if (menu.id == 'addScene') {
+    BrowserWindowApi.openUrl('/pomodoro/scene/add?frame=true&transparent=false&width=400&height=700')
+  }
+  else {
+    const scene = scenes.value.find(it => it.id?.toString() == menu.id)
+    if (scene) {
+      currentSceneId.value = scene.id!
+    }
   }
 })
 onMounted(async () => {
@@ -70,6 +79,28 @@ onMounted(async () => {
     resizable: false,
   })
 })
+
+useTray({
+  image: '/pomodoro.ico',
+  onMouseEnter: () => {
+    BrowserWindowApi.setAlwaysOnTop(true)
+    stickScreenEdge.showWindow()
+  },
+  onMouseLeave: () => {
+    stickScreenEdge.startHideWindow()
+  },
+})
+
+TrayApi.setContextMenu([
+  {
+    label: '退出',
+    id: 'exit',
+  },
+  {
+    label: '添加场景',
+    id: 'addScene',
+  },
+])
 </script>
 
 <template>
@@ -82,21 +113,21 @@ onMounted(async () => {
         <div class="scene">
           <div class="flex gap-1 items-center cursor-pointer" @click="onSceneClick">
             <div>{{ currentScene.icon }}</div>
-            <div>{{ status == 'resting' ? t('pomodoro.resting') : currentScene.name }}</div>
-            <Right v-show="status == 'stop'" />
+            <div>{{ status === 'resting' ? t('pomodoro.resting') : currentScene.name }}</div>
+            <Right v-show="status === 'stop'" />
           </div>
         </div>
         <div v-drag-window class="text-5xl font-bold time rubik-regular">
           {{ remindText }}
         </div>
         <div class="flex gap-4 buttons">
-          <div v-if="!isRunning && status != 'waiting'" class="btn start" @click="pomodoro.start()">
+          <div v-if="!isRunning && status !== 'waiting'" class="btn start" @click="pomodoroStore.start()">
             <PlayOne />
           </div>
-          <div v-if="isRunning && status != 'waiting'" class="btn small" @click="pomodoro.pause()">
+          <div v-if="isRunning && status !== 'waiting'" class="btn small" @click="pomodoroStore.pause()">
             <Pause />
           </div>
-          <div v-if="isRunning || status == 'waiting' || status == 'resting'" class="btn small" @click="pomodoro.stop()">
+          <div v-if="isRunning || status === 'waiting' || status === 'resting'" class="btn small" @click="pomodoroStore.stop()">
             <Check />
           </div>
         </div>

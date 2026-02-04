@@ -1,13 +1,5 @@
-import type { IPomodoroSceneRepository } from '@/data/repository/interface/IPomodoroSceneRepository'
-import { AndroidPomodoroSceneRepository } from '@/data/repository/android/AndroidPomodoroSceneRepository'
 import { WebPomodoroSceneRepository } from '@/data/repository/web/WebPomodoroSceneRepository'
-import { AndroidApi } from '@/api/android/AndroidApi'
+import type { IPomodoroSceneRepository } from '@/data/repository/interface/IPomodoroSceneRepository'
 
-let targetApi: IPomodoroSceneRepository
-if (AndroidApi.hasApi()) {
-  targetApi = new AndroidPomodoroSceneRepository()
-}
-else {
-  targetApi = new WebPomodoroSceneRepository()
-}
+const targetApi: IPomodoroSceneRepository = new WebPomodoroSceneRepository()
 export const PomodoroSceneRepository = targetApi

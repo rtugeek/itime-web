@@ -1,4 +1,6 @@
-export interface PomodoroHistory {
+import type { BaseData } from '@/data/base/BaseData'
+
+export interface PomodoroHistory extends BaseData {
   tableId?: string
   id: number
   duration: number

@@ -10,7 +10,7 @@ import { showNotify } from '@nutui/nutui'
 import { useI18n } from 'vue-i18n'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
-import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
+import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import FloatingActionButton from '@/components/FloatingActionButton.vue'
 import { AppUtils } from '@/utils/AppUtils'
 
@@ -19,7 +19,7 @@ const router = useRouter()
 const route = useRoute()
 const id = route.query.id as string
 const { t } = useI18n()
-const sceneStore = usePomodoroSceneStore()
+const pomodoroStore = usePomodoroStore()
 const title = computed(
   () => id ? t('pomodoro.scene.edit') : t('pomodoro.scene.add'),
 )
@@ -54,12 +54,12 @@ function save() {
     showNotify.warn(t('pomodoro.error.name'))
     return
   }
-  sceneStore.save(toRaw(sence))
+  pomodoroStore.saveScene(toRaw(sence))
   AppUtils.back(router)
 }
 
 function deleteScene() {
-  sceneStore.deleteScene(sence.id!)
+  pomodoroStore.deleteScene(sence.id!)
   AppUtils.back(router)
 }
 </script>

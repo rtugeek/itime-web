@@ -7,8 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { PomodoroUtils } from '@/utils/PomodoroUtils'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import PomodoroDetailBlock from '@/views/pomodoro/PomodoroDetailBlock.vue'
-import { usePomodoroHistoryStore } from '@/stores/usePomodoroHistoryStore'
-import { usePomodoroSceneStore } from '@/stores/usePomodoroSceneStore'
+import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 
 const route = useRoute()
@@ -19,12 +18,11 @@ const histories = ref<PomodoroHistory[]>([])
 const checkInDayCount = ref(0)
 const count = ref(0)
 const { t } = useI18n()
-const pomodoroHistory = usePomodoroHistoryStore()
-const pomodoroSceneStore = usePomodoroSceneStore()
-pomodoroSceneStore.findById(id).then((data) => {
+const pomodoroStore = usePomodoroStore()
+pomodoroStore.findSceneById(id).then((data) => {
   if (data) {
     scene.value = data
-    pomodoroHistory.findBySceneId(id).then((his) => {
+    pomodoroStore.findHistoryBySceneId(id).then((his) => {
       histories.value = his.sort((a, b) => dayjs(b.startTime).valueOf() - dayjs(a.startTime).valueOf())
       const date = new Set<string>()
       his.forEach((history) => {

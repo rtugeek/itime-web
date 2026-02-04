@@ -7,4 +7,5 @@ export interface IPomodoroSceneRepository {
   clear: () => Promise<void>
   all: () => Promise<PomodoroScene[]>
   createDefaultScenes: () => Promise<void>
+  softRemove: (scene: PomodoroScene) => Promise<PomodoroScene>
 }

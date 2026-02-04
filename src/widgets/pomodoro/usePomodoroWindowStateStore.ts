@@ -31,6 +31,7 @@ export const usePomodoroWindowStateStore = defineStore('pomodoroWindowStateStore
   })
 
   return {
+    stickScreenEdge,
     stickEdge: stickScreenEdge.stickEdge,
     isShowed: stickScreenEdge.isShowed,
   }

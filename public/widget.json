@@ -257,6 +257,43 @@
       "routes": []
     },
     {
+      "name": "itime.fun.calendar",
+      "title": {
+        "zh-CN": "日历",
+        "en-US": "Calendar"
+      },
+      "description": {
+        "zh-CN": "简单的日历，支持节假日显示",
+        "en-US": "Simple calendar with holiday display"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 4,
+      "minHeight": 4,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
+      "routes": []
+    },
+    {
       "name": "itime.fun.birthday_list",
       "title": {
         "zh-CN": "生日列表",
@@ -292,43 +329,6 @@
       ],
       "supportDeployMode": 17,
       "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
-      "routes": []
-    },
-    {
-      "name": "itime.fun.calendar",
-      "title": {
-        "zh-CN": "日历",
-        "en-US": "Calendar"
-      },
-      "description": {
-        "zh-CN": "简单的日历，支持节假日显示",
-        "en-US": "Simple calendar with holiday display"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 4,
-      "minHeight": 4,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/calendar",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_calendar.png",
-      "categories": [
-        "calendar"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
       "routes": []
     }
   ],

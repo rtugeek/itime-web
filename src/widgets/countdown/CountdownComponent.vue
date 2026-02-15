@@ -20,7 +20,7 @@ export default {
   setup(props) {
     const days = computed(() => {
       const now = dayjs()
-      return dayjs(props.date).diff(now, 'day')
+      return Math.ceil(dayjs(props.date).diff(now, 'day', true))
     })
     useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
       days.effect.run()

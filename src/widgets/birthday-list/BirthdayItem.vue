@@ -34,7 +34,7 @@ const isToday = computed(() => birthdayWrapper.value.isToday())
         </div>
       </div>
       <div class="dates flex items-center">
-        <div v-if="birthday.dateType == 1" class="date">
+        <div v-if="birthday.dateType === 1" class="date">
           <div class="date-type">
             农
           </div>

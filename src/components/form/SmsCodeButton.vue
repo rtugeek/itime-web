@@ -86,8 +86,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <nut-button :disabled="countdown != undefined" size="small" @click="getCode">
-    {{ countdown == undefined ? '获取验证码' : countdownText }}
+  <nut-button :disabled="countdown !== undefined" size="small" @click="getCode">
+    {{ countdown === undefined ? '获取验证码' : countdownText }}
   </nut-button>
 </template>
 

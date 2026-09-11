@@ -6,12 +6,10 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <h4> {{ t('pomodoro.settings') }}</h4>
+  <section class="flex w-full max-w-3xl flex-col gap-4">
+    <h2 class="text-xl font-semibold tracking-tight text-foreground">
+      {{ t('pomodoro.settings') }}
+    </h2>
     <PomodoroSettings />
-  </div>
+  </section>
 </template>
-
-<style scoped lang="scss">
-
-</style>

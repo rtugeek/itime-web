@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Cake, Clock, Hourglass, ListTodo, Timer } from '@lucide/vue'
+import { Cake, Clock, Hourglass, ListTodo, Settings, Timer } from '@lucide/vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import type { SidebarProps } from '@/components/ui/sidebar'
 import NavMain from '@/components/NavMain.vue'
@@ -17,8 +17,10 @@ const navItems = [
   { title: '倒计时', url: '/countdown', icon: Hourglass },
   { title: '番茄钟', url: '/pomodoro', icon: Timer },
   { title: '生日', url: '/birthday', icon: Cake },
+  { title: '设置', url: '/settings', icon: Settings },
 ]
 const noInsetBgRoutes = new Set([
+  'Settings',
   'Countdown',
   'CountdownAdd',
   'Todo',

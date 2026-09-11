@@ -1,5 +1,5 @@
-import { useBroadcastChannel, useIntervalFn, useStorage } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { useIntervalFn, useStorage } from '@vueuse/core'
+import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 import { NotificationApi } from '@widget-js/core'
@@ -14,6 +14,7 @@ import { PomodoroHistorySync } from '@/data/sync/PomodoroHistorySync'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { PomodoroSceneSync } from '@/data/sync/PomodoroSceneSync'
 import { useSupabaseStore } from '@/stores/useSupabaseStore'
+import { usePomodoroBroadcast } from '@/common/broadcast/usePomodoroBroadcast'
 
 export const usePomodoroStore = defineStore('pomodoroStore', () => {
   // #region Pomodoro Timer & Settings
@@ -216,13 +217,12 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
         currentSceneId.value = 0
       }
     }
-    post({ type: 'delete', id })
+    postEvent({ type: 'delete', id })
     await sync()
   }
 
-  const { post, data } = useBroadcastChannel({ name: 'pomodoroSceneStore' })
-  watch(data, () => {
-    loadScenes()
+  const { postEvent } = usePomodoroBroadcast({
+    onChanged: () => { loadScenes() },
   })
   // #endregion
 

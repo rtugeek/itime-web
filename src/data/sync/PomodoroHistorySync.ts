@@ -19,7 +19,7 @@ class PomodoroHistorySyncImpl extends BaseSync<PomodoroHistory, RemotePomodoroHi
   }
 
   getLocalItems(): Promise<PomodoroHistory[]> {
-    return PomodoroHistoryRepository.all()
+    return PomodoroHistoryRepository.all(true)
   }
 
   async isLogin(): Promise<boolean> {
@@ -33,7 +33,7 @@ class PomodoroHistorySyncImpl extends BaseSync<PomodoroHistory, RemotePomodoroHi
     const res = await supabaseClient.from('pomodoro_history').select('*')
     if (res.error) {
       consola.error(res.error)
-      return []
+      throw res.error
     }
     else {
       return res.data
@@ -74,9 +74,9 @@ class PomodoroHistorySyncImpl extends BaseSync<PomodoroHistory, RemotePomodoroHi
     return []
   }
 
-  saveItem(item: PomodoroHistory, updateNeedSync: boolean = true): Promise<PomodoroHistory> {
+  saveItem(item: PomodoroHistory, updateNeedSync: boolean = false): Promise<PomodoroHistory> {
     item.needSync = updateNeedSync
-    return PomodoroHistoryRepository.save(item)
+    return PomodoroHistoryRepository.save(item, true)
   }
 
   mapLocalToRemote(localItems: PomodoroHistory[]): RemotePomodoroHistory[] {

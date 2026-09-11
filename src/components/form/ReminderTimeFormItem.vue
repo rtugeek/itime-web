@@ -1,65 +1,72 @@
 <script setup lang="ts">
-import { AlarmClock } from '@icon-park/vue-next'
-import { computed, ref } from 'vue'
+import { AlarmClock } from '@lucide/vue'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs'
-import DateTimePicker from '@/components/DateTimePicker.vue'
+import DateTimeInput from '@/components/DateTimeInput.vue'
+import { Switch } from '@/components/ui/switch'
 
 const model = defineModel<string>()
 const enable = defineModel<boolean>('enable')
+const { t, locale } = useI18n()
 
-const showReminderDatePicker = ref(false)
+const minDate = ref(new Date())
 
-const reminderDateTimeText = computed(() => {
-  if (model.value) {
-    return dayjs(model.value).format('YYYY/MM/DD HH:mm')
-  }
-  return ''
-})
+const isZh = computed(() => locale.value.startsWith('zh'))
+const errorMsg = computed(() => isZh.value ? '提醒时间必须大于当前时间' : 'Reminder time must be later than now')
 
 const dateModel = computed({
   get: () => {
     if (model.value) {
       return dayjs(model.value).toDate()
     }
-    return undefined
+    return dayjs().add(1, 'hour').minute(0).second(0).toDate()
   },
   set: (val: Date | undefined) => {
-    model.value = val ? val.toISOString() : undefined
+    if (!val) {
+      model.value = undefined
+      return
+    }
+    if (dayjs(val).isBefore(dayjs())) {
+      return
+    }
+    model.value = val.toISOString()
   },
 })
 
-function onCancel() {
-  if (!model.value) {
-    enable.value = false
-  }
-}
+const isInvalid = computed(() => {
+  if (!model.value) { return false }
+  return dayjs(model.value).isBefore(dayjs())
+})
 
-function onConfirm(newValue: Date) {
-  if (newValue) {
-    enable.value = true
+watch(enable, (val) => {
+  if (val && !model.value) {
+    dateModel.value = dayjs().add(1, 'hour').minute(0).second(0).toDate()
   }
-}
+})
 </script>
 
 <template>
-  <div>
-    <nut-form-item :label-width="30">
-      <template #label>
-        <AlarmClock />
-      </template>
-      <nut-input
-        v-model="reminderDateTimeText" readonly class="w-full cursor-pointer" placeholder="提醒"
-        @click="showReminderDatePicker = true"
-      >
-        <template #right>
-          <el-switch v-model="enable" />
-        </template>
-      </nut-input>
-    </nut-form-item>
-    <DateTimePicker v-model="showReminderDatePicker" v-model:date-time="dateModel" type="datetime" @confirm="onConfirm" @cancel="onCancel" />
+  <div class="flex min-w-0 flex-col gap-3 rounded-md border border-border bg-muted/30 p-3">
+    <div class="flex min-h-6 items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-sm font-medium">
+        <AlarmClock class="size-4 text-muted-foreground" />
+        {{ t('todo.reminder') }}
+      </div>
+      <Switch v-model="enable" :aria-label="t('todo.reminder')" />
+    </div>
+    <div v-if="enable" class="flex flex-col gap-1.5">
+      <DateTimeInput
+        v-model="dateModel"
+        :min-date="minDate"
+        class="w-full"
+      />
+      <p v-if="isInvalid" class="text-xs text-destructive pl-1">
+        {{ errorMsg }}
+      </p>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-
 </style>

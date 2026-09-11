@@ -11,14 +11,14 @@ export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository 
     return pomodoroHistoryRepository.getItem<PomodoroHistory>(id)
   }
 
-  save(value: PomodoroHistory): Promise<PomodoroHistory> {
+  save(value: PomodoroHistory, preserveTime: boolean = false): Promise<PomodoroHistory> {
     if (!value.id) {
       value.id = new Date().getTime() + Math.ceil(Math.random() * 1000)
     }
     if (!value.createTime) {
       value.createTime = new Date()
     }
-    value.updateTime = new Date()
+    if (!preserveTime) { value.updateTime = new Date() }
     return pomodoroHistoryRepository.setItem(value.id.toString(), value)
   }
 
@@ -42,12 +42,12 @@ export class WebPomodoroHistoryRepository implements IPomodoroHistoryRepository 
     }
   }
 
-  async all(): Promise<PomodoroHistory[]> {
+  async all(includeRemoved: boolean = false): Promise<PomodoroHistory[]> {
     const histories: PomodoroHistory[] = []
     const keys = await pomodoroHistoryRepository.keys()
     for (const key of keys) {
       const history = await pomodoroHistoryRepository.getItem<PomodoroHistory>(key)
-      if (history && !history.deleteTime) {
+      if (history && (includeRemoved || !history.deleteTime)) {
         histories.push(history)
       }
     }

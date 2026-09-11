@@ -1,5 +1,5 @@
 import { type User, createClient } from '@supabase/supabase-js'
-import { BroadcastApi, type BroadcastEvent, Channel, ElectronApi, UserApi, UserApiEvent } from '@widget-js/core'
+import { BroadcastApi, type BroadcastEvent, Channel, ElectronApi, UserApi } from '@widget-js/core'
 import consola from 'consola'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
@@ -37,7 +37,7 @@ export const useSupabaseStore = defineStore('supabase', () => {
   }
 
   async function init() {
-    BroadcastApi.register(UserApiEvent.SIGNED_IN, UserApiEvent.TOKEN_REFRESHED, UserApiEvent.SIGNED_OUT)
+    BroadcastApi.register(UserApi.EVENT_SIGNED_IN, UserApi.EVENT_TOKEN_REFRESHED, UserApi.EVENT_SIGNED_OUT)
 
     // Initial session check
     const session = await UserApi.getSession()
@@ -57,11 +57,11 @@ export const useSupabaseStore = defineStore('supabase', () => {
     // Listeners
     ElectronApi.addIpcListener(Channel.BROADCAST, async (...args: any[]) => {
       const event = args[0] as BroadcastEvent
-      if (event.event == UserApiEvent.SIGNED_OUT) {
+      if (event.event == UserApi.EVENT_SIGNED_OUT) {
         client.value = newClient()
         user.value = null
       }
-      else if (event.event == UserApiEvent.SIGNED_IN || event.event == UserApiEvent.TOKEN_REFRESHED) {
+      else if (event.event == UserApi.EVENT_SIGNED_IN || event.event == UserApi.EVENT_TOKEN_REFRESHED) {
         consola.info('User token updated', event)
         client.value = newClient()
         const res = await client.value.auth.setSession(event.payload)

@@ -1,134 +1,235 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { Calendar, CloseOne, Flag } from '@icon-park/vue-next'
+import { computed, reactive, ref, toRaw, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import consola from 'consola'
-import { showDialog, showToast } from '@nutui/nutui'
 import dayjs from 'dayjs'
+import { Calendar, Flag, Loader2, Save, Trash2, X } from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
-import BaseView from '@/components/BaseView.vue'
 import { useTodoStore } from '@/stores/useTodoStore'
 import { TodoUtils } from '@/utils/TodoUtils'
-import DateTimePicker from '@/components/DateTimePicker.vue'
+import DatePicker from '@/components/DatePicker.vue'
 import RecurrenceFormItem from '@/components/form/RecurrenceFormItem.vue'
 import ReminderTimeFormItem from '@/components/form/ReminderTimeFormItem.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 const { t } = useI18n()
-const todoStore = useTodoStore()
+const router = useRouter()
 const route = useRoute()
-const showDatePicker = ref(false)
+const todoStore = useTodoStore()
+const showDeleteDialog = ref(false)
+const isSaving = ref(false)
+const isDeleting = ref(false)
 const id = Number.parseInt((route.query.id ?? '0') as string)
-const title = ref(t('todo.title'))
-const todo = ref(TodoUtils.new())
+const todo = reactive(TodoUtils.new())
 
 if (id > 0) {
-  title.value = t('todo.edit')
   todoStore.find(id.toString()).then((res) => {
     if (res) {
-      todo.value = reactive(res)
+      Object.assign(todo, res)
     }
   })
 }
 else {
   if (route.query.dueDateTime) {
-    todo.value.dueDateTime = dayjs(route.query.dueDateTime as string).toISOString()
+    todo.dueDateTime = dayjs(route.query.dueDateTime as string).toISOString()
   }
 }
 
-watch(() => todo.value.recurrence, (val) => {
+watch(() => todo.recurrence, (val) => {
   consola.info(val)
 })
 
-const dueDateTimeText = computed(() => {
-  if (todo.value.dueDateTime) {
-    return dayjs(todo.value.dueDateTime).format('YYYY年MM月DD日')
-  }
-  return ''
-})
-
-const dueDateTime = computed<string | undefined>({
-  get: () => {
-    return todo.value.dueDateTime
-  },
+const dueDateTime = computed<Date | undefined>({
+  get: () => todo.dueDateTime ? new Date(todo.dueDateTime) : undefined,
   set: (val: Date | undefined) => {
-    todo.value.dueDateTime = val ? val.toISOString() : undefined
+    todo.dueDateTime = val ? val.toISOString() : undefined
   },
 })
 
-watch(() => todo.value.recurrence, () => {
-  if (!todo.value.dueDateTime) {
-    todo.value.dueDateTime = new Date().toISOString()
+watch(() => todo.recurrence, () => {
+  if (!todo.dueDateTime) {
+    todo.dueDateTime = new Date().toISOString()
   }
 })
 
 async function save() {
-  showToast.loading(t('todo.saving'), { id: 'loading' })
+  if (isSaving.value) { return }
+  isSaving.value = true
+  const loadingId = toast.loading(t('todo.saving'))
   try {
-    await todoStore.saveTodo(todo.value)
+    await todoStore.saveTodo(toRaw(todo))
+    router.push({ name: 'Todo' })
+    toast.success(t('todo.saveSuccess'), { id: loadingId })
   }
   catch (e) {
     consola.error(e)
+    toast.error(t('todo.saveFailed'), { id: loadingId })
   }
-  showToast.hide('loading')
-  window.close()
+  finally {
+    isSaving.value = false
+  }
 }
 
-async function deleteTodo() {
-  showDialog({
-    title: t('todo.confirm'),
-    content: todo.value.title,
-    okText: t('todo.confirm'),
-    onOk: () => {
-      todoStore.deleteTodo(todo.value)
-    },
-  })
+function confirmDelete() {
+  showDeleteDialog.value = true
+}
+
+async function handleDeleteConfirm() {
+  if (isDeleting.value) { return }
+  isDeleting.value = true
+  try {
+    await todoStore.deleteTodo(todo)
+    router.push({ name: 'Todo' })
+    toast.success(t('todo.deleteSuccess'))
+  }
+  catch (e) {
+    consola.error(e)
+    toast.error(t('todo.deleteFailed'))
+  }
+  finally {
+    isDeleting.value = false
+  }
 }
 </script>
 
 <template>
-  <BaseView :title="title">
-    <div class="flex flex-col mt-2 p-4">
-      <nut-form>
-        <nut-form-item :label-width="30" label-align="center">
-          <template #label>
-            <Flag />
-          </template>
-          <nut-input v-model="todo.title" :placeholder="t('todo.content')" />
-        </nut-form-item>
-        <nut-form-item :label-width="30" label-align="center" @click="showDatePicker = true">
-          <template #label>
-            <Calendar />
-          </template>
-          <nut-input
-            v-model="dueDateTimeText" readonly class="w-full cursor-pointer" :placeholder="t('todo.dueDateTime')"
-            @click="showDatePicker = true"
-          >
-            <template #right>
-              <div
-                class="w-6 h-6 flex items-center cursor-pointer text-center"
-                @click.stop="todo.dueDateTime = undefined"
-              >
-                <CloseOne v-if="todo.dueDateTime" />
-              </div>
-            </template>
-          </nut-input>
-        </nut-form-item>
+  <section class="todo-editor">
+    <div class="editor-card">
+      <div class="editor-section">
+        <div class="editor-field">
+          <div class="field-label">
+            <label for="todo-title" class="flex items-center gap-2">
+              <Flag class="size-4 text-muted-foreground" />
+              {{ t('todo.content') }} <span class="required-mark" aria-hidden="true">*</span>
+            </label>
+          </div>
+          <Input id="todo-title" v-model="todo.title" :placeholder="t('todo.content')" />
+        </div>
+        <div class="editor-field">
+          <div class="field-label">
+            <label for="todo-due-date" class="flex items-center gap-2">
+              <Calendar class="size-4 text-muted-foreground" />
+              {{ t('todo.dueDateTime') }}
+            </label>
+          </div>
+          <div class="flex min-w-0 items-center gap-2">
+            <DatePicker id="todo-due-date" v-model="dueDateTime" class="flex-1" :placeholder="t('todo.dueDateTime')" />
+            <Button v-if="todo.dueDateTime" type="button" variant="ghost" size="icon" :aria-label="t('todo.clearDate')" @click="todo.dueDateTime = undefined">
+              <X class="size-4" />
+            </Button>
+          </div>
+        </div>
         <RecurrenceFormItem v-model="todo.recurrence" />
-        <!--        <nut-form-item v-show="todo.dueDateTime" :label-width="30" label-align="center"> -->
-        <!--          <template #label> -->
-        <!--            <div class="flex items-center justify-center content-center h-full"> -->
-        <!--              <AlarmClock :size="14" /> -->
-        <!--            </div> -->
-        <!--          </template> -->
         <ReminderTimeFormItem v-model:enable="todo.isReminderOn" v-model="todo.reminderDateTime" />
-      </nut-form>
-      <DateTimePicker v-model="showDatePicker" v-model:date-time="dueDateTime" />
-      <nut-button class="mt-4" block type="primary" @click="save">
-        {{ t('todo.save') }}
-      </nut-button>
-      <nut-button class="mt-2" type="danger" @click="deleteTodo">
-        {{ t('todo.delete') }}
-      </nut-button>
+      </div>
+
+      <footer class="editor-footer">
+        <Button v-if="id > 0" class="delete-button" type="button" variant="destructive" aria-label="删除待办" :disabled="isSaving" @click="confirmDelete">
+          <Trash2 class="size-4" />
+          {{ t('todo.delete') }}
+        </Button>
+        <Button type="button" variant="outline" @click="router.push({ name: 'Todo' })">
+          {{ t('cancel') }}
+        </Button>
+        <Button type="button" :disabled="isSaving" @click="save">
+          <Loader2 v-if="isSaving" class="size-4 animate-spin" />
+          <Save v-else class="size-4" />
+          {{ t('todo.save') }}
+        </Button>
+      </footer>
     </div>
-  </BaseView>
+    <AlertDialog v-model:open="showDeleteDialog">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{{ t('todo.confirm') }}</AlertDialogTitle>
+          <AlertDialogDescription>{{ todo.title }}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{{ t('cancel') }}</AlertDialogCancel>
+          <AlertDialogAction :disabled="isDeleting" @click="handleDeleteConfirm">
+            <Loader2 v-if="isDeleting" class="size-4 animate-spin" />
+            {{ t('todo.confirm') }}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </section>
 </template>
+
+<style scoped>
+.todo-editor {
+  width: 100%;
+  max-width: 640px;
+  margin-inline: auto;
+  padding-block: 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.field-label,
+.editor-footer {
+  display: flex;
+  align-items: center;
+}
+
+.field-label {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.field-hint {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.editor-card {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+.editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px;
+}
+
+.editor-field { display: grid; min-width: 0; gap: 10px; }
+.field-label { font-size: 13px; font-weight: 500; }
+.field-hint { font-weight: 400; }
+.required-mark { color: var(--destructive); }
+.editor-input { width: 100%; }
+.editor-footer {
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 28px;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 16px 16px;
+  background: var(--muted);
+}
+
+.editor-footer :deep(.delete-button) { margin-right: auto; flex: none; }
+
+@media (max-width: 639px) {
+  .todo-editor { padding-block: 8px 16px; gap: 20px; }
+  .editor-section { padding: 20px 16px; }
+  .editor-footer { padding: 10px 16px; }
+}
+</style>

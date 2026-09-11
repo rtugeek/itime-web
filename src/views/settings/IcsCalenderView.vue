@@ -1,39 +1,37 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { Check, Copy, Refresh } from '@icon-park/vue-next'
-import { showToast } from '@nutui/nutui'
+import { Copy, Refresh } from '@icon-park/vue-next'
+import { toast } from 'vue-sonner'
 import { useStorage } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import BaseView from '@/components/BaseView.vue'
 import { ICalendarApi } from '@/api/ICalendarApi'
-import { AndroidAppSettingApi } from '@/api/android/AndroidAppSettingApi'
-import { AndroidClipboardApi } from '@/api/android/AndroidClipboardApi'
+import { Item, ItemGroup } from '@/components/ui/item'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const { t } = useI18n()
 const token = useStorage('ics-token', '')
-const subscribeLink = ref('')
 
 function getToken() {
-  showToast.loading(t('loading'), { id: 'loading' })
+  const loadingId = toast.loading(t('loading'))
   ICalendarApi.get().then((result) => {
     token.value = result
   }).finally(() => {
-    showToast.hide('loading')
+    toast.dismiss(loadingId)
   })
 }
 
 function refreshToken() {
-  showToast.loading(t('loading'), { id: 'loading' })
+  const loadingId = toast.loading(t('loading'))
   ICalendarApi.post().then((result) => {
     token.value = result
   }).finally(() => {
-    showToast.hide('loading')
+    toast.dismiss(loadingId)
   })
 }
 
-function subscribe() {
-  AndroidAppSettingApi.subscribeICS(subscribeLink.value)
-}
 getToken()
 
 const link = computed(() => {
@@ -41,47 +39,39 @@ const link = computed(() => {
 })
 
 function copy() {
-  AndroidClipboardApi.copy(link.value)
-  showToast.success(t('copied'))
+  navigator.clipboard.writeText(link.value).then(() => {
+    toast.success(t('copied'))
+  }).catch(() => {
+    toast.error(t('copyFailed'))
+  })
 }
 </script>
 
 <template>
   <BaseView :title="t('ics.title')">
-    <div class="flex flex-col px-2">
-      <p>使用说明</p>
-      <NutCell>
-        {{ t('ics.desc') }}
-      </NutCell>
-      <nut-form>
-        <nut-form-item>
-          <div class="flex flex-col gap-2">
-            <div>{{ t('ics.exportToLink') }}</div>
-            <div class="flex items-center gap-2">
-              <NutInput v-model="link" class="h=full" readonly />
-              <nut-button size="small" @click="copy">
-                <Copy />
-              </nut-button>
-              <nut-button size="small" @click="refreshToken">
-                <Refresh />
-              </nut-button>
-            </div>
-          </div>
-        </nut-form-item>
-      </nut-form>
-      <nut-form>
-        <nut-form-item>
-          <div class="flex flex-col gap-2">
-            <div>{{ t('ics.importFromLink') }}</div>
-            <div class="flex items-center">
-              <NutInput v-model="subscribeLink" :placeholder="t('ics.importPlaceholder')" class="h=full" />
-              <nut-button size="small" @click="subscribe">
-                <Check />
-              </nut-button>
-            </div>
-          </div>
-        </nut-form-item>
-      </nut-form>
+    <div class="flex flex-col px-2 gap-4">
+      <div>
+        <p class="mb-2 font-medium">
+          使用说明
+        </p>
+        <ItemGroup>
+          <Item variant="outline">
+            {{ t('ics.desc') }}
+          </Item>
+        </ItemGroup>
+      </div>
+      <div class="flex flex-col gap-2">
+        <Label>{{ t('ics.exportToLink') }}</Label>
+        <div class="flex items-center gap-2">
+          <Input v-model="link" readonly class="flex-1" />
+          <Button size="icon" variant="outline" @click="copy">
+            <Copy class="size-4" />
+          </Button>
+          <Button size="icon" variant="outline" @click="refreshToken">
+            <Refresh class="size-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   </BaseView>
 </template>

@@ -7,6 +7,11 @@ import { DefaultWidgetTheme } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
 import { AppConfig } from '@/common/AppConfig'
 import type { DeadlineConfig } from '@/widgets/deadline/DeadlineConfig'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
+import { Slider } from '@/components/ui/slider'
 
 const { widgetParams } = useWidget()
 const { t } = useI18n()
@@ -39,44 +44,63 @@ const borderRadius = computed({
     widgetTheme.value.borderRadius = `${value}px`
   },
 })
+
+const borderRadiusValue = computed({
+  get: () => [borderRadius.value],
+  set: (val: number[]) => {
+    borderRadius.value = val[0] ?? 0
+  },
+})
 </script>
 
 <template>
   <BaseView :title="t('deadlineSetting.title')">
-    <div class="p2 flex flex-col gap-2">
-      <div>
-        <h4>{{ t('deadlineSetting.title') }}</h4>
-        <NutForm>
-          <NutFormItem :label="t('deadlineSetting.form.title')">
-            <NutInput v-model="deadlineConfig.title" />
-          </NutFormItem>
-          <NutFormItem :label="t('deadlineSetting.form.startDate')">
+    <div class="p-2 flex flex-col gap-4">
+      <Card>
+        <CardContent class="pt-6 flex flex-col gap-4">
+          <h4 class="font-medium">
+            {{ t('deadlineSetting.title') }}
+          </h4>
+          <div class="flex flex-col gap-2">
+            <Label for="deadline-title">{{ t('deadlineSetting.form.title') }}</Label>
+            <Input id="deadline-title" v-model="deadlineConfig.title" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <Label>{{ t('deadlineSetting.form.startDate') }}</Label>
             <DateInput v-model="deadlineConfig.startTime" :lunar="false" />
-          </NutFormItem>
-          <NutFormItem :label="t('deadlineSetting.form.endDate')">
+          </div>
+          <div class="flex flex-col gap-2">
+            <Label>{{ t('deadlineSetting.form.endDate') }}</Label>
             <DateInput v-model="deadlineConfig.endTime" :min-date="minEndDate" :lunar="false" />
-          </NutFormItem>
-        </NutForm>
-      </div>
-      <div>
-        <h4>{{ t('themeSetting.title') }}</h4>
-        <NutForm>
-          <NutFormItem :label="t('themeSetting.useGlobalTheme')">
-            <NutSwitch v-model="widgetTheme.useGlobalTheme" />
-          </NutFormItem>
-          <NutFormItem v-show="!widgetTheme.useGlobalTheme" :label="t('themeSetting.primaryColor')">
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent class="pt-6 flex flex-col gap-4">
+          <h4 class="font-medium">
+            {{ t('themeSetting.title') }}
+          </h4>
+          <div class="flex items-center justify-between">
+            <Label for="use-global-theme">{{ t('themeSetting.useGlobalTheme') }}</Label>
+            <Switch id="use-global-theme" v-model="widgetTheme.useGlobalTheme" />
+          </div>
+          <div v-show="!widgetTheme.useGlobalTheme" class="flex flex-col gap-2">
+            <Label>{{ t('themeSetting.primaryColor') }}</Label>
             <NutColorPicker v-model="widgetTheme.primaryColor" />
-          </NutFormItem>
-
-          <NutFormItem v-show="!widgetTheme.useGlobalTheme" :label="t('themeSetting.backgroundColor')">
+          </div>
+          <div v-show="!widgetTheme.useGlobalTheme" class="flex flex-col gap-2">
+            <Label>{{ t('themeSetting.backgroundColor') }}</Label>
             <NutColorPicker v-model="widgetTheme.backgroundColor" />
-          </NutFormItem>
-
-          <NutFormItem v-show="!widgetTheme.useGlobalTheme" :label="t('themeSetting.borderRadius')">
-            <NutRange v-model="borderRadius" :min="0" :max="50" />
-          </NutFormItem>
-        </NutForm>
-      </div>
+          </div>
+          <div v-show="!widgetTheme.useGlobalTheme" class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <Label>{{ t('themeSetting.borderRadius') }}</Label>
+              <span class="text-sm text-muted-foreground">{{ borderRadius }}px</span>
+            </div>
+            <Slider v-model="borderRadiusValue" :min="0" :max="50" />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   </BaseView>
 </template>

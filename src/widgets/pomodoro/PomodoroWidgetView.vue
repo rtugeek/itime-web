@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { BrowserWindowApi, MenuApi, TrayApi, type WidgetMenuItem } from '@widget-js/core'
-import { useMenuListener, useWidget } from '@widget-js/vue3'
-import { nextTick, onMounted } from 'vue'
+import { useIpcListener, useMenuListener, useWidget } from '@widget-js/vue3'
+import { nextTick, onMounted, onUnmounted } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { Check, Pause, PlayOne, Right } from '@icon-park/vue-next'
 import { storeToRefs } from 'pinia'
@@ -19,6 +19,21 @@ const { t } = useI18n()
 const pomodoroStore = usePomodoroStore()
 
 const { stickScreenEdge } = usePomodoroWindowStateStore()
+
+let resetWindowSizeTimer: ReturnType<typeof setTimeout> | undefined
+
+// 贴边动画没有完成回调；移动事件停止后恢复固定尺寸，避免 Electron 尺寸累积偏差。
+useIpcListener(BrowserWindowApi.EVENT_MOVED, () => {
+  clearTimeout(resetWindowSizeTimer)
+  resetWindowSizeTimer = setTimeout(() => {
+    resetWindowSizeTimer = undefined
+    BrowserWindowApi.setSize(AppConfig.SIZE_POMODORO_WINDOW, AppConfig.SIZE_POMODORO_WINDOW, false)
+  }, 150)
+})
+
+onUnmounted(() => {
+  clearTimeout(resetWindowSizeTimer)
+})
 
 const { scenes, currentScene, remindText, isRunning, status, currentSceneId } = storeToRefs(pomodoroStore)
 

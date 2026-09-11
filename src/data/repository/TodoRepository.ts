@@ -73,19 +73,21 @@ export class TodoRepository {
       throw new Error(`Todo with id ${id} not found`)
     }
     todoToDelete.deleteTime = new Date()
+    todoToDelete.updateTime = todoToDelete.deleteTime
+    todoToDelete.lastModifiedDateTime = todoToDelete.deleteTime.toISOString()
     todoToDelete.needSync = true
     await db.todos.put(todoToDelete, todoToDelete.id)
     return todoToDelete
   }
 
-  static async save(todo: Todo, needSync: boolean = true): Promise<Todo> {
+  static async save(todo: Todo, needSync: boolean = true, preserveTime: boolean = false): Promise<Todo> {
     const now = new Date()
     const nowStr = now.toISOString()
     const updatedTodo = {
       ...todo,
       id: todo.id ? todo.id : now.valueOf(),
-      updateTime: now,
-      lastModifiedDateTime: nowStr,
+      updateTime: preserveTime ? todo.updateTime : now,
+      lastModifiedDateTime: preserveTime ? todo.lastModifiedDateTime : nowStr,
     }
     updatedTodo.needSync = needSync
     await db.todos.put(updatedTodo, todo.id)

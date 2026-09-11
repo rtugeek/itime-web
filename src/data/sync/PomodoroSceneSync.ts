@@ -20,7 +20,7 @@ class PomodoroSceneSyncImpl extends BaseSync<PomodoroScene, RemotePomodoroScene>
   }
 
   getLocalItems(): Promise<PomodoroScene[]> {
-    return PomodoroSceneRepository.all()
+    return PomodoroSceneRepository.all(true)
   }
 
   async isLogin(): Promise<boolean> {
@@ -34,7 +34,7 @@ class PomodoroSceneSyncImpl extends BaseSync<PomodoroScene, RemotePomodoroScene>
     const res = await supabaseClient.from('pomodoro_scene').select('*')
     if (res.error) {
       consola.error(res.error)
-      return []
+      throw res.error
     }
     else {
       return res.data
@@ -74,9 +74,9 @@ class PomodoroSceneSyncImpl extends BaseSync<PomodoroScene, RemotePomodoroScene>
     return []
   }
 
-  saveItem(item: PomodoroScene, updateNeedSync: boolean = true): Promise<PomodoroScene> {
+  saveItem(item: PomodoroScene, updateNeedSync: boolean = false): Promise<PomodoroScene> {
     item.needSync = updateNeedSync
-    return PomodoroSceneRepository.save(item)
+    return PomodoroSceneRepository.save(item, true)
   }
 
   mapLocalToRemote(localItems: PomodoroScene[]): RemotePomodoroScene[] {

@@ -1,10 +1,10 @@
-import { showToast } from '@nutui/nutui'
+import { toast } from 'vue-sonner'
 
 export function useToastLoading(func: (...args: any) => Promise<any>, options: { message: string, id?: string }) {
   const message = options.message ?? 'Loading'
   const id = options.id ?? 'loading'
-  showToast.loading(message, { id })
+  const toastId = toast.loading(message, { id })
   return func().finally(async () => {
-    showToast.hide(id)
+    toast.dismiss(toastId)
   })
 }

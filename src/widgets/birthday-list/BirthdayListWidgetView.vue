@@ -37,7 +37,6 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
     WindowUtils.open('/settings')
   }
 } })
-
 </script>
 
 <template>
@@ -64,7 +63,7 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
 <style scoped lang="scss">
 .birthday-list-container {
   box-sizing: border-box;
-  padding: 24px;
+  padding: 16px;
   overflow: hidden;
   position: relative;
   display: flex;
@@ -80,7 +79,7 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
     position: absolute;
     right: 15px;
     height: 71px;
-    top: 12px;
+    top: 4px;
   }
 
   .title {

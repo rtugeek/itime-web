@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BirthdayCake } from '@icon-park/vue-next'
+import { Cake } from '@lucide/vue'
 import { type PropType, computed } from 'vue'
 import { MenuApi } from '@widget-js/core'
 import type { Birthday } from '@/data/Birthday'
@@ -54,7 +54,7 @@ const isToday = computed(() => birthdayWrapper.value.isToday())
     </div>
     <div class="right" :class="{ active: isToday }">
       <template v-if="isToday">
-        <BirthdayCake class="icon color-white" />
+        <Cake class="w-6 h-6 text-white" />
       </template>
       <template v-else>
         <div class="qty">
@@ -166,7 +166,7 @@ const isToday = computed(() => birthdayWrapper.value.isToday())
 
     .qty {
       color: #47310A;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 400;
       margin: 2px;
     }
@@ -176,6 +176,7 @@ const isToday = computed(() => birthdayWrapper.value.isToday())
       color: #47310A;
       background-color: #FADC98;
       font-size: 12px;
+      border-radius: 0 0 5px 5px;
       height: 20px;
     }
   }

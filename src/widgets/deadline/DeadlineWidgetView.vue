@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { useAppBroadcast, useWidgetParams, useWidgetTheme } from '@widget-js/vue3'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { AppApi, DefaultWidgetTheme, SystemApiEvent, WidgetTheme } from '@widget-js/core'
+import { DefaultWidgetTheme, SystemApi } from '@widget-js/core'
 import { TransitionPresets, useIntervalFn, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
-import consola from 'consola'
 import { useI18n } from 'vue-i18n'
 import { type DeadlineConfig, getDefaultDeadlineConfig } from '@/widgets/deadline/DeadlineConfig'
 import { AppConfig } from '@/common/AppConfig'
@@ -45,23 +44,7 @@ const animFillProgressPercent = useUnitTransition(deathGroupFillProgress, {
   transition: TransitionPresets.easeOutCubic,
 })
 
-function updateThemeColor(color: string = '#BE002A') {
-  document.querySelectorAll('.primary-color').forEach((el) => {
-    el.setAttribute('fill', color)
-  })
-}
-
-const { widgetTheme } = useWidgetTheme({ defaultTheme: DefaultWidgetTheme.copy({ primaryColor: '#BE002A', useGlobalTheme: false }), onThemeChanged: async (newValue) => {
-  consola.info('theme changed', newValue, newValue.primaryColor)
-  if (newValue.useGlobalTheme) {
-    const globalThemeCSS = await AppApi.getThemeCSS()
-    const theme = WidgetTheme.fromCSS(globalThemeCSS)
-    updateThemeColor(theme.primaryColor)
-  }
-  else {
-    updateThemeColor(newValue.primaryColor)
-  }
-} })
+useWidgetTheme({ defaultTheme: DefaultWidgetTheme.copy({ primaryColor: '#BE002A', useGlobalTheme: false }) })
 
 function update() {
   deathGroupX.value = Math.round(percent.value * 520)
@@ -70,7 +53,6 @@ function update() {
 }
 onMounted(async () => {
   await nextTick()
-  updateThemeColor(widgetTheme.value?.primaryColor)
   const armGrop = document.getElementById('designer-arm-grop')
   const progressTimeFill = document.getElementById('progress-time-fill')
   const deathGroup = document.getElementById('death-group')
@@ -80,7 +62,7 @@ onMounted(async () => {
   useIntervalFn(update, 60 * 1000, { immediate: true, immediateCallback: true })
 })
 
-useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
+useAppBroadcast([SystemApi.EVENT_DATE_CHANGED], () => {
   now.value = dayjs()
   update()
 })
@@ -217,6 +199,10 @@ html {
 
 #deadline svg {
   width: 100%;
+}
+
+.primary-color {
+  fill: var(--widget-primary-color, #BE002A);
 }
 
 #progress-time-fill {

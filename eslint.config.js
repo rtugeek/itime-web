@@ -15,6 +15,7 @@ export default antfu({
     'ts/no-use-before-define': 'off',
     'ts/explicit-function-return-type': 'off',
     'eqeqeq': 'off',
+    'vue/eqeqeq': 'off',
     'unused-imports/no-unused-vars': ['error', { caughtErrors: 'none' }],
     'style/max-statements-per-line': ['error', {
       max: 2,

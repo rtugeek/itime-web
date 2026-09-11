@@ -1,4 +1,4 @@
-import { type AddTrayOptions, Channel, ElectronApi, TrayApi, TrayApiEvent } from '@widget-js/core'
+import { type AddTrayOptions, Channel, ElectronApi, TrayApi } from '@widget-js/core'
 
 export interface UseTrayOptions extends AddTrayOptions {
   onMouseEnter?: () => void
@@ -11,17 +11,17 @@ export function useTray(options: UseTrayOptions) {
     tooltip: options.tooltip,
   })
   ElectronApi.addIpcListener(Channel.TRAY, (...args: any[]) => {
-    const event = args[0] as TrayApiEvent
+    const event = args[0] as string
     switch (event) {
-      case TrayApiEvent.CLICK:{
+      case TrayApi.EVENT_CLICK:{
         options?.onClick?.()
         break
       }
-      case TrayApiEvent.MOUSE_ENTER:{
+      case TrayApi.EVENT_MOUSE_ENTER:{
         options?.onMouseEnter?.()
         break
       }
-      case TrayApiEvent.MOUSE_LEAVE:{
+      case TrayApi.EVENT_MOUSE_LEAVE:{
         options?.onMouseLeave?.()
         break
       }

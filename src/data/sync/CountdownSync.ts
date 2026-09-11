@@ -1,9 +1,9 @@
 import consola from 'consola'
-import { BaseSync } from '@/data/sync/BaseSync'
+import type { BaseRemoteData } from '@/data/base/BaseData'
 import { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
+import { BaseSync } from '@/data/sync/BaseSync'
 import { useSupabaseStore } from '@/stores/useSupabaseStore'
-import type { BaseRemoteData } from '@/data/base/BaseData'
 
 export interface RemoteCountdown extends BaseRemoteData {
   name: string
@@ -33,7 +33,7 @@ class CountdownSyncImpl extends BaseSync<CountdownEvent, RemoteCountdown> {
     const supabaseClient = useSupabaseStore().client
     const res = await supabaseClient.from('countdown').select('*')
     if (res.error) {
-      return []
+      throw res.error
     }
     else {
       return res.data
@@ -46,8 +46,11 @@ class CountdownSyncImpl extends BaseSync<CountdownEvent, RemoteCountdown> {
       const upsertItems = items.filter(it => it.uuid)
       const insertItems = items.filter(it => !it.uuid)
       consola.info('pushToRemote', { insertItems, upsertItems })
-      const insertResult = await supabaseClient.from('countdown').insert(insertItems).select()
-      const upsertResult = await supabaseClient.from('countdown').upsert(upsertItems).select()
+      const insertResult = insertItems.length ? await supabaseClient.from('countdown').insert(insertItems).select() : { data: [], error: null }
+      const upsertResult = upsertItems.length ? await supabaseClient.from('countdown').upsert(upsertItems).select() : { data: [], error: null }
+
+      if (insertResult.error) { consola.error(insertResult.error) }
+      if (upsertResult.error) { consola.error(upsertResult.error) }
 
       const results: any[] = []
       if (insertResult.data) {
@@ -61,8 +64,8 @@ class CountdownSyncImpl extends BaseSync<CountdownEvent, RemoteCountdown> {
     return []
   }
 
-  saveItem(item: CountdownEvent): Promise<CountdownEvent> {
-    return CountdownEventRepository.save(item, false)
+  saveItem(item: CountdownEvent, needSync: boolean = false): Promise<CountdownEvent> {
+    return CountdownEventRepository.save(item, needSync, true)
   }
 
   mapLocalToRemote(localItems: CountdownEvent[]): RemoteCountdown[] {

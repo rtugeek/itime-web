@@ -1,63 +1,61 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import { ref } from 'vue'
+import { computed } from 'vue'
+import DatePicker from '@/components/DatePicker.vue'
+import TimePicker from '@/components/TimePicker.vue'
 
-const modelValue = defineModel({ default: new Date() })
-const textModel = ref<string>(dayjs().format('YYYY年MM月DD HH:mm'))
-const showDateTimePicker = ref(false)
-const selectedDateTime = ref(modelValue.value)
+const props = defineProps<{
+  id?: string
+  class?: string
+  placeholder?: string
+  disabled?: boolean
+  minDate?: Date | string
+  maxDate?: Date | string
+}>()
 
-function onDateTimeConfirm() {
-  textModel.value = dayjs(selectedDateTime.value).format('YYYY年MM月DD HH:mm')
-  modelValue.value = selectedDateTime.value
-  showDateTimePicker.value = false
-}
+const model = defineModel<Date>({ default: new Date() })
 
-function formatter(type: string, option: any) {
-  switch (type) {
-    case 'year':
-      option.text += '年'
-      break
-    case 'month':
-      option.text += '月'
-      break
-    case 'day':
-      option.text += '日'
-      break
-    case 'hour':
-      option.text += '时'
-      break
-    case 'minute':
-      option.text += '分'
-      break
-    default:
-      option.text += ''
-  }
-  return option
-}
+const dateModel = computed({
+  get: () => model.value,
+  set: (val: Date | undefined) => {
+    if (val) {
+      const newDate = new Date(model.value || new Date())
+      newDate.setFullYear(val.getFullYear(), val.getMonth(), val.getDate())
+      model.value = newDate
+    }
+  },
+})
+
+const timeModel = computed({
+  get: () => model.value,
+  set: (val: Date | undefined) => {
+    if (val) {
+      const newDate = new Date(model.value || new Date())
+      newDate.setHours(val.getHours(), val.getMinutes(), 0, 0)
+      model.value = newDate
+    }
+  },
+})
 </script>
 
 <template>
-  <nut-input
-    v-model="textModel" readonly placeholder="时间" @click="showDateTimePicker = true"
-    @focus="showDateTimePicker = true"
-  >
-    <template #left>
-      <slot name="left" />
-    </template>
-  </nut-input>
-  <nut-popup v-model:visible="showDateTimePicker" position="bottom">
-    <nut-date-picker
-      v-model="selectedDateTime"
-      type="datetime"
-      :formatter="formatter"
-      :three-dimensional="false"
-      @confirm="onDateTimeConfirm"
-      @cancel="showDateTimePicker = false"
+  <div class="flex items-stretch gap-2 w-full">
+    <DatePicker
+      :id="id ? `${id}-date` : undefined"
+      v-model="dateModel"
+      :class="props.class"
+      :disabled="disabled"
+      :min-date="minDate"
+      :max-date="maxDate"
+      class="flex-1"
     />
-  </nut-popup>
+    <TimePicker
+      :id="id ? `${id}-time` : undefined"
+      v-model="timeModel"
+      :disabled="disabled"
+      class="flex-1"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss">
-
 </style>

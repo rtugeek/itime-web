@@ -1,5 +1,6 @@
 import { WidgetApi, delay } from '@widget-js/core'
 import consola from 'consola'
+import { startSync } from '@/common/syncStatus'
 import type { BaseData, BaseRemoteData } from '@/data/base/BaseData'
 
 export interface SyncOptions {
@@ -7,134 +8,112 @@ export interface SyncOptions {
 }
 
 export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
-  private name: string
-  private isSync = false
+  private timer?: ReturnType<typeof setTimeout>
+  private running = false
+  private requested = false
+  private options?: SyncOptions
+  private waiters: Array<() => void> = []
+
+  constructor(private name: string) {}
 
   log(...message: any[]) {
-    consola.info(`[${this.name} Sync] `, ...message)
+    consola.info(`[${this.name} Sync]`, ...message)
   }
 
-  private debouncedSync: (options?: SyncOptions) => Promise<void>
-
-  private customDebounce(func: (...args: any[]) => Promise<void>, wait: number): (...args: any[]) => Promise<void> {
-    let timeout: NodeJS.Timeout | null = null
-    return (...args: any[]): Promise<void> => {
-      return new Promise((resolve) => {
-        if (timeout) {
-          clearTimeout(timeout)
-        }
-        timeout = setTimeout(async () => {
-          await func(...args)
-          resolve()
-        }, wait)
-      })
+  sync(options?: SyncOptions): Promise<void> {
+    this.options = options
+    this.requested = true
+    const result = new Promise<void>(resolve => this.waiters.push(resolve))
+    if (!this.running) {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => void this.drain(), 1000)
     }
+    return result
   }
 
-  constructor(name: string) {
-    this.name = name
-    this.debouncedSync = this.customDebounce(this.syncInternal.bind(this), 1000)
-  }
-
-  async sync(options?: SyncOptions) {
-    return this.debouncedSync(options)
-  }
-
-  private async syncInternal(options?: SyncOptions): Promise<void> {
-    if (this.isSync) {
-      return
-    }
-    this.isSync = true
+  private async drain() {
+    this.running = true
     try {
-      if (!(await this.isLogin())) {
-        return
-      }
-      if (options?.delay) {
-        await delay(options.delay)
-      }
-      const localItems = await this.getLocalItems()
-      this.log('localItems')
-      const needSyncItems = localItems.filter((it) => {
-        return it.needSync == undefined || it.needSync
-      })
-      this.log('needSyncItems')
-
-      const needUploadItems: T[] = []
-      const needDownloadItems: R[] = []
-
-      const remoteItems = await this.getRemoteItems()
-      for (const remoteItem of remoteItems) {
-        // 将remoteItems中有，但本地没有的item保存到本地
-        const localItem = localItems.find(item => item.id === remoteItem.id)
-        if (!localItem) {
-          needDownloadItems.push(remoteItem)
+      while (this.requested) {
+        this.requested = false
+        try {
+          await this.syncInternal(this.options)
         }
-        else if (remoteItem.update_time) {
-          const isNewer = new Date(remoteItem.update_time) > (localItem.updateTime || new Date(0))
-          if (isNewer) {
-            // 如果本地存在，则比较updateTime，如果比本地新，则覆盖本地
-            needDownloadItems.push(remoteItem)
-          }
+        catch (error) {
+          consola.error(error)
         }
       }
-      for (const t of this.mapRemoteToLocal(needDownloadItems)) {
-        await this.saveItem(t)
-      }
-
-      for (const needSyncItem of needSyncItems) {
-        // 将localItems中有，但远程没有的item上传到远程
-        const remoteItem = remoteItems.find(item => item.id === needSyncItem.id)
-        if (!remoteItem) {
-          needUploadItems.push(needSyncItem)
-        }
-        else if (needSyncItem.updateTime) {
-          const isNewer = needSyncItem.updateTime > new Date(remoteItem.update_time)
-          if (isNewer) {
-            // 如果远程存在，则比较updateTime，如果比远程新，则覆盖远程
-            needUploadItems.push(needSyncItem)
-          }
-        }
-        else {
-          needUploadItems.push(needSyncItem)
-        }
-      }
-
-      const pushedRemoteItems = await this.pushToRemote(this.mapLocalToRemote(needUploadItems))
-      for (const remoteItem of pushedRemoteItems) {
-        const find = localItems.find(it => it.id == remoteItem.id)
-        if (find) {
-          find.needSync = false
-          if (!find.uuid) {
-            find.uuid = remoteItem.uuid
-            this.log('update uuid', find.id, find.uuid)
-          }
-          await this.saveItem(find)
-        }
-      }
-      for (const needUploadItem of needUploadItems) {
-        await this.saveItem(needUploadItem, false)
-      }
-      WidgetApi.updateSyncInfo().catch()
-    }
-    catch (e) {
-      consola.error(e)
     }
     finally {
-      this.isSync = false
+      this.running = false
+      this.waiters.splice(0).forEach(resolve => resolve())
     }
   }
 
-  abstract saveItem(item: T, updateNeedSync?: boolean): Promise<T>
+  private matches(a: BaseData, b: BaseData): boolean {
+    if (a.uuid && b.uuid) { return a.uuid === b.uuid }
+    return a.id != null && b.id != null && String(a.id) === String(b.id)
+  }
 
+  private timestamp(value?: Date | string): number {
+    return value ? new Date(value).getTime() || 0 : 0
+  }
+
+  private async syncInternal(options?: SyncOptions) {
+    if (!await this.isLogin()) { return }
+    const finishSync = startSync()
+    try {
+      await this.syncLoggedIn(options)
+    }
+    finally {
+      finishSync()
+    }
+  }
+
+  private async syncLoggedIn(options?: SyncOptions) {
+    if (options?.delay) { await delay(options.delay) }
+
+    // Fetch remote first so local edits made during the request enter this snapshot.
+    const remotes = await this.getRemoteItems()
+    const locals = await this.getLocalItems()
+    const uploads: T[] = []
+    for (const remote of remotes) {
+      const local = locals.find(item => this.matches(item, remote))
+      if (!local || this.timestamp(remote.update_time) > this.timestamp(local.updateTime)) {
+        const current = (await this.getLocalItems()).find(item => this.matches(item, remote))
+        if (JSON.stringify(current) !== JSON.stringify(local)) { continue }
+        const downloaded = this.mapRemoteToLocal([remote])[0]
+        if (local) { downloaded.id = local.id }
+        await this.saveItem(downloaded, false)
+      }
+    }
+    for (const local of locals) {
+      if (local.needSync === false) { continue }
+      const remote = remotes.find(item => this.matches(local, item))
+      if (!remote || this.timestamp(local.updateTime) >= this.timestamp(remote.update_time)) {
+        // Recover identity after an insert succeeded but its response was lost.
+        uploads.push({ ...local, uuid: remote?.uuid ?? local.uuid })
+      }
+    }
+    const pushed = uploads.length ? await this.pushToRemote(this.mapLocalToRemote(uploads)) : []
+    for (const remote of pushed) {
+      const uploaded = uploads.find(item => this.matches(item, remote))
+      if (!uploaded) { continue }
+      const original = locals.find(item => this.matches(item, uploaded))
+      const current = (await this.getLocalItems()).find(item => this.matches(item, uploaded))
+      if (!current) { continue }
+      const unchanged = JSON.stringify(current) === JSON.stringify(original)
+      await this.saveItem({ ...current, uuid: remote.uuid ?? current.uuid }, !unchanged)
+    }
+    await WidgetApi.updateSyncInfo().catch(error => consola.error(error))
+  }
+
+  // Sync persistence must preserve modification times, even when keeping a dirty item.
+  abstract saveItem(item: T, needSync?: boolean): Promise<T>
   abstract pushToRemote(remoteItems: R[]): Promise<R[]>
-
   abstract getLocalItems(): Promise<T[]>
-
   abstract getRemoteItems(): Promise<R[]>
-
   abstract mapRemoteToLocal(item: R[]): T[]
-
   abstract mapLocalToRemote(item: T[]): R[]
-
   abstract isLogin(): Promise<boolean>
 }

@@ -1,26 +1,30 @@
 <script setup lang="ts">
 import { Check } from '@icon-park/vue-next'
 import type { PropType } from 'vue'
-import type { ButtonType } from '@nutui/nutui'
+import { Button } from '@/components/ui/button'
 
 defineProps({
   icon: {
     type: String,
     default: 'Plus',
   },
+  variant: {
+    type: String as PropType<'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'>,
+    default: 'default',
+  },
   type: {
-    type: String as PropType<ButtonType>,
-    default: 'primary',
+    type: String,
+    default: '',
   },
 })
 </script>
 
 <template>
-  <nut-button :type="type" class="fab-btn">
+  <Button :variant="type === 'danger' ? 'destructive' : variant" size="icon" class="fab-btn">
     <slot>
-      <Check size="24"/>
+      <Check size="24" />
     </slot>
-  </nut-button>
+  </Button>
 </template>
 
 <style scoped lang="scss">
@@ -28,12 +32,5 @@ defineProps({
   width: 56px;
   height: 56px;
   border-radius: 50%;
-}
-
-.i-icon {
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
 }
 </style>

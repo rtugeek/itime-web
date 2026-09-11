@@ -1,38 +1,17 @@
 <script setup lang="ts">
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
+
 defineProps<{ title: string, content: string | number, unit: string }>()
 </script>
 
 <template>
-  <nut-cell>
-    <div class="block">
-      <div class="title">
-        {{ title }}
-      </div>
-      <div class="content font-bold text-2xl">
-        {{ content }}
-      </div>
-      <div class="unit" style="text-transform: capitalize">
-        {{ unit }}
-      </div>
-    </div>
-  </nut-cell>
+  <Card class="min-w-0 gap-3 shadow-none">
+    <CardHeader class="px-3 sm:px-6">
+      <CardDescription>{{ title }}</CardDescription>
+    </CardHeader>
+    <CardContent class="flex flex-wrap items-baseline gap-2 px-3 sm:px-6">
+      <span class="text-3xl font-semibold tracking-tight tabular-nums">{{ content }}</span>
+      <span class="text-sm text-muted-foreground">{{ unit }}</span>
+    </CardContent>
+  </Card>
 </template>
-
-<style scoped lang="scss">
-$text-color: #494644;
-
-.nut-cell{
-  color: $text-color;
-  .block{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-    margin: auto;
-    .title,.unit{
-      font-size: 12px;
-    }
-  }
-}
-</style>

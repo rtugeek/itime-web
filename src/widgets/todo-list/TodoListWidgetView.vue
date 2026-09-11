@@ -85,7 +85,7 @@ useSupabaseSync(TodoSync)
       .icon {
         cursor: pointer;
         color: var(--widget-color);
-        font-size: 24px;
+        font-size: 18px;
       }
     }
   }

@@ -3,26 +3,16 @@ import widget from '@widget-js/vite-plugin-widget'
 import type { UserConfig } from 'vite'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import UnoCSS from 'unocss/vite'
+import tailwindcss from '@tailwindcss/vite'
 import Components from 'unplugin-vue-components/vite'
-import NutUIResolver from '@nutui/auto-import-resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import legacy from '@vitejs/plugin-legacy'
 import consola from 'consola'
 // https://vitejs.dev/config/
 export default defineConfig((config: UserConfig) => {
   let mode = config.mode
   let base = '/web'
-  if (mode == 'android') {
-    mode = 'production'
-    base = '/assets'
-  }
-  else if (mode == 'ios') {
-    mode = 'production'
-    base = '/'
-  }
-  else if (mode == 'offline') {
+  if (mode == 'offline') {
     mode = 'production'
     base = './'
   }
@@ -37,12 +27,9 @@ export default defineConfig((config: UserConfig) => {
         resolvers: [ElementPlusResolver()],
       }),
       Components({
-        resolvers: [NutUIResolver(), ElementPlusResolver()],
+        resolvers: [ElementPlusResolver()],
       }),
-      UnoCSS(),
-      legacy({
-        targets: ['ChromeAndroid > 73', ' Chrome > 73'],
-      }),
+      tailwindcss(),
     ],
     resolve: {
       alias: {

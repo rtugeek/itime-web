@@ -1,4 +1,5 @@
 import consola from 'consola'
+import { startSync } from '@/common/syncStatus'
 import type { Birthday } from '@/data/Birthday'
 import { BirthdayApi } from '@/api/BirthdayApi'
 import { BirthdayRepository } from '@/data/repository/BirthdayRepository'
@@ -10,19 +11,28 @@ export class BirthdaySync {
       const needSyncs = birthdays.filter(it => it.needSync)
       for (const birthday of needSyncs) {
         await BirthdayApi.save(birthday)
-        await BirthdayRepository.save(birthday, false)
+        const current = await BirthdayRepository.findOne({ id: String(birthday.id) })
+        if (current && JSON.stringify(current) === JSON.stringify(birthday)) { await BirthdayRepository.save(current, false) }
       }
     }
     catch (error) {
       consola.error('Failed to upload birthdays', error)
+      throw error
     }
   }
 
   static async download() {
     try {
-      const result = await BirthdayApi.getBirthdays()
-      const list = result.data
-      await BirthdayRepository.saveAll(list, false)
+      let page = 1
+      let hasNext = true
+      while (hasNext) {
+        const result = await BirthdayApi.getBirthdays(page++)
+        for (const birthday of result.data) {
+          const local = await BirthdayRepository.findOne({ id: String(birthday.id) })
+          if (!local?.needSync) { await BirthdayRepository.save(birthday, false) }
+        }
+        hasNext = result.hasNext
+      }
     }
     catch (error) {
       consola.error('Failed to download birthdays', error)
@@ -30,11 +40,28 @@ export class BirthdaySync {
     }
   }
 
-  static async sync() {
+  private static running?: Promise<void>
+  private static requested = false
+
+  static sync(): Promise<void> {
+    this.requested = true
+    if (!this.running) {
+      this.running = (async () => {
+        while (this.requested) {
+          this.requested = false
+          await this.syncInternal()
+        }
+      })().finally(() => { this.running = undefined })
+    }
+    return this.running
+  }
+
+  private static async syncInternal() {
     const userStore = useUserStore()
     if (!userStore.isLogin) {
       return
     }
+    const finishSync = startSync()
     try {
       const birthdays = await BirthdayRepository.findAll()
       await this.upload(birthdays)
@@ -42,6 +69,9 @@ export class BirthdaySync {
     }
     catch (error) {
       consola.error('Failed to sync birthdays', error)
+    }
+    finally {
+      finishSync()
     }
   }
 }

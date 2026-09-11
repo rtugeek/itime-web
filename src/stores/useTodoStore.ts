@@ -7,28 +7,68 @@ import { TodoRepository } from '@/data/repository/TodoRepository'
 import { useTodoBroadcast } from '@/common/broadcast/useTodoBroadcast'
 import { TodoSync } from '@/data/sync/TodoSync'
 
+function cloneForBroadcast<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+function sameId(a: Todo, b: Todo): boolean {
+  return String(a.id) === String(b.id)
+}
+
 export const useTodoStore = defineStore('todo-store', () => {
   const todos = reactive<Todo[]>([])
   const completedTodos = reactive<Todo[]>([])
   const { postEvent } = useTodoBroadcast({
     onUpdated: (todo) => {
-      const findIndex = todos.findIndex(it => it.id === todo.id)
-      if (findIndex > -1) {
-        todos[findIndex] = todo
+      const todoIndex = todos.findIndex(it => sameId(it, todo))
+      const completedIndex = completedTodos.findIndex(it => sameId(it, todo))
+      if (todo.completedDateTime) {
+        if (todoIndex > -1) {
+          todos.splice(todoIndex, 1)
+        }
+        if (completedIndex > -1) {
+          completedTodos.splice(completedIndex, 1, todo)
+        }
+        else {
+          completedTodos.splice(0, 0, todo)
+        }
       }
       else {
-        todos.splice(0, 0, todo)
-        sortTodos()
+        if (completedIndex > -1) {
+          completedTodos.splice(completedIndex, 1)
+        }
+        if (todoIndex > -1) {
+          todos.splice(todoIndex, 1, todo)
+        }
+        else {
+          todos.splice(0, 0, todo)
+          sortTodos()
+        }
       }
     },
     onInserted: (todo) => {
-      todos.splice(0, 0, todo)
-      sortTodos()
+      const todoIndex = todos.findIndex(it => sameId(it, todo))
+      const completedIndex = completedTodos.findIndex(it => sameId(it, todo))
+      if (todo.completedDateTime) {
+        if (completedIndex === -1) {
+          completedTodos.splice(0, 0, todo)
+        }
+      }
+      else {
+        if (todoIndex === -1 && completedIndex === -1) {
+          todos.splice(0, 0, todo)
+          sortTodos()
+        }
+      }
     },
     onDeleted: (todo) => {
-      const index = todos.findIndex(it => it.id === todo.id)
-      if (index > -1) {
-        todos.splice(index, 1)
+      const todoIndex = todos.findIndex(it => sameId(it, todo))
+      if (todoIndex > -1) {
+        todos.splice(todoIndex, 1)
+      }
+      const completedIndex = completedTodos.findIndex(it => sameId(it, todo))
+      if (completedIndex > -1) {
+        completedTodos.splice(completedIndex, 1)
       }
     },
   })
@@ -72,22 +112,22 @@ export const useTodoStore = defineStore('todo-store', () => {
   }
 
   async function deleteTodo(todo: Todo) {
-    const todoIndex = todos.findIndex(it => it.id === todo.id)
+    const todoIndex = todos.findIndex(it => sameId(it, todo))
     if (todoIndex > -1) {
       todos.splice(todoIndex, 1)
     }
-    const completedIndex = completedTodos.findIndex(it => it.id === todo.id)
+    const completedIndex = completedTodos.findIndex(it => sameId(it, todo))
     if (completedIndex > -1) {
       completedTodos.splice(completedIndex, 1)
     }
     await TodoRepository.softRemove(todo)
-    postEvent({ type: 'delete', todo: { ...todo } })
+    postEvent({ type: 'delete', todo: cloneForBroadcast(todo) })
     await sync()
   }
 
   async function finishTodo(rawTodo: Todo) {
     const todo = toRaw(rawTodo)
-    const index = todos.findIndex(it => it.id === todo.id)
+    const index = todos.findIndex(it => sameId(it, todo))
     if (index > -1) {
       todos.splice(index, 1)
     }
@@ -95,7 +135,7 @@ export const useTodoStore = defineStore('todo-store', () => {
     const completedTodo = await TodoRepository.save(todo)
     completedTodos.splice(0, 0, completedTodo)
 
-    // updateRemoteTodo(completedTodo).catch(consola.error)
+    postEvent({ type: 'update', todo: cloneForBroadcast(completedTodo) })
 
     if (todo.recurrence) {
       const nextTodo = TodoUtils.recurrent(todo)
@@ -120,14 +160,16 @@ export const useTodoStore = defineStore('todo-store', () => {
     const todo = toRaw(rawTodo)
     todo.completedDateTime = undefined
     const uncompletedTodo = await TodoRepository.save(todo)
-    const index = completedTodos.findIndex(it => it.id === todo.id)
+    const index = completedTodos.findIndex(it => sameId(it, todo))
     if (index > -1) {
       completedTodos.splice(index, 1)
     }
     todos.splice(0, 0, uncompletedTodo)
-    await sync()
+    sortTodos()
 
-    // updateRemoteTodo(uncompletedTodo).catch(consola.error)
+    postEvent({ type: 'update', todo: cloneForBroadcast(uncompletedTodo) })
+
+    await sync()
   }
 
   async function saveTodo(rawTodo: Todo, options?: {
@@ -139,9 +181,9 @@ export const useTodoStore = defineStore('todo-store', () => {
     const todo = toRaw(rawTodo)
 
     await TodoRepository.save(todo)
-    const index = todos.findIndex(it => it.id === todo.id)
+    const index = todos.findIndex(it => sameId(it, todo))
     if (index > -1) {
-      todos[index] = todo
+      todos.splice(index, 1, todo)
     }
     else {
       todos.splice(0, 0, todo)
@@ -150,7 +192,7 @@ export const useTodoStore = defineStore('todo-store', () => {
     if (broadcast) {
       postEvent({
         type: index > -1 ? 'update' : 'insert',
-        todo,
+        todo: cloneForBroadcast(todo),
       })
     }
     if (sort) {
@@ -167,8 +209,6 @@ export const useTodoStore = defineStore('todo-store', () => {
     await sync()
   }
 
-  // 在 store 初始化时执行迁移
-  // 迁移完成后加载数据
   loadTodo()
 
   return {

@@ -1,34 +1,52 @@
 <script lang="ts" setup>
 import { type Solar, SolarMonth } from 'lunar-typescript'
 import dayjs from 'dayjs'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAppBroadcast, useWidget } from '@widget-js/vue3'
 import { Left, Right } from '@icon-park/vue-next'
-import { SystemApiEvent } from '@widget-js/core'
+import { SystemApi } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
+import { useStorage } from '@vueuse/core'
 import CalendarDay from '@/widgets/calendar/CalendarDay.vue'
 import { type HuangLi, PublicEventApi } from '@/api/PublicEventApi'
 import AlmanacInfo from '@/widgets/calendar/AlmanacInfo.vue'
+import { AppConfig } from '@/common/AppConfig'
+
+interface CalendarConfig {
+  firstDayOfWeek: 0 | 1
+}
+
+const { widgetParams } = useWidget()
+
+const calendarConfig = useStorage<CalendarConfig>(`${AppConfig.KEY_CALENDAR_CONFIG}-${widgetParams.id}`, {
+  firstDayOfWeek: 1,
+})
 
 const today = ref(dayjs())
 const currentMonth = ref(dayjs())
 const currentMonthIndex = ref(today.value.month())
 const solarMonth = ref(SolarMonth.fromYm(today.value.year(), today.value.month() + 1))
-const weeks = ref(solarMonth.value.getWeeks(0))
+const weeks = ref(solarMonth.value.getWeeks(calendarConfig.value.firstDayOfWeek))
 const { t, d } = useI18n()
 
-useWidget()
+function updateWeeks() {
+  weeks.value = solarMonth.value.getWeeks(calendarConfig.value.firstDayOfWeek)
+}
+
+watch(() => calendarConfig.value.firstDayOfWeek, () => {
+  updateWeeks()
+})
 
 function next() {
   solarMonth.value = solarMonth.value.next(1)
-  weeks.value = solarMonth.value.getWeeks(0)
+  updateWeeks()
   currentMonth.value = currentMonth.value.add(1, 'month')
   currentMonthIndex.value = currentMonth.value.month()
 }
 
 function previous() {
   solarMonth.value = solarMonth.value.next(-1)
-  weeks.value = solarMonth.value.getWeeks(0)
+  updateWeeks()
   currentMonth.value = currentMonth.value.subtract(1, 'month')
   currentMonthIndex.value = currentMonth.value.month()
 }
@@ -49,19 +67,25 @@ function refresh() {
   currentMonth.value = dayjs()
   currentMonthIndex.value = today.value.month()
   solarMonth.value = SolarMonth.fromYm(today.value.year(), today.value.month() + 1)
-  weeks.value = solarMonth.value.getWeeks(0)
+  updateWeeks()
 }
 
-useAppBroadcast([SystemApiEvent.DATE_CHANGED], () => {
+useAppBroadcast([SystemApi.EVENT_DATE_CHANGED], () => {
   refresh()
 })
 
-const weekKeyPath = ['week.short.sunday', 'week.short.monday', 'week.short.tuesday', 'week.short.wednesday', 'week.short.thursday', 'week.short.friday', 'week.short.saturday']
+const weekKeyPathSundayFirst = ['week.short.sunday', 'week.short.monday', 'week.short.tuesday', 'week.short.wednesday', 'week.short.thursday', 'week.short.friday', 'week.short.saturday']
+const weekKeyPathMondayFirst = ['week.short.monday', 'week.short.tuesday', 'week.short.wednesday', 'week.short.thursday', 'week.short.friday', 'week.short.saturday', 'week.short.sunday']
+
+const weekKeyPath = computed(() => {
+  return calendarConfig.value.firstDayOfWeek === 0 ? weekKeyPathSundayFirst : weekKeyPathMondayFirst
+})
+
 const showDetail = ref(false)
 const selectedAlmanac = ref<HuangLi>()
 const selectedSolar = ref<Solar>()
 
-const show = (solar: Solar) => {
+function show(solar: Solar) {
   selectedAlmanac.value = findAlmanac(solar)
   selectedSolar.value = solar
   if (selectedAlmanac.value) {
@@ -73,14 +97,16 @@ const show = (solar: Solar) => {
 <template>
   <widget-wrapper>
     <div class="root flex flex-col h-full">
-      <div class="flex items-baseline gap-2 py-3 px-4">
-        <div class="text-xl font-bold">
-          {{ d(currentMonth.toDate(), 'yearMonth') }}
+      <div class="flex items-baseline justify-between py-3 px-4">
+        <div class="flex items-baseline gap-2">
+          <div class="text-xl font-bold">
+            {{ d(currentMonth.toDate(), 'yearMonth') }}
+          </div>
+          <div v-if="currentMonthIndex === today.month()" class="text-xs">
+            {{ t('week.number', { week: currentMonth.isoWeek() }) }}
+          </div>
         </div>
-        <div v-if="currentMonthIndex == today.month()" class="text-xs">
-          {{ t('week.number', { week: currentMonth.isoWeek() }) }}
-        </div>
-        <div class="ml-auto flex gap-1 btn-group text-center">
+        <div class="flex gap-1 btn-group text-center">
           <div class="btn btn-next flex items-center rounded-full cursor-pointer justify-center" @click="previous">
             <Left :size="20" />
           </div>
@@ -97,7 +123,7 @@ const show = (solar: Solar) => {
         <div v-for="week in weeks" :key="`week-${week.getIndex()}`" class="flex w-full justify-around">
           <div
             v-for="day in week.getDays()" :key="day.getDay()" class="flex w-full flex-col items-center content-center"
-            :class="{ 'opacity-40': day.getMonth() != currentMonthIndex + 1 }"
+            :class="{ 'opacity-40': day.getMonth() !== currentMonthIndex + 1 }"
           >
             <CalendarDay :day="day" :almanac="findAlmanac(day)" @click="show(day)" />
           </div>

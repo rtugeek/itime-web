@@ -1,44 +1,39 @@
 import { defineStore } from 'pinia'
-import { reactive, toRaw, watch } from 'vue'
-import consola from 'consola'
-import { useBroadcastChannel } from '@vueuse/core'
-import { AppConfig } from '@/common/AppConfig'
+import { reactive, toRaw } from 'vue'
+import { useBirthdayBroadcast } from '@/common/broadcast/useBirthdayBroadcast'
 import type { Birthday } from '@/data/Birthday'
 import { migrateBirthday } from '@/data/db'
 import { BirthdayWrapper } from '@/data/BirthdayWrapper'
 import { BirthdayRepository } from '@/data/repository/BirthdayRepository'
 import { BirthdaySync } from '@/data/sync/BirthdaySync'
 
-interface BirthdayEvent {
-  type: 'insert' | 'update' | 'delete'
-  data: Birthday
-}
-
 export const useBirthdayStore = defineStore('birthday-store', () => {
   const birthdayList = reactive<Birthday[]>([])
-  const broadcastChannel = useBroadcastChannel({
-    name: AppConfig.CHANNEL_BIRTHDAY,
-  })
-  watch(broadcastChannel.data, () => {
-    consola.info('broadcastChannel.data', broadcastChannel.data.value)
-    const payload = broadcastChannel.data.value as (BirthdayEvent | undefined)
-    if (payload) {
-      const birthday = payload.data
-      if (payload.type == 'update') {
-        const findIndex = birthdayList.findIndex(it => it.id == birthday.id)
-        if (findIndex > -1) {
-          birthdayList[findIndex] = birthday
-          sortBirthdayList()
-        }
-        else {
-          birthdayList.splice(0, 0, birthday)
-          sortBirthdayList()
-        }
-      }
-      else if (payload.type == 'delete') {
-        birthdayList.splice(birthdayList.findIndex(it => it.id == birthday.id), 1)
-      }
+  function upsertBirthday(birthday: Birthday) {
+    const index = birthdayList.findIndex(it => it.id == birthday.id)
+    if (index > -1) {
+      birthdayList[index] = birthday
     }
+    else {
+      birthdayList.push(birthday)
+    }
+  }
+
+  const { postEvent } = useBirthdayBroadcast({
+    onUpdated: (birthday) => {
+      upsertBirthday(birthday)
+      sortBirthdayList()
+    },
+    onInserted: (birthday) => {
+      upsertBirthday(birthday)
+      sortBirthdayList()
+    },
+    onDeleted: (birthday) => {
+      const index = birthdayList.findIndex(it => it.id == birthday.id)
+      if (index > -1) {
+        birthdayList.splice(index, 1)
+      }
+    },
   })
 
   const find = async (id: string) => {
@@ -84,9 +79,10 @@ export const useBirthdayStore = defineStore('birthday-store', () => {
     const broadcast = options?.broadcast ?? true
     const rawBirthday = toRaw(birthday)
     rawBirthday.needSync = true
-    await BirthdayRepository.save(rawBirthday, true)
+    const savedBirthday = await BirthdayRepository.save(rawBirthday, true)
+    upsertBirthday(savedBirthday)
     if (broadcast) {
-      broadcastChannel.post({ type: 'update', data: rawBirthday })
+      postEvent({ type: 'update', data: savedBirthday })
     }
     if (sort) {
       sortBirthdayList()

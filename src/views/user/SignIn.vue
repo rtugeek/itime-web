@@ -1,82 +1,106 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { showToast } from '@nutui/nutui'
+import { toast } from 'vue-sonner'
 import { Mail, Phone, Wechat } from '@icon-park/vue-next'
 import consola from 'consola'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/useUserStore'
 import { useI18n } from 'vue-i18n'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import { z } from 'zod'
+import { useUserStore } from '@/stores/useUserStore'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { FormItem, FormMessage } from '@/components/ui/form'
 
 const { t } = useI18n()
 const userStore = useUserStore()
 const router = useRouter()
-const formRef = ref()
-const formData = ref({
-  phone: userStore.latestUsername,
-  password: '',
-  code: '',
+
+const phoneRegex = /^1[3-9]\d{9}$/
+
+const schema = toTypedSchema(
+  z.object({
+    phone: z.string().refine(val => phoneRegex.test(val), t('signIn.validation.phoneFormat')),
+    password: z.string().min(1, t('signIn.validation.passwordRequired')),
+  }),
+)
+
+const { handleSubmit, values, errors, defineField } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    phone: userStore.latestUsername ?? '',
+    password: '',
+  },
 })
-function signIn() {
-  showToast.loading(t('signIn.signingIn'))
-  formRef.value?.validate().then(async ({ valid, errors }) => {
-    if (valid) {
-      const user = await userStore.loginByPassword(formData.value.phone, formData.value.password)
-      if (user) {
-        router.back()
-      }
+
+const [phone, phoneAttrs] = defineField('phone')
+const [password, passwordAttrs] = defineField('password')
+
+const signIn = handleSubmit(async () => {
+  const loadingId = toast.loading(t('signIn.signingIn'))
+  try {
+    const user = await userStore.loginByPassword(values.phone!, values.password!)
+    if (user) {
+      toast.dismiss(loadingId)
+      router.back()
     }
     else {
-      consola.warn('error:', errors)
+      toast.dismiss(loadingId)
     }
-    showToast.hide()
-  })
-}
+  }
+  catch (e) {
+    consola.warn('error:', e)
+    toast.dismiss(loadingId)
+  }
+})
 
 function otherSignIn(type: 'sms' | 'wechat' | 'mail') {
   if (type == 'sms') {
     router.push({ name: 'SmsSignIn' })
   }
   else {
-    showToast.warn(t('signIn.inDevelopment'))
+    toast.warning(t('signIn.inDevelopment'))
   }
-}
-
-const rules = {
-  phone: [
-    { regex: /^1[3-9]\d{9}$/, message: t('signIn.validation.phoneFormat') },
-  ],
-  code: [
-    { regex: /\d{4}/, message: t('signIn.validation.codeFormat') },
-  ],
 }
 </script>
 
 <template>
-  <div class="flex flex-col gap-2 p-4">
-    <nut-form ref="formRef" :rules="rules" :model-value="formData">
-      <nut-form-item :label="t('signIn.phone')" prop="phone" label-width="50">
-        <nut-input
-          v-model="formData.phone"
+  <div class="flex flex-col gap-4 p-4">
+    <div class="space-y-4">
+      <FormItem>
+        <Label>{{ t('signIn.phone') }}</Label>
+        <Input
+          v-model="phone"
           :placeholder="t('signIn.phonePlaceholder')"
           type="text"
+          v-bind="phoneAttrs"
         />
-      </nut-form-item>
-      <nut-form-item label-width="50" :label="t('signIn.password')" prop="password">
-        <nut-input
-          v-model="formData.password"
+        <FormMessage v-if="errors.phone">
+          {{ errors.phone }}
+        </FormMessage>
+      </FormItem>
+      <FormItem>
+        <Label>{{ t('signIn.password') }}</Label>
+        <Input
+          v-model="password"
           :placeholder="t('signIn.passwordPlaceholder')"
           type="password"
+          v-bind="passwordAttrs"
         />
-      </nut-form-item>
-    </nut-form>
+        <FormMessage v-if="errors.password">
+          {{ errors.password }}
+        </FormMessage>
+      </FormItem>
+    </div>
     <div class="flex flex-col gap-4">
-      <nut-button class="flex-1" type="primary" @click="signIn">
+      <Button class="w-full" @click="signIn">
         {{ t('signIn.signInButton') }}
-      </nut-button>
-      <router-link class="flex-1" :to="{ name: 'UserSignUp' }">
-        <nut-button style="width:100%">
+      </Button>
+      <router-link class="w-full" :to="{ name: 'UserSignUp' }">
+        <Button variant="outline" class="w-full">
           {{ t('signIn.signUpButton') }}
-        </nut-button>
+        </Button>
       </router-link>
     </div>
     <div class="sso flex w-full items-center gap-4 justify-center mt-8">
@@ -106,6 +130,9 @@ const rules = {
   background: #478EF2;
   border-radius: 50%;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sso{
   .line{

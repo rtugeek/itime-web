@@ -1,11 +1,12 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useBroadcastChannel, watchDebounced } from '@vueuse/core'
+import { useDebounceFn } from '@vueuse/core'
 import { useWidgetStorage } from '@widget-js/vue3'
 import consola from 'consola'
 import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { CountdownEvent } from '@/data/CountdownEvent'
 import { CountdownSync } from '@/data/sync/CountdownSync'
+import { useCountdownBroadcast } from '@/common/broadcast/useCountdownBroadcast'
 
 export type ListSort = 'asc' | 'desc'
 export const useCountdownEventStore = defineStore('countdownEventStore', () => {
@@ -34,15 +35,14 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
 
   CountdownEventRepository.createDefaultCountdown()
 
-  const { post, data } = useBroadcastChannel({ name: 'countdownEventStore' })
-  watchDebounced(data, async () => {
-    reload()
-  }, { debounce: 1000 })
+  const { postEvent } = useCountdownBroadcast({
+    onChanged: useDebounceFn(reload, 1000),
+  })
 
   async function deleteCountdown(id: string) {
     await CountdownEventRepository.softRemove(id)
     await reload()
-    post({ type: 'delete', id })
+    postEvent({ type: 'delete', id })
     CountdownSync.sync()
   }
 
@@ -55,7 +55,7 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
     event.needSync = true
     await CountdownEventRepository.save(event)
     await reload()
-    post({ type: 'save', event, time: Date.now() })
+    postEvent({ type: 'save', event, time: Date.now() })
     CountdownSync.sync()
   }
   reload()

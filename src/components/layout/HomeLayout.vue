@@ -1,63 +1,104 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { HourglassNull, SettingTwo, Stopwatch } from '@icon-park/vue-next'
-import { RouterView, useRoute, useRouter } from 'vue-router'
-import { useWindowSize } from '@vueuse/core'
+import { Clock, Hourglass, Settings, Timer } from '@lucide/vue'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+} from '@/components/ui/sidebar'
 
 const route = useRoute()
-const router = useRouter()
 const { t } = useI18n()
-const tabRoute = ['/countdown', '/pomodoro', '/settings']
-const active = computed<number>({
-  get: () => {
-    return tabRoute.indexOf(route.path)
-  },
-  set: (tab: number) => {
-    router.push({ path: tabRoute[tab] })
-  },
-})
 
-const { height } = useWindowSize()
+const navItems = computed(() => [
+  {
+    title: t('countdown.title'),
+    url: '/countdown',
+    icon: Hourglass,
+  },
+  {
+    title: t('pomodoro.title'),
+    url: '/pomodoro',
+    icon: Timer,
+  },
+  {
+    title: t('settings'),
+    url: '/settings',
+    icon: Settings,
+  },
+])
+
+const data = {
+  app: {
+    name: 'iTime',
+    logo: Clock,
+    description: '时间管理',
+  },
+}
 </script>
 
 <template>
-  <BaseView :left-show="false" title="iTime">
-    <div class="h-full">
-      <el-scrollbar class="w-full" :height="height - 100">
-        <div class="p-4">
-          <RouterView v-slot="{ Component }">
-            <component :is="Component" />
-          </RouterView>
-        </div>
-      </el-scrollbar>
-
-      <nut-tabbar v-model="active" bottom safe-area-inset-bottom>
-        <!--        <nut-tabbar-item tab-title="待办事项"> -->
-        <!--          <template #icon> -->
-        <!--            <Check></Check> -->
-        <!--          </template> -->
-        <!--        </nut-tabbar-item> -->
-        <nut-tabbar-item :tab-title="t('countdown.title')">
-          <template #icon>
-            <HourglassNull />
-          </template>
-        </nut-tabbar-item>
-        <nut-tabbar-item :tab-title="t('pomodoro.title')">
-          <template #icon>
-            <Stopwatch />
-          </template>
-        </nut-tabbar-item>
-        <nut-tabbar-item :tab-title="t('settings')">
-          <template #icon>
-            <SettingTwo />
-          </template>
-        </nut-tabbar-item>
-      </nut-tabbar>
-    </div>
-  </BaseView>
+  <SidebarProvider>
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" as-child>
+              <RouterLink to="/countdown">
+                <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <component :is="data.app.logo" class="size-4" />
+                </div>
+                <div class="grid flex-1 text-left text-sm leading-tight">
+                  <span class="truncate font-medium">{{ data.app.name }}</span>
+                  <span class="truncate text-xs">{{ data.app.description }}</span>
+                </div>
+              </RouterLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>{{ t('settings') }}</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem v-for="item in navItems" :key="item.url">
+              <SidebarMenuButton
+                as-child
+                :is-active="route.path === item.url || route.path.startsWith(`${item.url}/`)"
+                :tooltip="item.title"
+              >
+                <RouterLink :to="item.url">
+                  <component :is="item.icon" />
+                  <span>{{ item.title }}</span>
+                </RouterLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter />
+      <SidebarRail />
+    </Sidebar>
+    <SidebarInset>
+      <div class="flex min-h-svh flex-1 flex-col">
+        <RouterView v-slot="{ Component }">
+          <component :is="Component" />
+        </RouterView>
+      </div>
+    </SidebarInset>
+  </SidebarProvider>
 </template>
 
 <style scoped>
-
 </style>

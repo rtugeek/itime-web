@@ -12,14 +12,14 @@ export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
     return pomodoroSceneRepository.getItem<PomodoroScene>(key.toString())
   }
 
-  async save(value: PomodoroScene) {
+  async save(value: PomodoroScene, preserveTime: boolean = false) {
     if (!value.id) {
       value.id = new Date().getTime() + Math.ceil(Math.random() * 1000)
     }
     if (!value.createTime) {
       value.createTime = new Date()
     }
-    value.updateTime = new Date()
+    if (!preserveTime) { value.updateTime = new Date() }
     return pomodoroSceneRepository.setItem(value.id.toString(), value)
   }
 
@@ -38,7 +38,7 @@ export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
     return pomodoroSceneRepository.clear()
   }
 
-  async all(): Promise<PomodoroScene[]> {
+  async all(includeRemoved: boolean = false): Promise<PomodoroScene[]> {
     const scenes: PomodoroScene[] = []
     const keys = await pomodoroSceneRepository.keys()
     // 迁移旧数据
@@ -61,7 +61,7 @@ export class WebPomodoroSceneRepository implements IPomodoroSceneRepository {
     }
     for (const key of keys) {
       const scene = await pomodoroSceneRepository.getItem<PomodoroScene>(key)
-      if (scene && !scene.deleteTime) {
+      if (scene && (includeRemoved || !scene.deleteTime)) {
         scenes.push(scene)
       }
     }

@@ -31,11 +31,11 @@ const lunar = computed(() => {
       <div class="cursor-pointer absolute top-4 right-4 text-gray-500 hover:text-gray-700 !rounded-button" @click="closeWindow">
         <Close />
       </div>
-      <div class="text-center text-gray-600 flex items-center flex-col gap-2 mb-3">
-        <div class="text-2xl  font-bold">
+      <div class="text-center text-gray-600 flex items-center flex-col gap-2">
+        <div class="text-xl  font-bold">
           {{ solar.getYear() }}年{{ solar.getMonth() }}月{{ solar.getDay() }}日
         </div>
-        <div class="text-gray-600">
+        <div class="text-gray-600 text-md">
           {{ lunar.toString() }}
         </div>
         <div class="flex items-center gap-2">
@@ -48,7 +48,7 @@ const lunar = computed(() => {
         </div>
       </div>
 
-      <div v-if="almanac" class="flex flex-col gap-2">
+      <div v-if="almanac" class="flex flex-col gap-2 mt-5">
         <div class="bg-green-50 p-2 rounded-lg">
           <div class="text-green-600 font-medium mb-2">
             宜
@@ -84,6 +84,7 @@ const lunar = computed(() => {
   .tag{
     border-radius: 4px;
     padding: 2px 4px;
+    font-size: 12px;
     background-color: #f3f4f6;
     color: #6b7280;
   }

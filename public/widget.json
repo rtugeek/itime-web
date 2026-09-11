@@ -58,8 +58,7 @@
       ],
       "supportDeployMode": 273,
       "synchronizable": true,
-      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500",
-      "routes": []
+      "configPagePath": "/widget/todo_list/config?frame=true&transparent=false&width=600&height=500"
     },
     {
       "name": "itime.fun.pomodoro",
@@ -98,7 +97,6 @@
       "requiredAppVersion": "24.6.2",
       "synchronizable": true,
       "configPagePath": "/settings?frame=true&transparent=false&width=400&height=700",
-      "routes": [],
       "browserWindowOptions": {
         "transparent": false,
         "frame": false,
@@ -142,47 +140,7 @@
         "time"
       ],
       "supportDeployMode": 17,
-      "configPagePath": "/widget/config/deadline?width=400&height=700&frame=true&transparent=false",
-      "routes": []
-    },
-    {
-      "name": "itime.fun.countdown",
-      "title": {
-        "zh-CN": "倒计时",
-        "en-US": "Countdown"
-      },
-      "description": {
-        "zh-CN": "日历样式的倒计时组件",
-        "en-US": "Countdown widget with calendar style"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 2,
-      "height": 2,
-      "maxWidth": 4,
-      "webviewTag": false,
-      "maxHeight": 4,
-      "minWidth": 2,
-      "minHeight": 2,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/countdown",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_countdown.png",
-      "categories": [
-        "time",
-        "countdown"
-      ],
-      "supportDeployMode": 17,
-      "synchronizable": true,
-      "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown",
-      "routes": []
+      "configPagePath": "/widget/config/deadline?width=400&height=700&frame=true&transparent=false"
     },
     {
       "name": "itime.fun.countdown_list",
@@ -219,8 +177,54 @@
         "countdown"
       ],
       "supportDeployMode": 17,
-      "configPagePath": "/widget/config/countdown/list?frame=true&transparent=false&width=600&height=400",
-      "routes": []
+      "configPagePath": "/widget/config/countdown/list?frame=true&transparent=false&width=600&height=400"
+    },
+    {
+      "name": "itime.fun.countdown",
+      "title": {
+        "zh-CN": "倒计时",
+        "en-US": "Countdown"
+      },
+      "description": {
+        "zh-CN": "日历样式的倒计时组件",
+        "en-US": "Countdown widget with calendar style"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 2,
+      "height": 2,
+      "maxWidth": 4,
+      "webviewTag": false,
+      "maxHeight": 4,
+      "minWidth": 2,
+      "minHeight": 2,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/countdown",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_countdown.png",
+      "categories": [
+        "time",
+        "countdown"
+      ],
+      "supportDeployMode": 17,
+      "configPage": {
+        "path": "/",
+        "frame": true,
+        "maximizable": true,
+        "minimizable": true,
+        "transparent": false,
+        "width": 900,
+        "height": 700
+      },
+      "synchronizable": true,
+      "configPagePath": "/?frame=true&transparent=false&width=400&height=700&tab=countdown&maximize=true&minimize=true"
     },
     {
       "name": "itime.fun.calendar_large",
@@ -254,8 +258,43 @@
         "calendar"
       ],
       "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar_large?width=600&height=500&frame=true&transparent=false",
-      "routes": []
+      "configPagePath": "/widget/config/calendar_large?width=600&height=500&frame=true&transparent=false"
+    },
+    {
+      "name": "itime.fun.calendar",
+      "title": {
+        "zh-CN": "日历",
+        "en-US": "Calendar"
+      },
+      "description": {
+        "zh-CN": "简单的日历，支持节假日显示",
+        "en-US": "Simple calendar with holiday display"
+      },
+      "keywords": [
+        "recommend"
+      ],
+      "security": false,
+      "permissions": [],
+      "lang": "zh-CN",
+      "width": 4,
+      "height": 4,
+      "maxWidth": 6,
+      "webviewTag": false,
+      "maxHeight": 6,
+      "minWidth": 4,
+      "minHeight": 4,
+      "movable": true,
+      "singleton": false,
+      "resizable": true,
+      "path": "/widget/calendar",
+      "meta": {},
+      "backgroundThrottling": true,
+      "previewImage": "/images/preview_calendar.png",
+      "categories": [
+        "calendar"
+      ],
+      "supportDeployMode": 17,
+      "configPagePath": "/widget/config/calendar?frame=true&transparent=false"
     },
     {
       "name": "itime.fun.birthday_list",
@@ -292,45 +331,7 @@
         "countdown"
       ],
       "supportDeployMode": 17,
-      "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400",
-      "routes": []
-    },
-    {
-      "name": "itime.fun.calendar",
-      "title": {
-        "zh-CN": "日历",
-        "en-US": "Calendar"
-      },
-      "description": {
-        "zh-CN": "简单的日历，支持节假日显示",
-        "en-US": "Simple calendar with holiday display"
-      },
-      "keywords": [
-        "recommend"
-      ],
-      "security": false,
-      "permissions": [],
-      "lang": "zh-CN",
-      "width": 4,
-      "height": 4,
-      "maxWidth": 6,
-      "webviewTag": false,
-      "maxHeight": 6,
-      "minWidth": 4,
-      "minHeight": 4,
-      "movable": true,
-      "singleton": false,
-      "resizable": true,
-      "path": "/widget/calendar",
-      "meta": {},
-      "backgroundThrottling": true,
-      "previewImage": "/images/preview_calendar.png",
-      "categories": [
-        "calendar"
-      ],
-      "supportDeployMode": 17,
-      "configPagePath": "/widget/config/calendar?frame=true&transparent=false",
-      "routes": []
+      "configPagePath": "/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400"
     }
   ],
   "pages": []

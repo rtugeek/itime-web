@@ -10,14 +10,14 @@ export class CountdownEventRepository {
     return countdownEventRepository.getItem<CountdownEvent>(key)
   }
 
-  static async save(value: CountdownEvent, needSync: boolean = true): Promise<CountdownEvent> {
+  static async save(value: CountdownEvent, needSync: boolean = true, preserveTime: boolean = false): Promise<CountdownEvent> {
     if (!value.id) {
       value.id = nanoid()
     }
     if (!value.createTime) {
       value.createTime = new Date()
     }
-    value.updateTime = new Date()
+    if (!preserveTime) { value.updateTime = new Date() }
     value.needSync = needSync
     return countdownEventRepository.setItem(value.id.toString(), value)
   }

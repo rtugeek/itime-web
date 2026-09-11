@@ -1,113 +1,69 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { type PropType, computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { CalendarIcon } from '@lucide/vue'
 import { Lunar } from 'lunar-typescript'
-import { useI18n } from 'vue-i18n'
+import DatePicker from '@/components/DatePicker.vue'
+import LunarPickerDialog from '@/components/dialog/LunarPickerDialog.vue'
+import { Button } from '@/components/ui/button'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
-defineProps({
-  lunar: {
-    type: Boolean,
-    default: true,
-  },
-  minDate: {
-    type: Object as PropType<Date | string>,
-    default: dayjs().subtract(100, 'year').toDate(),
-  },
+const props = withDefaults(defineProps<{
+  lunar?: boolean
+  minDate?: Date | string
+}>(), {
+  lunar: true,
+  minDate: () => dayjs().subtract(100, 'year').toDate(),
 })
 
-const { t, d } = useI18n({
-  messages: {
-    zh: {
-      pickDate: '选择日期',
-    },
-    en: {
-      pickDate: 'Pick Date',
-    },
-  },
-})
-const modelValue = defineModel({ default: new Date() })
+const modelValue = defineModel({ default: () => new Date() })
 const dateType = defineModel('dateType', { default: 0 })
-const showDateTimePicker = ref(false)
 const showLunarPicker = ref(false)
-const selectedDate = ref(new Date())
-onMounted(async () => {
-  await nextTick()
-  selectedDate.value = dayjs(modelValue.value).toDate()
-  selectedLunarDate.value = modelValue.value
-})
 const selectedLunarDate = ref(modelValue.value)
-const textModel = computed(() => {
-  if (dateType.value == 0) {
-    return d(modelValue.value)
-  }
-  else {
-    return Lunar.fromDate(modelValue.value).toString()
-  }
-})
+const lunarText = computed(() => Lunar.fromDate(modelValue.value).toString())
 
-watch(() => modelValue.value, () => {
-  selectedDate.value = dayjs(modelValue.value).toDate()
-  selectedLunarDate.value = modelValue.value
+watch(modelValue, (value) => {
+  selectedLunarDate.value = value
 })
-
-function onDateTimeConfirm() {
-  modelValue.value = selectedDate.value
-  selectedLunarDate.value = modelValue.value
-  showDateTimePicker.value = false
-}
 
 function onLunarDateConfirm() {
   modelValue.value = selectedLunarDate.value
-  selectedDate.value = selectedLunarDate.value
   showLunarPicker.value = false
 }
 
-function showPicker() {
-  if (dateType.value == 0) {
-    showDateTimePicker.value = true
-  }
-  else {
-    showLunarPicker.value = true
-  }
+function onDateTypeChange(value: unknown) {
+  if (value !== '0' && value !== '1') { return }
+  dateType.value = Number(value)
+  showLunarPicker.value = false
 }
 </script>
 
 <template>
-  <nut-input
-    v-model="textModel" readonly placeholder="时间" @click="showPicker"
-    @focus="showDateTimePicker = true"
-  >
-    <template #left>
-      <slot name="left" />
-    </template>
-    <template v-if="lunar" #right>
-      <nut-radio-group v-model="dateType" direction="horizontal" @click.stop="">
-        <nut-radio :label="0">
-          公历
-        </nut-radio>
-        <nut-radio :label="1">
-          农历
-        </nut-radio>
-      </nut-radio-group>
-    </template>
-  </nut-input>
-  <nut-popup v-model:visible="showDateTimePicker" position="bottom">
-    <nut-date-picker
-      v-model="selectedDate"
-      :title="t('pickDate')"
-      type="date"
-      :min-date="minDate"
-      :is-show-chinese="true"
-      :three-dimensional="false"
-      @confirm="onDateTimeConfirm"
-      @cancel="showDateTimePicker = false"
-    />
-  </nut-popup>
-  <nut-popup v-if="lunar" v-model:visible="showLunarPicker" position="bottom">
-    <nut-lunar-date-picker v-model="selectedLunarDate" @cancel="showLunarPicker = false" @confirm="onLunarDateConfirm" />
-  </nut-popup>
+  <div class="flex min-w-0 items-center gap-3">
+    <ToggleGroup v-if="lunar" type="single" variant="outline" class="shrink-0" :model-value="String(dateType)" orientation="horizontal" aria-label="日期类型" @update:model-value="onDateTypeChange">
+      <ToggleGroupItem value="0" aria-label="公历">
+        公历
+      </ToggleGroupItem>
+      <ToggleGroupItem value="1" aria-label="农历">
+        农历
+      </ToggleGroupItem>
+    </ToggleGroup>
+    <DatePicker v-if="dateType === 0 || !lunar" v-model="modelValue" class="w-auto flex-1" :min-date="props.minDate">
+      <template v-if="$slots.left" #left>
+        <slot name="left" />
+      </template>
+    </DatePicker>
+    <Button v-else type="button" variant="outline" class="min-w-0 flex-1 justify-start gap-2 px-3 font-normal" @click="showLunarPicker = true">
+      <slot name="left">
+        <CalendarIcon class="size-4 shrink-0 text-muted-foreground" />
+      </slot>
+      <span class="truncate">{{ lunarText }}</span>
+    </Button>
+  </div>
+  <LunarPickerDialog
+    v-if="lunar"
+    v-model="selectedLunarDate"
+    v-model:visible="showLunarPicker"
+    @confirm="onLunarDateConfirm"
+  />
 </template>
-
-<style scoped lang="scss">
-
-</style>

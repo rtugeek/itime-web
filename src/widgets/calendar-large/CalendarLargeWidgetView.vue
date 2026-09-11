@@ -8,13 +8,23 @@ import rrulePlugin from '@fullcalendar/rrule'
 import icalendarPlugin from '@fullcalendar/icalendar'
 import interactionPlugin from '@fullcalendar/interaction'
 import { storeToRefs } from 'pinia'
-import { watchOnce } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
 import { WindowUtils } from '@/utils/WindowUtils'
 import { useTodoStore } from '@/stores/useTodoStore'
 import { useFestivalEventSource } from '@/widgets/calendar-large/useFestivalEventSource'
 import { useLunarEventSource } from '@/widgets/calendar-large/useLunarEventSource'
+import { AppConfig } from '@/common/AppConfig'
 
-useWidget()
+interface CalendarConfig {
+  firstDayOfWeek: 0 | 1
+}
+
+const { widgetParams } = useWidget()
+
+const calendarConfig = useStorage<CalendarConfig>(`${AppConfig.KEY_CALENDAR_CONFIG}-${widgetParams.id}`, {
+  firstDayOfWeek: 1,
+})
+
 const calendarRef = ref<InstanceType<typeof FullCalendar>>()
 const todoStore = useTodoStore()
 const { todos } = storeToRefs(todoStore)
@@ -27,6 +37,7 @@ document.addEventListener('contextmenu', () => {
 const calendarOptions = ref<CalendarOptions>({
   plugins: [dayGridPlugin, rrulePlugin, interactionPlugin, icalendarPlugin],
   weekNumbers: false,
+  firstDay: calendarConfig.value.firstDayOfWeek,
   buttonText: {
     today: '今天',
   },
@@ -39,7 +50,6 @@ const calendarOptions = ref<CalendarOptions>({
     }
   },
   dateClick: (info) => {
-    // 判断是否是右键点击
     if (contextMenuClickAt + 200 > Date.now()) {
       return
     }
@@ -47,8 +57,12 @@ const calendarOptions = ref<CalendarOptions>({
   },
 },
 )
-//
-watch(() => todos.value, (newVal, oldVal) => {
+
+watch(() => calendarConfig.value.firstDayOfWeek, (newVal) => {
+  calendarOptions.value.firstDay = newVal
+})
+
+watch(() => todos.value, (newVal) => {
   const calendar = calendarRef.value?.getApi()
   // 清空事件
   if (calendar) {

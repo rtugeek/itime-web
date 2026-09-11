@@ -6,7 +6,7 @@ import { useTodoStore } from '@/stores/useTodoStore'
 import { useSupabaseStore } from '@/stores/useSupabaseStore'
 
 function click() {
-  AppApi.showAppWindow('/user/profile', { width: 400, height: 500 })
+  AppApi.showAppWindow('/user/profile')
 }
 
 const todoStore = useTodoStore()

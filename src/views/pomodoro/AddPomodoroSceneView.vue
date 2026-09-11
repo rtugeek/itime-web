@@ -1,28 +1,25 @@
 <script lang="ts" setup>
-import { BrowserWindowApi } from '@widget-js/core'
-import { computed, reactive, ref, toRaw } from 'vue'
-import EmojiPicker from 'vue3-emoji-picker'
-import { Delete } from '@icon-park/vue-next'
-import 'vue3-emoji-picker/css'
-
+import { reactive, ref, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { showNotify } from '@nutui/nutui'
+import EmojiPicker from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
+import { toast } from 'vue-sonner'
+import { Save, Trash2 } from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
 import type { PomodoroScene } from '@/data/PomodoroScene'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
-import FloatingActionButton from '@/components/FloatingActionButton.vue'
-import { AppUtils } from '@/utils/AppUtils'
+import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Avatar } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-BrowserWindowApi.setAlwaysOnTop(true)
 const router = useRouter()
 const route = useRoute()
 const id = route.query.id as string
 const { t } = useI18n()
 const pomodoroStore = usePomodoroStore()
-const title = computed(
-  () => id ? t('pomodoro.scene.edit') : t('pomodoro.scene.add'),
-)
 
 const sence = reactive<PomodoroScene>({
   id: undefined,
@@ -38,6 +35,7 @@ if (id) {
       sence.createTime = res.createTime
       sence.icon = res.icon
       sence.name = res.name
+      sence.duration = res.duration ?? 0
     }
   })
 }
@@ -51,54 +49,116 @@ function onSelectEmoji(newEmoji: any) {
 
 function save() {
   if (!sence.name.trim()) {
-    showNotify.warn(t('pomodoro.error.name'))
+    toast.warning(t('pomodoro.error.name'))
     return
   }
   pomodoroStore.saveScene(toRaw(sence))
-  AppUtils.back(router)
+  router.push({ name: 'Pomodoro' })
 }
 
 function deleteScene() {
   pomodoroStore.deleteScene(sence.id!)
-  AppUtils.back(router)
+  router.push({ name: 'Pomodoro' })
 }
 </script>
 
 <template>
-  <BaseView :title="title">
-    <nut-popup v-model:visible="showEmojiPicker" :style="{ padding: '30px 50px', backgroundColor: 'transparent' }">
-      <EmojiPicker :native="true" display-recent @select="onSelectEmoji" />
-    </nut-popup>
-    <div class="section mt-4">
-      <h5>{{ t('pomodoro.iconAndName') }}</h5>
-      <nut-form label-position="top">
-        <nut-form-item>
-          <div class="flex items-center gap-2">
-            <nut-avatar shape="square" bg-color="#ece8da" class="cursor-pointer" @click="showEmojiPicker = true">
-              <div class="flex items-center justify-center emoji text-xl h-full">
-                {{ sence.icon }}
-              </div>
-            </nut-avatar>
-            <nut-input v-model="sence.name" :placeholder="t('pomodoro.scene.placeholder')" />
+  <section class="scene-editor">
+    <Sheet v-model:open="showEmojiPicker">
+      <SheetContent side="bottom" class="h-auto" style="padding: 30px 50px; background-color: transparent;">
+        <EmojiPicker :native="true" display-recent @select="onSelectEmoji" />
+      </SheetContent>
+    </Sheet>
+    <div class="editor-card">
+      <div class="editor-section">
+        <div class="editor-field">
+          <div class="field-label">
+            <label>{{ t('pomodoro.iconAndName') }}</label>
           </div>
-        </nut-form-item>
-      </nut-form>
+          <div class="flex flex-col gap-2">
+            <Label for="scene-name">{{ t('pomodoro.scene.placeholder') }}</Label>
+            <div class="flex items-center gap-2">
+              <Avatar class="cursor-pointer w-10 h-10 rounded-md bg-[#ece8da]" @click="showEmojiPicker = true">
+                <div class="flex items-center justify-center emoji text-xl h-full">
+                  {{ sence.icon }}
+                </div>
+              </Avatar>
+              <Input id="scene-name" v-model="sence.name" :placeholder="t('pomodoro.scene.placeholder')" class="editor-input" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="editor-footer">
+        <Button v-if="id" class="delete-button" type="button" variant="destructive" aria-label="删除场景" @click="deleteScene">
+          <Trash2 class="size-4" />
+          删除
+        </Button>
+        <Button type="button" variant="outline" @click="router.push({ name: 'Pomodoro' })">
+          {{ t('cancel') }}
+        </Button>
+        <Button type="button" @click="save">
+          <Save class="size-4" />
+          {{ t('save') }}
+        </Button>
+      </footer>
     </div>
-    <div class="fixed-right-bottom gap-2 flex">
-      <FloatingActionButton v-if="id" v-no-android type="danger" @click="deleteScene">
-        <Delete size="24" />
-      </FloatingActionButton>
-      <FloatingActionButton @click="save" />
-    </div>
-  </BaseView>
+  </section>
 </template>
 
-<style lang="scss">
-@import url('@/assets/common.scss');
+<style scoped>
+.scene-editor {
+  width: 100%;
+  max-width: 640px;
+  margin-inline: auto;
+  padding-block: 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
-.section {
-  h5 {
-    padding-left: 1rem;
-  }
+.field-label,
+.editor-footer {
+  display: flex;
+  align-items: center;
+}
+
+.field-label {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.editor-card {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+.editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px;
+}
+
+.editor-field { display: grid; min-width: 0; gap: 10px; }
+.field-label { font-size: 13px; font-weight: 500; }
+.editor-input { width: 100%; }
+.editor-footer {
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 28px;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 16px 16px;
+  background: var(--muted);
+}
+
+.editor-footer :deep(.delete-button) { margin-right: auto; flex: none; }
+
+@media (max-width: 639px) {
+  .scene-editor { padding-block: 8px 16px; gap: 20px; }
+  .editor-section { padding: 20px 16px; }
+  .editor-footer { padding: 10px 16px; }
 }
 </style>

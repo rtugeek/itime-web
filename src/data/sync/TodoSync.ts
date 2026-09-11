@@ -34,7 +34,7 @@ class TodoSyncImpl extends BaseSync<Todo, RemoteTodo> {
     const supabaseClient = useSupabaseStore().client
     const res = await supabaseClient.from('todo').select('*')
     if (res.error) {
-      return []
+      throw res.error
     }
     else {
       return res.data
@@ -47,8 +47,11 @@ class TodoSyncImpl extends BaseSync<Todo, RemoteTodo> {
       const supabaseClient = useSupabaseStore().client
       const upsertItems = items.filter(it => it.uuid)
       const insertItems = items.filter(it => !it.uuid)
-      const insertResult = await supabaseClient.from('todo').insert(insertItems).select()
-      const upsertResult = await supabaseClient.from('todo').upsert(upsertItems).select()
+      const insertResult = insertItems.length ? await supabaseClient.from('todo').insert(insertItems).select() : { data: [], error: null }
+      const upsertResult = upsertItems.length ? await supabaseClient.from('todo').upsert(upsertItems).select() : { data: [], error: null }
+
+      if (insertResult.error) { consola.error(insertResult.error) }
+      if (upsertResult.error) { consola.error(upsertResult.error) }
 
       const results: RemoteTodo[] = []
       if (insertResult.data) {
@@ -62,8 +65,8 @@ class TodoSyncImpl extends BaseSync<Todo, RemoteTodo> {
     return []
   }
 
-  saveItem(item: Todo): Promise<Todo> {
-    return TodoRepository.save(item, item.needSync)
+  saveItem(item: Todo, needSync: boolean = false): Promise<Todo> {
+    return TodoRepository.save(item, needSync, true)
   }
 
   mapLocalToRemote(localItems: Todo[]): RemoteTodo[] {
@@ -95,6 +98,9 @@ class TodoSyncImpl extends BaseSync<Todo, RemoteTodo> {
         importance: item.importance,
         isReminderOn: item.is_reminder_on,
       })
+      todo.importance = item.importance
+      todo.isReminderOn = item.is_reminder_on
+      todo.deleteTime = item.delete_time ? new Date(item.delete_time) : undefined
       todo.id = item.id
       todo.uuid = item.uuid
       todo.order = item.order ?? 0

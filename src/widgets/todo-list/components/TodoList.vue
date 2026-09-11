@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useSortable } from '@vueuse/integrations/useSortable'
 import { storeToRefs } from 'pinia'
 import { useSound } from '@vueuse/sound'
+import consola from 'consola'
 import TodoItem from '@/widgets/todo-list/components/TodoItem.vue'
 import { delay } from '@/utils/TimeUtils'
 import { useTodoStore } from '@/stores/useTodoStore'
@@ -16,30 +17,37 @@ const listRef = ref<HTMLElement>()
 const todoStore = useTodoStore()
 const { completedTodos, todos: todoList } = storeToRefs(todoStore)
 const { play } = useSound(Ding)
-function finishTodo(todo: Todo) {
-  if (todo.completedDateTime) {
-    todoStore.reTodo(todo)
+async function finishTodo(todo: Todo) {
+  try {
+    if (todo.completedDateTime) {
+      await todoStore.reTodo(todo)
+    }
+    else {
+      await todoStore.finishTodo(todo)
+      play()
+    }
   }
-  else {
-    todoStore.finishTodo(todo)
-    play()
+  catch (err) {
+    consola.error('finishTodo failed:', err)
   }
 }
-
-useSortable(listRef, todoStore.todos, {
-  animation: 150,
-  onEnd: async () => {
-    await delay(300)
-    for (let i = 0; i < todoStore.todos.length; i++) {
-      todoStore.todos[i].order = i
-    }
-    todoStore.save()
-  },
-})
 
 const todos = computed(() => {
   return props.isCompleted ? completedTodos.value : todoList.value
 })
+
+if (!props.isCompleted) {
+  useSortable(listRef, todoStore.todos, {
+    animation: 150,
+    onEnd: async () => {
+      await delay(300)
+      for (let i = 0; i < todoStore.todos.length; i++) {
+        todoStore.todos[i].order = i
+      }
+      todoStore.save()
+    },
+  })
+}
 </script>
 
 <template>

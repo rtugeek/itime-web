@@ -2,18 +2,16 @@
 import { BrowserWindowApi } from '@widget-js/core'
 import { Close, Left } from '@icon-park/vue-next'
 import { useRouter } from 'vue-router'
-import { usePreferredDark } from '@vueuse/core'
 import { AppUtils } from '@/utils/AppUtils'
+import { Button } from '@/components/ui/button'
 
-const props = defineProps({
+defineProps({
   title: String,
   leftShow: {
     type: Boolean,
     default: true,
   },
 })
-
-const isDark = usePreferredDark()
 
 const router = useRouter()
 function goBack() {
@@ -34,26 +32,27 @@ function close() {
 </script>
 
 <template>
-  <NutConfigProvider :theme="isDark ? 'dark' : 'light'">
-    <div class="base-view flex flex-col w-full">
-      <div class="div" @mousedown="mouseDown" @mouseup="mouseUp">
-        <nut-navbar class="widget-drag-region" fixed v-bind="{ ...props, leftShow: false }" style="height: 56px;font-size: 24px" @click-back="goBack">
-          <template #left>
-            <Left size="26" class="widget-no-drag-region" @click="goBack" />
-          </template>
-          <template #right>
-            <div class="flex gap-2 widget-no-drag-region">
-              <slot name="actions" />
-              <nut-button v-electron plain size="small" @click="close">
-                <Close />
-              </nut-button>
-            </div>
-          </template>
-        </nut-navbar>
+  <div class="base-view flex flex-col w-full">
+    <div class="navbar flex items-center justify-between h-14 px-3 widget-drag-region select-none" @mousedown="mouseDown" @mouseup="mouseUp">
+      <div class="flex items-center widget-no-drag-region">
+        <Button v-if="leftShow" variant="ghost" size="icon" class="w-9 h-9" @click="goBack">
+          <Left size="20" />
+        </Button>
       </div>
+      <div class="flex-1 text-center font-semibold text-lg truncate px-2">
+        {{ title }}
+      </div>
+      <div class="flex gap-1 widget-no-drag-region">
+        <slot name="actions" />
+        <Button v-electron variant="ghost" size="icon" class="w-9 h-9" @click="close">
+          <Close size="20" />
+        </Button>
+      </div>
+    </div>
+    <div class="flex-1 overflow-hidden">
       <slot />
     </div>
-  </NutConfigProvider>
+  </div>
 </template>
 
 <style scoped>
@@ -64,5 +63,9 @@ function close() {
   border-radius: 8px;
   overflow: hidden;
   box-sizing: border-box;
+}
+.navbar {
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
 }
 </style>

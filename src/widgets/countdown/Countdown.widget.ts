@@ -8,7 +8,16 @@ const keywords = [WidgetKeyword.RECOMMEND]
 // 组件关键词
 const CountdownWidget = new Widget({
   path: '/widget/countdown',
-  configPagePath: '/?frame=true&transparent=false&width=400&height=700&tab=countdown',
+  configPagePath: '/?frame=true&transparent=false&width=400&height=700&tab=countdown&maximize=true&minimize=true',
+  configPage: {
+    path: '/',
+    frame: true,
+    maximizable: true,
+    minimizable: true,
+    transparent: false,
+    width: 900,
+    height: 700,
+  },
   name,
   title: { 'zh-CN': '倒计时', 'en-US': 'Countdown' },
   description: { 'zh-CN': '日历样式的倒计时组件', 'en-US': 'Countdown widget with calendar style' },

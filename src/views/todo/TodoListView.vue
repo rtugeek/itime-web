@@ -6,6 +6,7 @@ import { useSortable } from '@vueuse/integrations/useSortable'
 import { useSound } from '@vueuse/sound'
 import { CalendarDays, ListTodo, Pencil, Plus, Repeat2, Trash2 } from '@lucide/vue'
 import dayjs from 'dayjs'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -18,8 +19,8 @@ import {
 } from '@/components/ui/empty'
 import { useTodoStore } from '@/stores/useTodoStore'
 import { RRuleUtils } from '@/utils/RRuleUtils'
-import { delay } from '@/utils/TimeUtils'
 import type { Todo } from '@/data/Todo'
+import { delay } from '@/utils/TimeUtils'
 import Ding from '@/assets/audio/ding.mp3'
 
 const router = useRouter()
@@ -29,14 +30,16 @@ const { play } = useSound(Ding)
 const completed = ref(false)
 const todoListRef = ref<HTMLElement>()
 
-useSortable(todoListRef, store.todos, {
+useSortable(todoListRef, todos, {
   animation: 150,
   onEnd: async () => {
     await delay(300)
-    for (let i = 0; i < store.todos.length; i++) {
-      store.todos[i].order = i
+    const modifiedAt = new Date().toISOString()
+    for (let i = 0; i < todos.value.length; i++) {
+      todos.value[i].order = i
+      todos.value[i].lastModifiedDateTime = modifiedAt
     }
-    store.save()
+    await store.save()
   },
 })
 
@@ -66,29 +69,38 @@ function toggleFinish(todo: Todo) {
         <div class="flex gap-2">
           <Button :variant="completed ? 'ghost' : 'secondary'" @click="completed = false">
             待办事项
+            <Badge v-if="todos.length > 0" variant="outline" class="ml-2 tabular-nums">
+              {{ todos.length }}
+            </Badge>
           </Button>
           <Button :variant="completed ? 'secondary' : 'ghost'" @click="completed = true">
             已完成
+            <Badge v-if="completedTodos.length > 0" variant="outline" class="ml-2 tabular-nums">
+              {{ completedTodos.length }}
+            </Badge>
           </Button>
         </div>
-        <Button class="rounded-lg" @click="goAdd">
-          <Plus class="size-4" aria-hidden="true" />
-          添加事项
-        </Button>
+        <div class="flex items-center gap-3">
+          <Button class="rounded-lg" @click="goAdd">
+            <Plus class="size-4" aria-hidden="true" />
+            添加事项
+          </Button>
+        </div>
       </header>
 
       <section aria-labelledby="todo-list-title" class="space-y-4">
         <div v-show="!completed">
-          <div v-if="todos.length">
+          <div v-show="todos.length">
             <div ref="todoListRef" class="flex flex-col gap-2">
               <div
                 v-for="item in todos"
-                :key="`${item.id}-${item.lastModifiedDateTime}`"
-                class="group flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm transition-colors hover:bg-accent/30"
+                :key="item.id"
+                class="draggable group flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm transition-colors hover:bg-accent/30"
+                @click="goEdit(item)"
               >
                 <Checkbox
                   :checked="!!item.completedDateTime"
-                  @click="toggleFinish(item)"
+                  @click.stop="toggleFinish(item)"
                 />
                 <div class="min-w-0 flex-1">
                   <p
@@ -110,7 +122,7 @@ function toggleFinish(todo: Todo) {
                     </div>
                   </div>
                 </div>
-                <div class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100" @click.stop>
                   <Button
                     variant="ghost"
                     size="icon-sm"
@@ -131,7 +143,7 @@ function toggleFinish(todo: Todo) {
               </div>
             </div>
           </div>
-          <Empty v-else>
+          <Empty v-if="!todos.length">
             <EmptyContent>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -157,14 +169,14 @@ function toggleFinish(todo: Todo) {
             <div class="flex flex-col gap-2">
               <div
                 v-for="item in completedTodos"
-                :key="`${item.id}-${item.lastModifiedDateTime}`"
+                :key="item.id"
                 class="group flex items-center gap-3 rounded-lg border bg-card p-3 text-card-foreground shadow-sm transition-colors hover:bg-accent/30"
               >
                 <Checkbox
                   :checked="!!item.completedDateTime"
                   @click="toggleFinish(item)"
                 />
-                <div class="min-w-0 flex-1">
+                <div class="min-w-0 flex-1" @click="goEdit(item)">
                   <p
                     class="text-base font-medium leading-tight break-words whitespace-pre-wrap line-clamp-2 text-muted-foreground line-through"
                   >
@@ -184,7 +196,7 @@ function toggleFinish(todo: Todo) {
                     </div>
                   </div>
                 </div>
-                <div class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100" @click.stop>
                   <Button
                     variant="ghost"
                     size="icon-sm"
@@ -217,3 +229,9 @@ function toggleFinish(todo: Todo) {
     </div>
   </main>
 </template>
+
+<style scoped>
+.draggable {
+  -webkit-user-drag: element;
+}
+</style>

@@ -7,12 +7,6 @@ const CountdownListWidgetRoutes: RouteRecordRaw[] = [
     name: `${CountdownListWidget.name}`,
     component: () => import('./CountdownListWidgetView.vue'),
   },
-  {
-    path: CountdownListWidget.configPagePath!.split('?')[0],
-    name: `${CountdownListWidget.name}.config`,
-    component: () =>
-      import('./CountdownListConfigView.vue'),
-  },
 ]
 
 export default CountdownListWidgetRoutes

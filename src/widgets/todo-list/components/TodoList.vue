@@ -41,10 +41,12 @@ if (!props.isCompleted) {
     animation: 150,
     onEnd: async () => {
       await delay(300)
-      for (let i = 0; i < todoStore.todos.length; i++) {
-        todoStore.todos[i].order = i
+      const modifiedAt = new Date().toISOString()
+      for (let i = 0; i < todoStore.todos.value.length; i++) {
+        todoStore.todos.value[i].order = i
+        todoStore.todos.value[i].lastModifiedDateTime = modifiedAt
       }
-      todoStore.save()
+      await todoStore.save()
     },
   })
 }
@@ -53,7 +55,7 @@ if (!props.isCompleted) {
 <template>
   <div class="wrapper">
     <div ref="listRef" class="list">
-      <div v-for="item in todos" :key="`${item.id}-${item.lastModifiedDateTime}`" class="draggable">
+      <div v-for="item in todos" :key="item.id" class="draggable">
         <TodoItem
           :editable="!isCompleted" :todo="item" @finish="finishTodo(item)" @delete="todoStore.deleteTodo(item)"
         />

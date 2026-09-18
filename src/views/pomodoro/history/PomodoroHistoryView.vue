@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { useRoute, useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft, Delete } from '@lucide/vue'
 import { toast } from 'vue-sonner'
-import consola from 'consola'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
-import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import { Button } from '@/components/ui/button'
 import {
@@ -24,16 +22,13 @@ import {
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
-const id = Number.parseInt(route.query.id as string)
+const id = route.query.id as string
 const histories = ref<PomodoroHistory[]>()
-if (id) {
-  PomodoroHistoryRepository.findBySceneId(id).then((his) => {
-    histories.value = his
-    consola.log(histories.value)
-  })
-}
-
 const pomodoroStore = usePomodoroStore()
+watch(() => pomodoroStore.dataRevision, async () => {
+  if (id) { histories.value = await pomodoroStore.findHistoryBySceneId(id) }
+}, { immediate: true })
+
 const showDeleteDialog = ref(false)
 const pendingDeleteHistory = ref<PomodoroHistory | null>(null)
 
@@ -63,7 +58,7 @@ function handleDeleteCancel() {
 
 function onBack() {
   if (id) {
-    router.push({ name: 'PomodoroDetail', query: { id } })
+    router.push({ name: 'PomodoroDetail', query: { id: String(id) } })
   }
   else {
     router.push({ name: 'Pomodoro' })

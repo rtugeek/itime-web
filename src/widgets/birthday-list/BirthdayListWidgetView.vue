@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+import { useSortable } from '@vueuse/integrations/useSortable'
 import { useContextMenu, useMenuListener, useWidget } from '@widget-js/vue3'
 import { AddOne } from '@icon-park/vue-next'
 import { useWindowSize } from '@vueuse/core'
@@ -8,16 +10,27 @@ import { useI18n } from 'vue-i18n'
 import { WindowUtils } from '@/utils/WindowUtils'
 import { useBirthdayStore } from '@/stores/useBirthdayStore'
 import BirthdayItem from '@/widgets/birthday-list/BirthdayItem.vue'
+import { delay } from '@/utils/TimeUtils'
 
 const birthdayStore = useBirthdayStore()
 useWidget()
 const { t } = useI18n()
 const { birthdayList } = storeToRefs(birthdayStore)
+const listRef = ref<HTMLElement>()
 function add() {
   WindowUtils.open('/birthday/add')
 }
 
 const { height } = useWindowSize()
+
+useSortable(listRef, birthdayStore.birthdayList, {
+  animation: 150,
+  onEnd: async () => {
+    await delay(300)
+    await birthdayStore.saveAll(birthdayStore.birthdayList)
+  },
+})
+
 useMenuListener((eventType, menu) => {
   if (eventType == MenuApiEvent.ITEM_CLICK) {
     const menuId = menu.id
@@ -49,13 +62,20 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
         <span v-t="'birthday.list'" />
         <AddOne class="add cursor-pointer" @click="add" />
       </div>
-      <el-scrollbar :height="height - 110">
-        <div class="people-list" style="flex:1; display:flex; flex-flow:column; overflow: auto;">
-          <template v-for="item in birthdayList" :key="`${item.updateTime}-${item.createTime}`">
+      <div
+        class="scroll-wrapper"
+        :style="{ height: `${height - 110}px` }"
+      >
+        <div ref="listRef" class="people-list" style="flex:1; display:flex; flex-flow:column; overflow: auto;">
+          <div
+            v-for="item in birthdayList"
+            :key="`${item.updateTime}-${item.createTime}`"
+            class="draggable"
+          >
             <BirthdayItem :birthday="item" />
-          </template>
+          </div>
         </div>
-      </el-scrollbar>
+      </div>
     </div>
   </WidgetWrapper>
 </template>
@@ -69,10 +89,28 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
   display: flex;
   flex-flow: column;
 
-  ::-webkit-scrollbar {
-    height: 0;
-    width: 0;
-    color: transparent;
+  .scroll-wrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(128, 128, 128, 0.4);
+      border-radius: 3px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  }
+
+  .people-list {
+    gap: 0.6rem;
+    padding: 0.4rem 0;
+  }
+
+  .draggable {
+    -webkit-user-drag: element;
   }
 
   .image {

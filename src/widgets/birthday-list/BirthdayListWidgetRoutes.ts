@@ -7,12 +7,6 @@ const BirthdayListWidgetRoutes: RouteRecordRaw[] = [
     name: `${BirthdayListWidget.name}`,
     component: () => import('./BirthdayListWidgetView.vue'),
   },
-  {
-    path: BirthdayListWidget.configPagePath!.split('?')[0],
-    name: `${BirthdayListWidget.name}.config`,
-    component: () =>
-      import('./BirthdayListConfigView.vue'),
-  },
 ]
 
 export default BirthdayListWidgetRoutes

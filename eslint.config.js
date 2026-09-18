@@ -10,6 +10,8 @@ export default antfu({
   vue: true,
   jsonc: false,
   yaml: false,
+  markdown: false,
+  ignores: ['**/*.md'],
   rules: {
     'curly': ['error', 'multi-line'],
     'ts/no-use-before-define': 'off',

@@ -1,6 +1,6 @@
 export class AppConfig {
   static KEY_POMODORO_SETTINGS = 'pomodoro_settings'
-  static KEY_POMODORO_INIT = 'pomodoro_inited'
+  static KEY_POMODORO_INIT = 'wuThocehoo0a'
   static KEY_POMODORO_USING_SCENE = 'woev2bahna3'
   static KEY_COUNTDOWN_INIT = 'ru9choS2gahh'
   static KEY_POMODORO = 'aeSe1neich7S'

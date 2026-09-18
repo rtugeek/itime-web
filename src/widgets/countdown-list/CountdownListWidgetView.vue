@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
+import { nextTick, ref } from 'vue'
+import { useSortable } from '@vueuse/integrations/useSortable'
 import { useMenuListener, useWidget } from '@widget-js/vue3'
 import { AddOne, SortAmountDown } from '@icon-park/vue-next'
 import { useWindowSize } from '@vueuse/core'
@@ -7,8 +9,6 @@ import { DefaultWidgetTheme, MenuApiEvent } from '@widget-js/core'
 import { WindowUtils } from '@/utils/WindowUtils'
 import CountdownItem from '@/widgets/countdown-list/CountdownListWidgetItem.vue'
 import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
-import { CountdownSync } from '@/data/sync/CountdownSync'
-import { useSupabaseSync } from '@/common/composition/useSupabaseSync'
 
 const countdownStore = useCountdownEventStore()
 const theme = DefaultWidgetTheme.copy({
@@ -17,11 +17,21 @@ const theme = DefaultWidgetTheme.copy({
 })
 useWidget({ defaultTheme: theme })
 const { events } = storeToRefs(countdownStore)
+const listRef = ref<HTMLElement>()
 function add() {
   WindowUtils.open('/countdown/add')
 }
 
 const { height } = useWindowSize()
+
+useSortable(listRef, events, {
+  animation: 150,
+  onEnd: async () => {
+    await nextTick()
+    await countdownStore.saveAll(countdownStore.events)
+  },
+})
+
 useMenuListener((eventType, menu) => {
   if (eventType == MenuApiEvent.ITEM_CLICK) {
     const menuId = menu.id
@@ -35,8 +45,6 @@ useMenuListener((eventType, menu) => {
     }
   }
 })
-
-useSupabaseSync(CountdownSync)
 </script>
 
 <template>
@@ -51,13 +59,20 @@ useSupabaseSync(CountdownSync)
           <SortAmountDown size="22" class="add cursor-pointer mr-2" @click="countdownStore.toggleSort" />
         </div>
       </div>
-      <el-scrollbar :height="height - 72">
-        <div class="event-list-wrapper">
-          <template v-for="item in events" :key="`${item.updateTime}-${item.createTime}`">
+      <div
+        class="scroll-wrapper"
+        :style="{ height: `${height - 72}px` }"
+      >
+        <div ref="listRef" class="event-list-wrapper">
+          <div
+            v-for="item in events"
+            :key="item.id"
+            class="draggable"
+          >
             <CountdownItem :event="item" />
-          </template>
+          </div>
         </div>
-      </el-scrollbar>
+      </div>
     </div>
   </WidgetWrapper>
 </template>
@@ -69,10 +84,30 @@ useSupabaseSync(CountdownSync)
   display: flex;
   flex-flow: column;
 
-  ::-webkit-scrollbar {
-    height: 0;
-    width: 0;
-    color: transparent;
+  .scroll-wrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(128, 128, 128, 0.4);
+      border-radius: 3px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  }
+
+  .event-list-wrapper{
+    display: flex;
+    flex-flow: column;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  .draggable {
+    -webkit-user-drag: element;
   }
 
   .image {
@@ -100,13 +135,6 @@ useSupabaseSync(CountdownSync)
       display: flex;
       align-items: center;
     }
-  }
-
-  .event-list-wrapper{
-    display: flex;
-    flex-flow: column;
-    gap: 0.6rem;
-    padding: 1rem;
   }
 
 }

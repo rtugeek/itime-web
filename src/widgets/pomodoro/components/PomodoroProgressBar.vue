@@ -49,16 +49,15 @@ const isShow = computed(() => {
 </script>
 
 <template>
-  <div v-show="isShow">
-    <div class="progress" :class="{ [position]: true }">
-      <ProgressBar :progress="pomodoro.progress" :color="color" :vertical="isVertical" />
-    </div>
+  <div v-show="isShow" class="progress" :class="{ [position]: true }">
+    <ProgressBar :progress="pomodoro.progress" :color="color" :vertical="isVertical" />
   </div>
 </template>
 
 <style scoped lang="scss">
 .progress{
   position: absolute;
+  pointer-events: none;
   &.bottom{
     bottom: 0;
     left: 0;

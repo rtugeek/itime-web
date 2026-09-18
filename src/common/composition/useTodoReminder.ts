@@ -1,24 +1,26 @@
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import dayjs from 'dayjs'
 import consola from 'consola'
 import type { BroadcastEvent } from '@widget-js/core'
 import { NotificationApi } from '@widget-js/core'
 import { useAppBroadcast } from '@widget-js/vue3'
+import { UserDataSync } from '@/data/sync/UserDataSync'
+import { useUserStore } from '@/stores/useUserStore'
 import { useTodoStore } from '@/stores/useTodoStore'
 import type { Todo } from '@/data/Todo'
 import { TodoRepository } from '@/data/repository/TodoRepository'
 import { useTodoBroadcast } from '@/common/broadcast/useTodoBroadcast'
 
 interface ReminderTimeout {
-  todoId: number
+  todoId: string
   timeoutId: number
 }
 
 export function useTodoReminder() {
   const todoStore = useTodoStore()
-  const todoRepository = new TodoRepository()
-  const timeouts = new Map<number, ReminderTimeout>()
-  let currentNotifyTodo: Todo = null
+  const userStore = useUserStore()
+  const timeouts = new Map<string, ReminderTimeout>()
+  let currentNotifyTodo: Todo | null = null
 
   /**
    * 检查todo的提醒相关字段是否有变化
@@ -34,15 +36,16 @@ export function useTodoReminder() {
 
   // 监听todo变化
   useTodoBroadcast({
+    onSynced: () => { void initializeReminders() },
     onUpdated: async (todo) => {
-      const existingTodo = await TodoRepository.findOne({ id: todo.id.toString() })
+      const existingTodo = await TodoRepository.findOne({ id: String(todo.id) })
       // 只有在提醒相关的字段变化时才更新提醒
       if (hasReminderChanged(existingTodo, todo)) {
-        updateReminder(todo.id)
+        updateReminder((String(todo.id)))
       }
     },
     onDeleted: (todo) => {
-      clearReminder(todo.id)
+      clearReminder((String(todo.id)))
     },
     onInserted: (todo) => {
       // 新增的todo如果有提醒，则设置提醒
@@ -62,7 +65,7 @@ export function useTodoReminder() {
   }
 
   useAppBroadcast(['reminder-confirm'], (event: BroadcastEvent) => {
-    if (event.event == 'reminder-confirm') {
+    if (event.event == 'reminder-confirm' && currentNotifyTodo) {
       todoStore.finishTodo(currentNotifyTodo)
     }
   })
@@ -71,6 +74,8 @@ export function useTodoReminder() {
    * 设置单个提醒
    */
   function setReminder(todo: Todo) {
+    clearReminder((String(todo.id)))
+    if (todo.id == null || todo.deleteTime) { return }
     // 如果已经完成或者没有开启提醒，则不设置
     if (todo.completedDateTime || !todo.isReminderOn || !todo.reminderDateTime) {
       return
@@ -84,7 +89,7 @@ export function useTodoReminder() {
     }
 
     // 清除已存在的提醒
-    clearReminder(todo.id)
+    clearReminder((String(todo.id)))
 
     // 设置新的提醒
     const timeoutId = window.setTimeout(() => {
@@ -100,12 +105,12 @@ export function useTodoReminder() {
       })
       currentNotifyTodo = todo
       // 提醒后清除timeout记录
-      timeouts.delete(todo.id)
+      timeouts.delete((String(todo.id)))
     }, delay)
 
     // 保存timeout信息
-    timeouts.set(todo.id, {
-      todoId: todo.id,
+    timeouts.set((String(todo.id)), {
+      todoId: (String(todo.id)),
       timeoutId,
     })
 
@@ -115,7 +120,7 @@ export function useTodoReminder() {
   /**
    * 清除单个提醒
    */
-  function clearReminder(todoId: number) {
+  function clearReminder(todoId: string) {
     const timeout = timeouts.get(todoId)
     if (timeout) {
       window.clearTimeout(timeout.timeoutId)
@@ -139,7 +144,7 @@ export function useTodoReminder() {
    * 更新提醒
    * 当todo的提醒时间或状态发生变化时调用
    */
-  async function updateReminder(todoId: number) {
+  async function updateReminder(todoId: string) {
     const todo = await todoStore.find(todoId.toString())
     if (todo) {
       setReminder(todo)
@@ -153,12 +158,15 @@ export function useTodoReminder() {
    * 初始化所有提醒
    */
   async function initializeReminders() {
+    clearAllReminders()
     const todos = await TodoRepository.findReminderOn()
     for (const todo of todos) {
       setReminder(todo)
     }
     consola.info(`Initialized ${todos.length} reminders`)
   }
+
+  watch([UserDataSync.revision, () => userStore.userId], () => { void initializeReminders() })
 
   // 组件挂载时初始化提醒
   onMounted(() => {

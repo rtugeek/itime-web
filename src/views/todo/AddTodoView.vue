@@ -31,11 +31,11 @@ const todoStore = useTodoStore()
 const showDeleteDialog = ref(false)
 const isSaving = ref(false)
 const isDeleting = ref(false)
-const id = Number.parseInt((route.query.id ?? '0') as string)
+const id = String(route.query.id ?? '')
 const todo = reactive(TodoUtils.new())
 
-if (id > 0) {
-  todoStore.find(id.toString()).then((res) => {
+if (id) {
+  todoStore.find(id).then((res) => {
     if (res) {
       Object.assign(todo, res)
     }
@@ -106,7 +106,7 @@ async function handleDeleteConfirm() {
 
 <template>
   <section class="todo-editor">
-    <div class="editor-card">
+    <form class="editor-card" @submit.prevent="save">
       <div class="editor-section">
         <div class="editor-field">
           <div class="field-label">
@@ -115,7 +115,7 @@ async function handleDeleteConfirm() {
               {{ t('todo.content') }} <span class="required-mark" aria-hidden="true">*</span>
             </label>
           </div>
-          <Input id="todo-title" v-model="todo.title" :placeholder="t('todo.content')" />
+          <Input id="todo-title" v-model="todo.title" :placeholder="t('todo.content')" required />
         </div>
         <div class="editor-field">
           <div class="field-label">
@@ -136,20 +136,20 @@ async function handleDeleteConfirm() {
       </div>
 
       <footer class="editor-footer">
-        <Button v-if="id > 0" class="delete-button" type="button" variant="destructive" aria-label="删除待办" :disabled="isSaving" @click="confirmDelete">
+        <Button v-if="id" class="delete-button" type="button" variant="destructive" aria-label="删除待办" :disabled="isSaving" @click="confirmDelete">
           <Trash2 class="size-4" />
           {{ t('todo.delete') }}
         </Button>
         <Button type="button" variant="outline" @click="router.push({ name: 'Todo' })">
           {{ t('cancel') }}
         </Button>
-        <Button type="button" :disabled="isSaving" @click="save">
+        <Button type="submit" :disabled="isSaving">
           <Loader2 v-if="isSaving" class="size-4 animate-spin" />
           <Save v-else class="size-4" />
           {{ t('todo.save') }}
         </Button>
       </footer>
-    </div>
+    </form>
     <AlertDialog v-model:open="showDeleteDialog">
       <AlertDialogContent>
         <AlertDialogHeader>

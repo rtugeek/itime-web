@@ -6,7 +6,7 @@ const route = useRoute()
 
 <template>
   <BaseView :title="route.meta.title">
-    <div class="h-full">
+    <div class="h-full overflow-y-auto">
       <RouterView v-slot="{ Component }">
         <component :is="Component" />
       </RouterView>

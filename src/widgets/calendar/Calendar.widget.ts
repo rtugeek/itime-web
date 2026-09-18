@@ -15,7 +15,14 @@ const CalendarWidget = new Widget({
   maxHeight: 6,
   previewImage: '/images/preview_calendar.png',
   path: '/widget/calendar',
-  configPagePath: '/widget/config/calendar?frame=true&transparent=false',
+  configPagePath: '/widget/config/calendar?frame=true&transparent=false&width=900&height=700',
+  configPage: {
+    path: '/widget/config/calendar',
+    frame: true,
+    transparent: false,
+    width: 900,
+    height: 700,
+  },
 })
 
 export default CalendarWidget

@@ -15,7 +15,14 @@ const DeadlineWidget = new Widget({
   maxHeight: 2,
   previewImage: '/images/preview_deadline.png',
   path: '/widget/deadline',
-  configPagePath: '/widget/config/deadline?width=400&height=700&frame=true&transparent=false',
+  configPagePath: '/widget/config/deadline?frame=true&transparent=false&width=900&height=700',
+  configPage: {
+    path: '/widget/config/deadline',
+    frame: true,
+    transparent: false,
+    width: 900,
+    height: 700,
+  },
 })
 
 export default DeadlineWidget

@@ -1,19 +1,28 @@
-import consola from 'consola'
-import { BaseSync } from '@/data/sync/BaseSync'
+import { api } from '@/api/Api'
+import type { PageResult } from '@/api/ApiResult'
+import { UserDataSync } from '@/data/sync/UserDataSync'
+import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
+import { PomodoroSnapshotSync } from '@/data/sync/PomodoroSnapshotSync'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
-import { useSupabaseStore } from '@/stores/useSupabaseStore'
+import { useUserStore } from '@/stores/useUserStore'
 import type { BaseRemoteData } from '@/data/base/BaseData'
 
+interface HistoryDTO { id: number, sceneId: string, duration: number, startTime: string, name?: string | null, finishTime?: string | null }
+function fromDTO(item: HistoryDTO): RemotePomodoroHistory {
+  const finish = item.name ?? item.finishTime ?? ''
+  return { id: item.id, sceneId: item.sceneId, duration: item.duration, startTime: item.startTime, finishTime: finish, createTime: item.startTime, updateTime: finish || item.startTime }
+}
+
 export interface RemotePomodoroHistory extends BaseRemoteData {
-  user_id?: string
-  scene_id?: number
-  start_time?: string
-  finish_time?: string
+  userId?: string
+  sceneId?: string
+  startTime?: string
+  finishTime?: string
   duration?: number
 }
 
-class PomodoroHistorySyncImpl extends BaseSync<PomodoroHistory, RemotePomodoroHistory> {
+export class PomodoroHistorySyncImpl extends PomodoroSnapshotSync<PomodoroHistory, RemotePomodoroHistory> {
   constructor() {
     super('pomodoro_history')
   }
@@ -23,56 +32,44 @@ class PomodoroHistorySyncImpl extends BaseSync<PomodoroHistory, RemotePomodoroHi
   }
 
   async isLogin(): Promise<boolean> {
-    const supabaseClient = useSupabaseStore().client
-    const user = await supabaseClient.auth.getUser()
-    return !user.error
+    return useUserStore().isLogin
   }
 
   async getRemoteItems(): Promise<RemotePomodoroHistory[]> {
-    const supabaseClient = useSupabaseStore().client
-    const res = await supabaseClient.from('pomodoro_history').select('*')
-    if (res.error) {
-      consola.error(res.error)
-      throw res.error
+    const result: RemotePomodoroHistory[] = []
+    let page = 1
+    let hasNext = true
+    while (hasNext) {
+      // Do not use updateTime: the current history entity has no update timestamp.
+      const response = await api.get<unknown, PageResult<HistoryDTO>>('/pomodoro/history', { params: { page: page++, size: 100 } })
+      result.push(...response.data.map(fromDTO))
+      hasNext = response.hasNext
     }
-    else {
-      return res.data
-    }
+    return result
   }
 
   async pushToRemote(items: RemotePomodoroHistory[]): Promise<RemotePomodoroHistory[]> {
-    if (items.length > 0) {
-      consola.info('pushToRemote', items)
-      const supabaseClient = useSupabaseStore().client
-      const upsertItems = items.filter(it => it.uuid)
-      const insertItems = items.filter(it => !it.uuid)
-
-      const results: RemotePomodoroHistory[] = []
-
-      if (insertItems.length > 0) {
-        const insertResult = await supabaseClient.from('pomodoro_history').insert(insertItems).select()
-        if (insertResult.data) {
-          results.push(...insertResult.data)
-        }
-        if (insertResult.error) {
-          consola.error('insert error', insertResult.error)
-        }
-      }
-
-      if (upsertItems.length > 0) {
-        const upsertResult = await supabaseClient.from('pomodoro_history').upsert(upsertItems).select()
-        if (upsertResult.data) {
-          results.push(...upsertResult.data)
-        }
-        if (upsertResult.error) {
-          consola.error('upsert error', upsertResult.error)
-        }
-      }
-
-      return results
+    const result: RemotePomodoroHistory[] = []
+    for (const item of items) {
+      // Gson @SerializedName on finishTime is currently "name" in the server entity.
+      const dto: HistoryDTO = { id: Number(item.id), sceneId: item.sceneId!, duration: item.duration || 0, startTime: item.startTime!, name: item.finishTime || null }
+      result.push(fromDTO(await api.post<unknown, HistoryDTO>('/pomodoro/history', dto)))
     }
-    return []
+    return result
   }
+
+  async beforeSync() {
+    await UserDataSync.sync()
+    if (UserDataSync.error.value) { throw new Error(`场景同步未完成：${UserDataSync.error.value}`) }
+  }
+
+  async beforeUpload(history: PomodoroHistory) {
+    const scene = await PomodoroSceneRepository.get(history.sceneId)
+    if (!scene || scene.deleteTime) { throw new Error('记录所属场景不存在，已保留记录等待重试') }
+    if (Number(scene.userId) !== useUserStore().userId) { throw new Error('记录所属场景归属异常，已保留记录等待重试') }
+  }
+
+  deleteRemote(id: number) { return api.delete<unknown, void>(`/pomodoro/history/${id}`) }
 
   saveItem(item: PomodoroHistory, updateNeedSync: boolean = false): Promise<PomodoroHistory> {
     item.needSync = updateNeedSync
@@ -83,19 +80,16 @@ class PomodoroHistorySyncImpl extends BaseSync<PomodoroHistory, RemotePomodoroHi
     return localItems.map((localItem) => {
       const remoteItem: RemotePomodoroHistory = {
         id: localItem.id,
-        scene_id: localItem.sceneId,
+        sceneId: String(localItem.sceneId),
         duration: localItem.duration,
-        finish_time: localItem.finishTime,
-        start_time: localItem.startTime,
-        update_time: localItem.updateTime ? localItem.updateTime.toISOString() : new Date().toISOString(),
-        create_time: localItem.createTime ? localItem.createTime.toISOString() : new Date().toISOString(),
-      }
-      if (localItem.uuid) {
-        remoteItem.uuid = localItem.uuid
+        finishTime: localItem.finishTime,
+        startTime: localItem.startTime,
+        updateTime: localItem.updateTime ? new Date(localItem.updateTime).toISOString() : new Date().toISOString(),
+        createTime: localItem.createTime ? new Date(localItem.createTime).toISOString() : new Date().toISOString(),
       }
 
       if (localItem.deleteTime) {
-        remoteItem.delete_time = localItem.deleteTime.toISOString()
+        remoteItem.deleteTime = new Date(localItem.deleteTime).toISOString()
       }
 
       return remoteItem
@@ -106,15 +100,14 @@ class PomodoroHistorySyncImpl extends BaseSync<PomodoroHistory, RemotePomodoroHi
     return remotes.map((item) => {
       const history: PomodoroHistory = {
         id: typeof item.id === 'string' ? Number.parseInt(item.id) : (item.id as number),
-        sceneId: item.scene_id || 0,
+        sceneId: item.sceneId || '',
         duration: item.duration || 0,
-        finishTime: item.finish_time || '',
-        startTime: item.start_time || '',
-        uuid: item.uuid,
-        tableId: item.uuid,
-        createTime: item.create_time ? new Date(item.create_time) : undefined,
-        updateTime: item.update_time ? new Date(item.update_time) : undefined,
-        deleteTime: item.delete_time ? new Date(item.delete_time) : undefined,
+        finishTime: item.finishTime || '',
+        startTime: item.startTime || '',
+
+        createTime: item.createTime ? new Date(item.createTime) : undefined,
+        updateTime: item.updateTime ? new Date(item.updateTime) : undefined,
+        deleteTime: item.deleteTime ? new Date(item.deleteTime) : undefined,
       }
       return history
     })

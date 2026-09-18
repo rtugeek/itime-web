@@ -2,7 +2,6 @@
 import { type PropType, computed, ref } from 'vue'
 import { MenuApi } from '@widget-js/core'
 import { useIntervalFn } from '@vueuse/core'
-import dayjs from 'dayjs'
 import type { CountdownEvent } from '@/data/CountdownEvent'
 
 const props = defineProps({ event: { type: Object as PropType<CountdownEvent>, required: true } })
@@ -12,11 +11,11 @@ function onItemClick() {
     menuItems: [
       {
         label: '编辑',
-        id: `edit-${props.event.id}`,
+        id: `edit-${props.event.id || props.event.id}`,
       },
       {
         label: '删除',
-        id: `delete-${props.event.id}`,
+        id: `delete-${props.event.id || props.event.id}`,
       },
     ],
   })
@@ -71,6 +70,7 @@ useIntervalFn(() => {
   transition: all 0.5s ease;
 
   .info {
+    color: #000;
     padding: 6px 0;
   }
 

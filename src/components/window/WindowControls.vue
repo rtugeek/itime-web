@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<{
 })
 
 async function toggleMaximize() {
-  if (isMaximized.value) {
+  if (await BrowserWindowApi.isMaximized()) {
     await BrowserWindowApi.unmaximize()
   }
   else {

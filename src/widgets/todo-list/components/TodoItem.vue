@@ -41,10 +41,8 @@ const isCompleted = computed(() => {
 <template>
   <div class="todo-item">
     <div class="flex items-center">
-      <ElCheckbox :checked="isCompleted" @click="finish">
-        <span />
-      </ElCheckbox>
-      <div class="todo flex flex-col gap-1" style="line-height: 1.2">
+      <Checkbox class="mr-2" :checked="isCompleted" @click="finish" />
+      <div class="todo flex ml-2 flex-col gap-1" style="line-height: 1.2">
         <p :style=" { 'text-decoration': isCompleted ? 'line-through' : 'none' }">
           {{ todo.title }}
         </p>
@@ -75,12 +73,6 @@ const isCompleted = computed(() => {
 </template>
 
 <style scoped lang="scss">
-.el-checkbox.is-checked {
-  .todo {
-    text-decoration-line: line-through;
-  }
-}
-
 p {
   font-weight: normal;
   margin: 0;

@@ -15,7 +15,14 @@ const CountdownListWidget = new Widget({
   categories: ['time', 'countdown'],
   maxHeight: 6,
   path: '/widget/countdown/list',
-  configPagePath: '/widget/config/countdown/list?frame=true&transparent=false&width=600&height=400',
+  configPagePath: '/widget/config/countdown/list?frame=true&transparent=false&width=900&height=700',
+  configPage: {
+    path: '/widget/config/countdown/list',
+    frame: true,
+    transparent: false,
+    width: 900,
+    height: 700,
+  },
 })
 
 export default CountdownListWidget

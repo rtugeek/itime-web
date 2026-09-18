@@ -1,75 +1,88 @@
-import Dexie, { type Table } from 'dexie'
-import type { Birthday } from '@/data/Birthday'
+import { nanoid } from 'nanoid'
+import type { UserData } from '@/data/UserData'
+import type { BirthdayPayload, IBirthday } from '@/data/Birthday'
+import { UserDataRepository } from '@/data/repository/UserDataRepository'
 
-export class BirthdayDatabase extends Dexie {
-  birthdays!: Table<Birthday>
-
-  constructor() {
-    super('birthday-v1')
-
-    this.version(1).stores({
-      birthdays: '++id, year, month, dayOfMonth, dateType, tableId, userId, createTime, updateTime',
-    })
+function toData<T extends IBirthday>(birthday: T): BirthdayPayload {
+  return {
+    name: birthday.name,
+    year: birthday.year,
+    month: birthday.month,
+    dayOfMonth: birthday.dayOfMonth,
+    dateType: birthday.dateType,
+    introduction: birthday.introduction ?? '',
   }
 }
 
-const db = new BirthdayDatabase()
+function fromUserData(item: UserData<BirthdayPayload>): IBirthday {
+  return {
+    dataType: 'birthday',
+    id: item.id,
+    userId: item.userId,
+    name: item.data.name,
+    year: item.data.year,
+    month: item.data.month,
+    dayOfMonth: item.data.dayOfMonth,
+    dateType: item.data.dateType,
+    introduction: item.data.introduction ?? '',
+    deleteTime: item.deleteTime ? new Date(item.deleteTime) : null,
+    createTime: new Date(item.createTime),
+    updateTime: new Date(item.updateTime),
+    sortOrder: item.sortOrder ?? 0,
+    needSync: item.needSync,
+    lastSyncedAt: item.lastSyncedAt,
+  }
+}
+
+function toUserData(birthday: IBirthday): UserData<BirthdayPayload> {
+  return {
+    id: birthday.id || nanoid(),
+    userId: birthday.userId ?? 0,
+    dataType: 'birthday',
+    data: toData(birthday),
+    sortOrder: birthday.sortOrder ?? 0,
+    deleteTime: birthday.deleteTime ?? null,
+    createTime: birthday.createTime,
+    updateTime: birthday.updateTime,
+    needSync: birthday.needSync,
+    lastSyncedAt: birthday.lastSyncedAt,
+  }
+}
 
 export class BirthdayRepository {
-  static async findOne(options: { id: string }): Promise<Birthday | undefined> {
-    return db.birthdays.get(Number(options.id))
+  static async findOne(options: { id: string }): Promise<IBirthday | undefined> {
+    const item = await UserDataRepository.findOne<BirthdayPayload>({ id: options.id })
+    return item?.dataType === 'birthday' ? fromUserData(item) : undefined
   }
 
-  static async findAll(): Promise<Birthday[]> {
-    return db.birthdays.toArray()
+  static async findAll(includeRemoved = false): Promise<IBirthday[]> {
+    const items = await UserDataRepository.findByDataType<BirthdayPayload>('birthday', includeRemoved)
+    return items.map(fromUserData)
   }
 
-  static async findByTableId(tableId: number): Promise<Birthday[]> {
-    return db.birthdays.filter(birthday => birthday.tableId === tableId).toArray()
+  static async save(birthday: IBirthday, needSync = false, preserveTime = false): Promise<IBirthday> {
+    const user = toUserData(birthday)
+    const saved = await UserDataRepository.save<BirthdayPayload>(user, needSync, preserveTime)
+    return fromUserData(saved)
   }
 
-  static async save(birthday: Birthday, needSync: boolean = false): Promise<Birthday> {
-    const now = new Date().toISOString()
-    birthday.needSync = needSync
-    if (birthday.id) {
-      // Update existing birthday
-      const updatedBirthday = {
-        ...birthday,
-        updateTime: now,
-      }
-      await db.birthdays.put(updatedBirthday)
-      return updatedBirthday
-    }
-    else {
-      // Add new birthday
-      const id = await db.birthdays.add({
-        ...birthday,
-        createTime: now,
-        updateTime: now,
-      } as Birthday) as number
-      return {
-        ...birthday,
-        createTime: now,
-        updateTime: now,
-        id,
-      }
-    }
+  static async softRemove(birthday: IBirthday | string): Promise<IBirthday> {
+    const id = typeof birthday === 'string' ? birthday : String(birthday.id)
+    const removed = await UserDataRepository.softRemove(id)
+    return fromUserData(removed as UserData<BirthdayPayload>)
   }
 
-  static async saveAll(birthdays: Birthday[], needSync: boolean = false): Promise<Birthday[]> {
+  static async saveAll(birthdays: IBirthday[], needSync: boolean = false): Promise<IBirthday[]> {
+    const result: IBirthday[] = []
     for (const birthday of birthdays) {
-      await this.save(birthday, needSync)
+      result.push(await this.save(birthday, needSync))
     }
-    return birthdays
+    return result
   }
 
-  static async remove(birthday: Birthday | string): Promise<Birthday> {
-    const id = typeof birthday === 'string' ? Number(birthday) : birthday.id
-    const birthdayToDelete = await db.birthdays.get(id)
-    if (!birthdayToDelete) {
-      throw new Error(`Birthday with id ${id} not found`)
-    }
-    await db.birthdays.delete(id)
-    return birthdayToDelete
+  static async remove(birthday: IBirthday | string): Promise<IBirthday> {
+    const id = typeof birthday === 'string' ? birthday : String(birthday.id)
+    const removed = await UserDataRepository.remove(id)
+    return fromUserData(removed as UserData<BirthdayPayload>)
   }
 }

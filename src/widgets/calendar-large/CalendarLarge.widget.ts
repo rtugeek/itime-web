@@ -16,7 +16,14 @@ const CalendarLargeWidget = new Widget({
   previewImage: '/images/preview_calendar_large.png',
   path: '/widget/calendar_large',
   configPagePath:
-    '/widget/config/calendar_large?width=600&height=500&frame=true&transparent=false',
+    '/widget/config/calendar_large?frame=true&transparent=false&width=900&height=700',
+  configPage: {
+    path: '/widget/config/calendar_large',
+    frame: true,
+    transparent: false,
+    width: 900,
+    height: 700,
+  },
 })
 
 export default CalendarLargeWidget

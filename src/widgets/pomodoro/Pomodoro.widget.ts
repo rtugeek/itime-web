@@ -11,7 +11,8 @@ const PomodoroWidget = new BackgroundWidget({
   path: '/widget/pomodoro',
   requiredAppVersion: '24.6.2',
   synchronizable: true,
-  configPagePath: '/settings?frame=true&transparent=false&width=400&height=700',
+  movable: true,
+  configPagePath: '/settings?frame=true&transparent=false&width=900&height=700',
   configPage: {
     path: '/settings',
     width: 900,
@@ -20,6 +21,7 @@ const PomodoroWidget = new BackgroundWidget({
     transparent: false,
   },
   browserWindowOptions: {
+    movable: true,
     transparent: false,
     frame: false,
     backgroundMaterial: 'acrylic',

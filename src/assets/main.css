@@ -4,16 +4,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 * {
-  margin: 0;
   user-select: none;
   -webkit-user-drag: none;
 }
 
 :root {
-  --color-on-background: rgba(0, 0, 0, 0.8);
+  color-scheme: light;
+  --color-on-background: var(--foreground);
   --background-color: #F8F8F8;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -54,11 +54,6 @@ h1,h2,h3,h4,h5{
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --color-on-background: #c4c4c4;
-    --background-color: #0F0F0F
-  }
-
   .nut-cell-group .nut-cell-group__wrap{
     box-shadow: none;
     background-color: transparent;
@@ -104,19 +99,19 @@ a:-webkit-any-link {
 
 /* 滚动条轨道 */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--muted);
   border-radius: 10px;
 }
 
 /* 滚动条滑块 */
 ::-webkit-scrollbar-thumb {
-  background: #d8d8d8;
+  background: var(--border);
   border-radius: 10px;
 }
 
 /* 当用户悬停在滚动条上时 */
 ::-webkit-scrollbar-thumb:hover {
-  background: #e5e5e5;
+  background: var(--muted-foreground);
 }
 
 /* 可选：滚动条按钮（上下箭头等） */
@@ -164,6 +159,9 @@ a:-webkit-any-link {
 }
 
 .dark {
+  color-scheme: dark;
+  --color-on-background: var(--foreground);
+  --background-color: var(--background);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -189,8 +187,8 @@ a:-webkit-any-link {
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
@@ -200,17 +198,10 @@ a:-webkit-any-link {
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    user-select: none;
+    -webkit-user-drag: none;
   }
   body {
     @apply bg-transparent text-foreground;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }

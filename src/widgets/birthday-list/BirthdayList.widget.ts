@@ -15,7 +15,14 @@ const BirthdayListWidget = new Widget({
   categories: ['time', 'countdown'],
   maxHeight: 6,
   path: '/widget/birthday_list',
-  configPagePath: '/widget/config/birthday_list?frame=true&transparent=false&width=600&height=400',
+  configPagePath: '/widget/config/birthday_list?frame=true&transparent=false&width=900&height=700',
+  configPage: {
+    path: '/widget/config/birthday_list',
+    frame: true,
+    transparent: false,
+    width: 900,
+    height: 700,
+  },
 })
 
 export default BirthdayListWidget

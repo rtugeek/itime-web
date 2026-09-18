@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { BrowserWindowApi, MenuApi, TrayApi, type WidgetMenuItem } from '@widget-js/core'
-import { useMenuListener, useWidget } from '@widget-js/vue3'
+import { BrowserWindowApi, Channel, MenuApi, TrayApi, type WidgetMenuItem } from '@widget-js/core'
+import { useIpcListener, useMenuListener, useWidget } from '@widget-js/vue3'
 import { nextTick, onMounted, onUnmounted } from 'vue'
-import { useStorage } from '@vueuse/core'
 import { Check, Pause, PlayOne, Right } from '@icon-park/vue-next'
+import { Grip } from '@lucide/vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { AppConfig } from '@/common/AppConfig'
@@ -11,7 +11,6 @@ import { AppConfig } from '@/common/AppConfig'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 import { usePomodoroWindowStateStore } from '@/widgets/pomodoro/usePomodoroWindowStateStore'
 import PomodoroProgressBar from '@/widgets/pomodoro/components/PomodoroProgressBar.vue'
-import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { useTray } from '@/common/composition/useTray'
 import { createWindowSizeGuard } from '@/widgets/pomodoro/windowSizeGuard'
 
@@ -20,6 +19,13 @@ const { t } = useI18n()
 const pomodoroStore = usePomodoroStore()
 
 const { stickScreenEdge } = usePomodoroWindowStateStore()
+let positionReady = false
+
+useIpcListener(Channel.BROWSER_WINDOW, (event) => {
+  if (positionReady && event === BrowserWindowApi.EVENT_MOVED) {
+    void stickScreenEdge.onMoved()
+  }
+})
 
 let stopWindowSizeGuard: (() => void) | undefined
 let disposed = false
@@ -27,20 +33,25 @@ let disposed = false
 onUnmounted(() => {
   disposed = true
   stopWindowSizeGuard?.()
+  stickScreenEdge.dispose()
+  document.body.removeEventListener('mouseenter', onWindowEnter)
+  document.body.removeEventListener('mouseleave', onWindowLeave)
 })
+
+function onWindowEnter() {
+  stickScreenEdge.cancelHide()
+  if (!stickScreenEdge.isShowed) {
+    void stickScreenEdge.showWindow()
+  }
+}
+
+function onWindowLeave() {
+  stickScreenEdge.startHideWindow()
+}
 
 const { scenes, currentScene, remindText, isRunning, status, currentSceneId } = storeToRefs(pomodoroStore)
 
-const defaultPomodoro = useStorage(AppConfig.KEY_POMODORO_INIT, false)
-
 pomodoroStore.loadScenes()
-onMounted(async () => {
-  await nextTick()
-  if (!defaultPomodoro.value) {
-    PomodoroSceneRepository.createDefaultScenes()
-    defaultPomodoro.value = true
-  }
-})
 
 function onSceneClick() {
   if (isRunning.value) {
@@ -65,7 +76,7 @@ useMenuListener((type, menu) => {
     BrowserWindowApi.close()
   }
   else if (menu.id == 'reposition') {
-    BrowserWindowApi.center()
+    stickScreenEdge.resetPosition()
   }
   else if (menu.id == 'addScene') {
     BrowserWindowApi.openUrl('/pomodoro/scene/add?frame=true&transparent=false&width=400&height=700')
@@ -88,14 +99,22 @@ onMounted(async () => {
     maxHeight: AppConfig.SIZE_POMODORO_WINDOW,
     alwaysOnTop: true,
     resizable: false,
+    movable: true,
   })
+  await BrowserWindowApi.setMovable(true)
   if (!disposed) {
     stopWindowSizeGuard = createWindowSizeGuard(BrowserWindowApi, AppConfig.SIZE_POMODORO_WINDOW)
+    document.body.addEventListener('mouseenter', onWindowEnter)
+    document.body.addEventListener('mouseleave', onWindowLeave)
+    await stickScreenEdge.resetPosition()
+    positionReady = !disposed
+    if (!disposed) { stickScreenEdge.startHideWindow() }
   }
 })
 
 useTray({
   image: '/pomodoro.ico',
+  onClick: onWindowEnter,
   onMouseEnter: () => {
     BrowserWindowApi.setAlwaysOnTop(true)
     stickScreenEdge.showWindow()
@@ -118,11 +137,13 @@ TrayApi.setContextMenu([
 </script>
 
 <template>
-  <div>
+  <div class="pomodoro-root">
     <div
-      v-drag-window
       class="pomodoro flex flex-col gap-2 justify-center items-center overflow-hidden" :class="{ [status]: true }"
     >
+      <div class="pomodoro-drag-handle" :title="t('pomodoro.dragWindow')" :aria-label="t('pomodoro.dragWindow')" role="img">
+        <Grip :size="16" aria-hidden="true" />
+      </div>
       <template v-if="currentScene">
         <div class="scene">
           <div class="flex gap-1 items-center cursor-pointer" @click="onSceneClick">
@@ -131,7 +152,7 @@ TrayApi.setContextMenu([
             <Right v-show="status === 'stop'" />
           </div>
         </div>
-        <div v-drag-window class="text-5xl font-bold time rubik-regular">
+        <div class="text-5xl font-bold time rubik-regular">
           {{ remindText }}
         </div>
         <div class="flex gap-4 buttons">
@@ -158,6 +179,12 @@ TrayApi.setContextMenu([
 body {
   background-color: transparent;
   overflow: hidden;
+}
+
+.pomodoro-root {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
 }
 
 @keyframes wiggle {
@@ -197,9 +224,10 @@ body {
 }
 
 .pomodoro {
+  user-select: none;
   position: relative;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   border-radius: 22px;
   overflow: hidden;
   color: rgb(0, 16, 24);
@@ -215,6 +243,10 @@ body {
     }
 
     .buttons {
+      opacity: 1;
+    }
+
+    .pomodoro-drag-handle {
       opacity: 1;
     }
   }
@@ -234,6 +266,23 @@ body {
       animation-iteration-count: infinite;
     }
   }
+}
+
+.pomodoro-drag-handle {
+  app-region: drag;
+  -webkit-app-region: drag;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
 }
 
 .btn {

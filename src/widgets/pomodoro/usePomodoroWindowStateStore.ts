@@ -1,14 +1,21 @@
-import { onMounted, watch } from 'vue'
-import { useStickScreenEdge } from '@widget-js/vue3'
+import { watch } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 
-import { BrowserWindowApi, delay } from '@widget-js/core'
+import { BrowserWindowApi, DeviceApi } from '@widget-js/core'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
+import { createEdgeWindow } from '@/widgets/pomodoro/edgeWindow'
 
 export const usePomodoroWindowStateStore = defineStore('pomodoroWindowStateStore', () => {
   const pomodoroStore = usePomodoroStore()
   const { status } = storeToRefs(pomodoroStore)
-  const stickScreenEdge = useStickScreenEdge({ storageKey: 'overlap_page_state', peakSize: 6 })
+  const stickScreenEdge = createEdgeWindow({
+    getBounds: () => BrowserWindowApi.getBounds(),
+    getWorkArea: async point => (await DeviceApi.getDisplayNearestPoint(point)).workArea,
+    setBounds: bounds => BrowserWindowApi.setBounds(bounds),
+    show: () => BrowserWindowApi.show(),
+    setAlwaysOnTop: value => BrowserWindowApi.setAlwaysOnTop(value),
+    isDraggingWindow: () => BrowserWindowApi.isDraggingWindow(),
+  }, 'bottom')
   watch(status, (value, oldValue) => {
     if (value == 'waiting') {
       stickScreenEdge.showWindow().then(() => {
@@ -21,13 +28,6 @@ export const usePomodoroWindowStateStore = defineStore('pomodoroWindowStateStore
         stickScreenEdge.startHideWindow()
       })
     }
-  })
-
-  BrowserWindowApi.center()
-  stickScreenEdge.isAutoHide.value = true
-  onMounted(async () => {
-    await delay(3000)
-    stickScreenEdge.stickToEdge()
   })
 
   return {

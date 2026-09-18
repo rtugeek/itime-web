@@ -1,26 +1,29 @@
 <script setup lang="ts">
 import { ChevronRight } from '@lucide/vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Badge } from '@/components/ui/badge'
 import { ItemActions, ItemContent, ItemMedia, ItemTitle } from '@/components/ui/item'
 import { PomodoroUtils } from '@/utils/PomodoroUtils'
-import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
-import type { PomodoroScene } from '@/data/PomodoroScene'
+import { usePomodoroStore } from '@/stores/usePomodoroStore'
+import type { IPomodoroScene } from '@/data/PomodoroScene'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 
 const prop = defineProps({
   scene: {
-    type: Object as PropType<PomodoroScene>,
+    type: Object as PropType<IPomodoroScene>,
     required: true,
   },
 })
 const { t } = useI18n()
+const pomodoroStore = usePomodoroStore()
 const histories = ref<PomodoroHistory[]>([])
-PomodoroHistoryRepository.findBySceneId(prop.scene.id!).then((his) => {
-  histories.value = his
-})
+async function loadHistories() {
+  histories.value = await pomodoroStore.findHistoryBySceneId(prop.scene.id!)
+}
+void loadHistories()
+watch(() => pomodoroStore.dataRevision, loadHistories)
 const totalDuration = computed(() => {
   return PomodoroUtils.getTotalHour(histories.value)
 })

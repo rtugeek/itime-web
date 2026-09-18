@@ -15,7 +15,7 @@ import {
   NumberFieldInput,
 } from '@/components/ui/number-field'
 
-const pomoSettings = useStorage<PomodoroSettings>(AppConfig.KEY_POMODORO_SETTINGS, getDefaultPomodoroSettings())
+const pomoSettings = useStorage<PomodoroSettings>(AppConfig.KEY_POMODORO_SETTINGS, getDefaultPomodoroSettings(), undefined, { mergeDefaults: true })
 const { t } = useI18n()
 </script>
 

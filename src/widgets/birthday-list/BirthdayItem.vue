@@ -2,11 +2,11 @@
 import { Cake } from '@lucide/vue'
 import { type PropType, computed } from 'vue'
 import { MenuApi } from '@widget-js/core'
-import type { Birthday } from '@/data/Birthday'
-import { BirthdayWrapper } from '@/data/BirthdayWrapper'
+import type { IBirthday } from '@/data/Birthday'
+import { Birthday } from '@/data/Birthday'
 
-const props = defineProps({ birthday: { type: Object as PropType<Birthday>, required: true } })
-const birthdayWrapper = computed(() => new BirthdayWrapper(props.birthday))
+const props = defineProps({ birthday: { type: Object as PropType<IBirthday>, required: true } })
+const birthdayModel = computed(() => new Birthday(props.birthday))
 function onItemClick() {
   MenuApi.showMenu({
     menuItems: [
@@ -22,7 +22,7 @@ function onItemClick() {
   })
 }
 
-const isToday = computed(() => birthdayWrapper.value.isToday())
+const isToday = computed(() => birthdayModel.value.isToday())
 </script>
 
 <template>
@@ -39,7 +39,7 @@ const isToday = computed(() => birthdayWrapper.value.isToday())
             农
           </div>
           <div class="date-value">
-            {{ birthdayWrapper.toString() }}
+            {{ birthdayModel.format() }}
           </div>
         </div>
         <div class="date">
@@ -47,7 +47,7 @@ const isToday = computed(() => birthdayWrapper.value.isToday())
             公
           </div>
           <div class="date-value">
-            {{ birthdayWrapper.toString(0) }}
+            {{ birthdayModel.format(0) }}
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@ const isToday = computed(() => birthdayWrapper.value.isToday())
       </template>
       <template v-else>
         <div class="qty">
-          {{ birthdayWrapper.countdown() }}
+          {{ birthdayModel.countdown() }}
         </div>
         <div class="unit">
           天

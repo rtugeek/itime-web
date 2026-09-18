@@ -65,7 +65,7 @@ function close() {
   box-sizing: border-box;
 }
 .navbar {
-  border-bottom: 1px solid hsl(var(--border));
-  background: hsl(var(--background));
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
 }
 </style>

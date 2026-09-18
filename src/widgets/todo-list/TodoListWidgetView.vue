@@ -3,13 +3,11 @@ import { ref } from 'vue'
 import { useElementSize, useStorage } from '@vueuse/core'
 import { AddOne, ArrowCircleLeft, History } from '@icon-park/vue-next'
 import { useContextMenu, useWidget } from '@widget-js/vue3'
-import type { WidgetMenuItem } from '@widget-js/core'
+import { DefaultWidgetTheme, type WidgetMenuItem } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
 import TodoList from '@/widgets/todo-list/components/TodoList.vue'
 import { WindowUtils } from '@/utils/WindowUtils'
 import { useTodoReminder } from '@/common/composition/useTodoReminder'
-import { useSupabaseSync } from '@/common/composition/useSupabaseSync'
-import { TodoSync } from '@/data/sync/TodoSync'
 import UserIcon from '@/widgets/todo-list/components/UserIcon.vue'
 
 const { t } = useI18n()
@@ -24,15 +22,13 @@ const { height } = useElementSize(root)
 function openAddPage() {
   WindowUtils.open('/todo/add')
 }
-useWidget()
+useWidget({ defaultTheme: DefaultWidgetTheme.copy() })
 useTodoReminder()
 useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMenuClick: (menu: WidgetMenuItem) => {
   if (menu.id == 'app-settings') {
     WindowUtils.open('/settings')
   }
 } })
-
-useSupabaseSync(TodoSync)
 </script>
 
 <template>
@@ -50,7 +46,10 @@ useSupabaseSync(TodoSync)
         </div>
       </div>
       <div class="list-body">
-        <el-scrollbar :height="height - 48" wrap-style="overflow-x:hidden;">
+        <div
+          class="scroll-wrapper"
+          :style="{ height: `${height - 48}px` }"
+        >
           <TodoList
             v-show="viewType === 'default'"
           />
@@ -59,7 +58,7 @@ useSupabaseSync(TodoSync)
             v-show="viewType === 'history'"
             is-completed
           />
-        </el-scrollbar>
+        </div>
       </div>
     </div>
   </widget-wrapper>
@@ -95,6 +94,20 @@ useSupabaseSync(TodoSync)
     color: var(--widget-color);
     font-size: 1.1rem;
     height: calc(100% - 48px);
+    .scroll-wrapper {
+      overflow-y: auto;
+      overflow-x: hidden;
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(128, 128, 128, 0.4);
+        border-radius: 3px;
+      }
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+    }
     .list {
       padding: 16px;
       display: flex;

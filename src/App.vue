@@ -1,11 +1,22 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useAppLanguage } from '@widget-js/vue3'
+import { UserDataSync } from '@/data/sync/UserDataSync'
+import { PomodoroHistorySync } from '@/data/sync/PomodoroHistorySync'
 import { i18n } from '@/i18n'
-import { useSupabaseStore } from '@/stores/useSupabaseStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { useSyncStore } from '@/stores/useSyncStore'
 
-const supabaseStore = useSupabaseStore()
-supabaseStore.init()
+const userStore = useUserStore()
+useSyncStore()
+void userStore.init()
+watch(() => userStore.user?.uuid, (uuid) => {
+  if (uuid) {
+    void UserDataSync.sync()
+    void PomodoroHistorySync.sync()
+  }
+}, { immediate: true })
 
 function updateLang(lang: string) {
   i18n.global.locale = lang.includes('zh') ? 'zh' : 'en'

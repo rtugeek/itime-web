@@ -1,8 +1,15 @@
 import dayjs from 'dayjs'
+import { nanoid } from 'nanoid'
 import { Lunar } from 'lunar-typescript'
 import { BaseRecurrentEvent } from '@/data/base/BaseRecurrentEvent'
 
+export type CountdownPayload = Pick<CountdownEvent, 'name' | 'note' | 'image' | 'dateTime' | 'sourceDateTime' | 'dateType' | 'recurrence' | 'periodType'> & { archiveTime?: string }
+
 export class CountdownEvent extends BaseRecurrentEvent {
+  declare userId?: number
+  image?: string
+  archiveTime?: Date
+  sortOrder?: number
   name: string
   /**
    * 当前公历日期 ISO格式
@@ -37,6 +44,7 @@ export class CountdownEvent extends BaseRecurrentEvent {
 
   constructor(name: string, sourceDateTime: Date, dateType: number = 0, recurrence?: string, note?: string) {
     super(dateType)
+    this.id = nanoid()
     this.name = name
     this.setSourceDateTime(sourceDateTime)
     this.recurrence = recurrence

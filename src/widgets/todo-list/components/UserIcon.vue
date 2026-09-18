@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { Refresh, RightUser, User } from '@icon-park/vue-next'
 import { storeToRefs } from 'pinia'
-import { AppApi } from '@widget-js/core'
+import { useRouter } from 'vue-router'
 import { useTodoStore } from '@/stores/useTodoStore'
-import { useSupabaseStore } from '@/stores/useSupabaseStore'
+import { useUserStore } from '@/stores/useUserStore'
 
+const router = useRouter()
 function click() {
-  AppApi.showAppWindow('/user/profile')
+  router.push('/user/sign/in')
 }
 
 const todoStore = useTodoStore()
 const { syncing } = storeToRefs(todoStore)
-const supabaseStore = useSupabaseStore()
-const { isLogin } = storeToRefs(supabaseStore)
+const userStore = useUserStore()
+const { isLogin } = storeToRefs(userStore)
 </script>
 
 <template>

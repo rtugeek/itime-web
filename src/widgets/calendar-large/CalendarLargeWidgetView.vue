@@ -2,7 +2,7 @@
 import { useAppLanguage, useWidget } from '@widget-js/vue3'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { onScopeDispose, ref, watch } from 'vue'
 import type { CalendarOptions, EventClickArg } from '@fullcalendar/core'
 import rrulePlugin from '@fullcalendar/rrule'
 import icalendarPlugin from '@fullcalendar/icalendar'
@@ -31,9 +31,11 @@ const { todos } = storeToRefs(todoStore)
 const festivalEventSource = useFestivalEventSource()
 const lunarEventSource = useLunarEventSource()
 let contextMenuClickAt = Date.now()
-document.addEventListener('contextmenu', () => {
+function onContextMenu() {
   contextMenuClickAt = Date.now()
-})
+}
+document.addEventListener('contextmenu', onContextMenu)
+onScopeDispose(() => document.removeEventListener('contextmenu', onContextMenu))
 const calendarOptions = ref<CalendarOptions>({
   plugins: [dayGridPlugin, rrulePlugin, interactionPlugin, icalendarPlugin],
   weekNumbers: false,
@@ -62,33 +64,26 @@ watch(() => calendarConfig.value.firstDayOfWeek, (newVal) => {
   calendarOptions.value.firstDay = newVal
 })
 
-watch(() => todos.value, (newVal) => {
+watch([todos, calendarRef], ([newVal]) => {
   const calendar = calendarRef.value?.getApi()
-  // 清空事件
-  if (calendar) {
-    const events = calendar.getEvents()
-    for (const removedEvent of events) {
+  if (!calendar) { return }
+  calendar.batchRendering(() => {
+    for (const removedEvent of calendar.getEvents()) {
       if (removedEvent.extendedProps.category == 'default') {
-        calendar?.getEventById(removedEvent.id)?.remove()
+        removedEvent.remove()
       }
     }
-  }
-  for (const addedEvent of newVal) {
-    calendar?.addEvent({
-      id: addedEvent.id,
-      title: addedEvent.title,
-      start: addedEvent.dueDateTime,
-      rrule: addedEvent.recurrence,
-      extendedProps: {
-        category: 'default',
-      },
-    })
-  }
-}, { deep: true, immediate: true })
-
-onMounted(async () => {
-  await nextTick()
-})
+    for (const addedEvent of newVal) {
+      calendar.addEvent({
+        id: addedEvent.id,
+        title: addedEvent.title,
+        start: addedEvent.dueDateTime,
+        rrule: addedEvent.recurrence,
+        extendedProps: { category: 'default' },
+      })
+    }
+  })
+}, { deep: true, immediate: true, flush: 'post' })
 useAppLanguage({
   onLoad: (code) => {
     calendarOptions.value.locale = code

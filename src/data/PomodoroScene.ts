@@ -1,39 +1,49 @@
-import type { BaseData } from '@/data/base/BaseData'
+let lastSceneId = 0
 
-export interface PomodoroScene extends BaseData {
-  tableId?: string
-  id?: number
+/** 使用毫秒时间戳，同一毫秒内连续创建时递增，避免 ID 重复。 */
+export function createPomodoroSceneId(): string {
+  lastSceneId = Math.max(Date.now(), lastSceneId + 1)
+  return String(lastSceneId)
+}
+
+export interface IPomodoroScene {
+  /** 客户端与服务器共用的数字字符串 ID，兼容历史记录的 BIGINT sceneId */
+  id?: string
+  userId?: number | string
   createTime?: Date
   updateTime?: Date
   deleteTime?: Date
+  needSync?: boolean
+  lastSyncedAt?: Date
+  sortOrder?: number
   name: string
   duration: number
   icon: string
-  userId?: string
-  needSync?: boolean
 }
 
-export const DefaultScenes: PomodoroScene[] = [
+export type PomodoroScenePayload = Pick<IPomodoroScene, 'name' | 'duration' | 'icon'>
+
+export const DefaultScenes: IPomodoroScene[] = [
   {
-    id: 1,
+    id: createPomodoroSceneId(),
     name: '阅读',
     duration: 0,
     icon: '📖',
   },
   {
-    id: 2,
+    id: createPomodoroSceneId(),
     name: '敲代码',
-    icon: '👩‍💻',
+    icon: '👨‍💻',
     duration: 0,
   },
   {
-    id: 2,
+    id: createPomodoroSceneId(),
     name: '打工',
     icon: '🔨',
     duration: 0,
   },
   {
-    id: 3,
+    id: createPomodoroSceneId(),
     name: '摸鱼',
     icon: '🐟',
     duration: 0,

@@ -1,4 +1,6 @@
 export interface User {
+  id?: number
+  userId?: number
   phone: string
   avatar?: string
   nick?: string

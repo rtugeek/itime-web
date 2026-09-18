@@ -47,7 +47,7 @@ const animFillProgressPercent = useUnitTransition(deathGroupFillProgress, {
 useWidgetTheme({ defaultTheme: DefaultWidgetTheme.copy({ primaryColor: '#BE002A', useGlobalTheme: false }) })
 
 function update() {
-  deathGroupX.value = Math.round(percent.value * 520)
+  deathGroupX.value = Math.round(110 + percent.value * 410)
   deathGroupFillProgress.value = Math.round(percent.value * 100 - 100)
   maskRedWidth.value = Math.round(percent.value * 100)
 }

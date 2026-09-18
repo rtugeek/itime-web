@@ -21,7 +21,7 @@ const days = computed(() => props.event.getCountdownDays())
 const countdownLabel = computed(() => days.value < 0 ? '已经' : '还有')
 
 function onClick() {
-  router.push({ name: 'CountdownAdd', query: { id: props.event.id } })
+  router.push({ name: 'CountdownAdd', query: { id: String(props.event.id) } })
 }
 </script>
 
@@ -54,7 +54,7 @@ function onClick() {
         </div>
         <div class="shrink-0 text-right">
           <template v-if="days === 0">
-            <span class="text-2xl font-semibold tracking-tight">今天</span>
+            <span class="text-lg font-semibold tracking-tight">今天</span>
           </template>
           <template v-else>
             <div class="flex items-baseline justify-end gap-1">

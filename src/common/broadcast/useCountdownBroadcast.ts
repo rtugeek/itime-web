@@ -3,13 +3,16 @@ import { getCurrentScope, onScopeDispose, watch } from 'vue'
 import consola from 'consola'
 import type { CountdownEvent } from '@/data/CountdownEvent'
 
-export type CountdownBroadcastEvent = ({
+export type CountdownBroadcastEvent = ({ type: 'sync' } | {
   type: 'save'
   event: CountdownEvent
   time?: number
 } | {
   type: 'delete'
   id: string
+} | {
+  type: 'save-all'
+  time?: number
 }) & { nonce?: number }
 
 export interface UseCountdownBroadcastOptions {

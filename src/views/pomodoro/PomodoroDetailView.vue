@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { toast } from 'vue-sonner'
-import { ArrowLeft, Edit, History, Timer } from '@lucide/vue'
+import { ArrowLeft, Edit, History, Loader2, Timer, Trash2 } from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
+import consola from 'consola'
 import { PomodoroUtils } from '@/utils/PomodoroUtils'
-import type { PomodoroScene } from '@/data/PomodoroScene'
+import type { IPomodoroScene } from '@/data/PomodoroScene'
 import PomodoroDetailBlock from '@/views/pomodoro/PomodoroDetailBlock.vue'
 import PomodoroCheckInCalendar from '@/views/pomodoro/PomodoroCheckInCalendar.vue'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
@@ -16,37 +17,78 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Item, ItemContent, ItemMedia, ItemTitle } from '@/components/ui/item'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 const route = useRoute()
 const router = useRouter()
-const id = Number.parseInt(route.query.id as string)
-const scene = ref<PomodoroScene>()
+const id = route.query.id as string
+const scene = ref<IPomodoroScene>()
 const histories = ref<PomodoroHistory[]>([])
 const checkInDayCount = ref(0)
 const count = ref(0)
+const showDeleteDialog = ref(false)
+const isDeleting = ref(false)
+let reloadPromise: Promise<void> | undefined
 const { t } = useI18n()
 const pomodoroStore = usePomodoroStore()
-pomodoroStore.findSceneById(id).then((data) => {
-  if (data) {
-    scene.value = data
-    pomodoroStore.findHistoryBySceneId(id).then((his) => {
-      histories.value = his.sort((a, b) => dayjs(b.startTime).valueOf() - dayjs(a.startTime).valueOf())
+function reload() {
+  if (reloadPromise) { return reloadPromise }
+  reloadPromise = (async () => {
+    try {
+      const data = await pomodoroStore.findSceneById(id)
+      if (!data) {
+        consola.warn('Scene not found', id)
+        toast.warning('Scene not found')
+        router.push({ name: 'Pomodoro' })
+        return
+      }
+      const his = await pomodoroStore.findHistoryBySceneId(data.id!)
+      const sorted = his.sort((a, b) => dayjs(b.startTime).valueOf() - dayjs(a.startTime).valueOf())
       const date = new Set<string>()
       his.forEach((history) => {
         date.add(dayjs(history.startTime).format('YYYY-MM-DD'))
       })
+      scene.value = data
+      histories.value = sorted
       checkInDayCount.value = date.size
-      count.value = histories.value.length
-    })
-  }
-  else {
-    toast.warning('Scene not found')
-    router.push({ name: 'Pomodoro' })
-  }
-})
+      count.value = sorted.length
+    }
+    finally {
+      reloadPromise = undefined
+    }
+  })()
+  return reloadPromise
+}
+watch(() => pomodoroStore.dataRevision, reload, { immediate: true })
 
 function onEdit() {
   router.push({ name: 'PomodoroSceneAdd', query: { id } })
+}
+
+function onDelete() {
+  showDeleteDialog.value = true
+}
+
+async function confirmDelete() {
+  if (isDeleting.value) { return }
+  isDeleting.value = true
+  try {
+    await pomodoroStore.deleteScene(id)
+    toast.success('已删除番茄场景')
+    router.push({ name: 'Pomodoro' })
+  }
+  finally {
+    isDeleting.value = false
+  }
 }
 
 function onBack() {
@@ -74,6 +116,11 @@ const total = computed(() => {
           <Button variant="outline" @click="onBack">
             <ArrowLeft class="size-4" aria-hidden="true" />
             返回
+          </Button>
+          <Button variant="destructive" :disabled="isDeleting" @click="onDelete">
+            <Loader2 v-if="isDeleting" class="size-4 animate-spin" aria-hidden="true" />
+            <Trash2 v-else class="size-4" aria-hidden="true" />
+            删除
           </Button>
           <Button @click="onEdit">
             <Edit class="size-4" aria-hidden="true" />
@@ -134,4 +181,23 @@ const total = computed(() => {
       </section>
     </div>
   </main>
+  <AlertDialog v-model:open="showDeleteDialog">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>删除番茄场景</AlertDialogTitle>
+        <AlertDialogDescription>
+          此操作将删除「{{ scene?.name }}」及其全部 {{ count }} 条专注记录，无法恢复。是否确定删除？
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel :disabled="isDeleting">
+          取消
+        </AlertDialogCancel>
+        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" :disabled="isDeleting" @click="confirmDelete">
+          <Loader2 v-if="isDeleting" class="size-4 animate-spin" aria-hidden="true" />
+          确认删除
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>

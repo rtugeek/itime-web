@@ -2,18 +2,20 @@ import { useBroadcastChannel } from '@vueuse/core'
 import { getCurrentScope, onScopeDispose, watch } from 'vue'
 import consola from 'consola'
 import { AppConfig } from '@/common/AppConfig'
-import type { Birthday } from '@/data/Birthday'
+import type { IBirthday } from '@/data/Birthday'
 
-export interface BirthdayEvent {
+export type BirthdayEvent = { type: 'sync' | 'save-all', nonce?: number, time?: number } | {
   type: 'insert' | 'update' | 'delete'
-  data: Birthday
+  data: IBirthday
   nonce?: number
 }
 
 export interface UseBirthdayBroadcastOptions {
-  onUpdated?: (data: Birthday) => void
-  onDeleted?: (data: Birthday) => void
-  onInserted?: (data: Birthday) => void
+  onSynced?: () => void
+  onUpdated?: (data: IBirthday) => void
+  onDeleted?: (data: IBirthday) => void
+  onInserted?: (data: IBirthday) => void
+  onSaveAll?: () => void
 }
 
 const STORAGE_KEY = `${AppConfig.CHANNEL_BIRTHDAY}_storage`
@@ -27,6 +29,9 @@ export function useBirthdayBroadcast(options?: UseBirthdayBroadcastOptions) {
 
   const handleEvent = (payload: BirthdayEvent) => {
     if (!payload) { return }
+    if ((payload.type === 'insert' || payload.type === 'update' || payload.type === 'delete') && payload.data?.lastSyncedAt) {
+      payload.data.lastSyncedAt = new Date(payload.data.lastSyncedAt)
+    }
     if (payload.nonce != null) {
       if (processedNonces.has(payload.nonce)) {
         consola.debug('Birthday broadcast event skipped (duplicate nonce):', payload.nonce)
@@ -44,6 +49,11 @@ export function useBirthdayBroadcast(options?: UseBirthdayBroadcastOptions) {
     consola.info('Birthday broadcast event received:', payload)
 
     switch (payload.type) {
+      case 'sync':
+      case 'save-all':
+        options?.onSynced?.()
+        options?.onSaveAll?.()
+        break
       case 'update':
         options?.onUpdated?.(payload.data)
         break

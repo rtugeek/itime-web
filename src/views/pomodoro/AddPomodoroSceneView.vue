@@ -6,10 +6,11 @@ import 'vue3-emoji-picker/css'
 import { toast } from 'vue-sonner'
 import { Save, Trash2 } from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
-import type { PomodoroScene } from '@/data/PomodoroScene'
+import type { IPomodoroScene } from '@/data/PomodoroScene'
+import { createPomodoroSceneId } from '@/data/PomodoroScene'
 import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneRepository'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,8 +22,8 @@ const id = route.query.id as string
 const { t } = useI18n()
 const pomodoroStore = usePomodoroStore()
 
-const sence = reactive<PomodoroScene>({
-  id: undefined,
+const sence = reactive<IPomodoroScene>({
+  id: createPomodoroSceneId(),
   icon: '🔨',
   name: '',
   duration: 0,
@@ -30,12 +31,8 @@ const sence = reactive<PomodoroScene>({
 
 if (id) {
   PomodoroSceneRepository.get(id).then((res) => {
-    sence.id = Number.parseInt(id)
     if (res) {
-      sence.createTime = res.createTime
-      sence.icon = res.icon
-      sence.name = res.name
-      sence.duration = res.duration ?? 0
+      Object.assign(sence, res)
     }
   })
 }
@@ -64,12 +61,7 @@ function deleteScene() {
 
 <template>
   <section class="scene-editor">
-    <Sheet v-model:open="showEmojiPicker">
-      <SheetContent side="bottom" class="h-auto" style="padding: 30px 50px; background-color: transparent;">
-        <EmojiPicker :native="true" display-recent @select="onSelectEmoji" />
-      </SheetContent>
-    </Sheet>
-    <div class="editor-card">
+    <form class="editor-card" @submit.prevent="save">
       <div class="editor-section">
         <div class="editor-field">
           <div class="field-label">
@@ -78,12 +70,21 @@ function deleteScene() {
           <div class="flex flex-col gap-2">
             <Label for="scene-name">{{ t('pomodoro.scene.placeholder') }}</Label>
             <div class="flex items-center gap-2">
-              <Avatar class="cursor-pointer w-10 h-10 rounded-md bg-[#ece8da]" @click="showEmojiPicker = true">
-                <div class="flex items-center justify-center emoji text-xl h-full">
-                  {{ sence.icon }}
-                </div>
-              </Avatar>
-              <Input id="scene-name" v-model="sence.name" :placeholder="t('pomodoro.scene.placeholder')" class="editor-input" />
+              <Popover v-model:open="showEmojiPicker">
+                <PopoverTrigger as-child>
+                  <button type="button" class="shrink-0 rounded-md" aria-label="选择场景表情">
+                    <Avatar class="cursor-pointer w-10 h-10 rounded-md bg-[#ece8da]">
+                      <div class="flex items-center justify-center emoji text-xl leading-none w-full h-full">
+                        {{ sence.icon }}
+                      </div>
+                    </Avatar>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="bottom" align="start" :side-offset="8" class="w-auto p-0">
+                  <EmojiPicker :native="true" display-recent @select="onSelectEmoji" />
+                </PopoverContent>
+              </Popover>
+              <Input id="scene-name" v-model="sence.name" :placeholder="t('pomodoro.scene.placeholder')" class="editor-input" required />
             </div>
           </div>
         </div>
@@ -96,12 +97,12 @@ function deleteScene() {
         <Button type="button" variant="outline" @click="router.push({ name: 'Pomodoro' })">
           {{ t('cancel') }}
         </Button>
-        <Button type="button" @click="save">
+        <Button type="submit">
           <Save class="size-4" />
           {{ t('save') }}
         </Button>
       </footer>
-    </div>
+    </form>
   </section>
 </template>
 

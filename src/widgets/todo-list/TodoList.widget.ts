@@ -20,7 +20,15 @@ const TodoListWidget = new Widget({
   browserWindowOptions: {
     backgroundThrottling: false,
   },
-  configPagePath: '/widget/todo_list/config?frame=true&transparent=false&width=600&height=500',
+  configPagePath: '/widget/todo_list/config?frame=true&transparent=false&width=900&height=700',
+  configPage: {
+    path: '/widget/todo_list/config',
+    frame: true,
+    transparent: false,
+    width: 900,
+    height: 700,
+  },
+
 })
 
 export default TodoListWidget

@@ -4,13 +4,14 @@ import consola from 'consola'
 import { AppConfig } from '@/common/AppConfig'
 import type { Todo } from '@/data/Todo'
 
-export interface TodoEvent {
+export type TodoEvent = { type: 'sync', nonce?: number } | {
   type: 'insert' | 'update' | 'delete'
   todo: Todo
   nonce?: number
 }
 
 export interface UseTodoBroadcastOptions {
+  onSynced?: () => void
   onUpdated?: (todo: Todo) => void
   onDeleted?: (todo: Todo) => void
   onInserted?: (todo: Todo) => void
@@ -27,6 +28,9 @@ export function useTodoBroadcast(options?: UseTodoBroadcastOptions) {
 
   const handleEvent = (payload: TodoEvent) => {
     if (!payload) { return }
+    if (payload.type !== 'sync' && payload.todo?.lastSyncedAt) {
+      payload.todo.lastSyncedAt = new Date(payload.todo.lastSyncedAt)
+    }
     if (payload.nonce != null) {
       if (processedNonces.has(payload.nonce)) {
         consola.debug('Todo broadcast event skipped (duplicate nonce):', payload.nonce)
@@ -44,6 +48,9 @@ export function useTodoBroadcast(options?: UseTodoBroadcastOptions) {
     consola.info('Todo broadcast event received:', payload)
 
     switch (payload.type) {
+      case 'sync':
+        options?.onSynced?.()
+        break
       case 'update':
         options?.onUpdated?.(payload.todo)
         break

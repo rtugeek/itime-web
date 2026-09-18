@@ -5,15 +5,12 @@ import {
 
 const name = 'itime.fun.countdown'
 const keywords = [WidgetKeyword.RECOMMEND]
-// 组件关键词
 const CountdownWidget = new Widget({
   path: '/widget/countdown',
-  configPagePath: '/?frame=true&transparent=false&width=400&height=700&tab=countdown&maximize=true&minimize=true',
+  configPagePath: '/widget/countdown/config?frame=true&transparent=false&width=900&height=700',
   configPage: {
-    path: '/',
+    path: '/widget/countdown/config',
     frame: true,
-    maximizable: true,
-    minimizable: true,
     transparent: false,
     width: 900,
     height: 700,

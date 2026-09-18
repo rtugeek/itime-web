@@ -1,5 +1,6 @@
 import { WidgetApi, delay } from '@widget-js/core'
 import consola from 'consola'
+import { AppConfig } from '@/common/AppConfig'
 import { startSync } from '@/common/syncStatus'
 import type { BaseData, BaseRemoteData } from '@/data/base/BaseData'
 
@@ -50,7 +51,7 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
     }
   }
 
-  private matches(a: BaseData, b: BaseData): boolean {
+  private matches(a: Pick<BaseData, 'id' | 'uuid'>, b: Pick<BaseData, 'id' | 'uuid'>): boolean {
     if (a.uuid && b.uuid) { return a.uuid === b.uuid }
     return a.id != null && b.id != null && String(a.id) === String(b.id)
   }
@@ -70,16 +71,19 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
     }
   }
 
-  private async syncLoggedIn(options?: SyncOptions) {
+  protected async syncLoggedIn(options?: SyncOptions) {
     if (options?.delay) { await delay(options.delay) }
 
     // Fetch remote first so local edits made during the request enter this snapshot.
+    const account = localStorage.getItem(AppConfig.KEY_TOKEN)
     const remotes = await this.getRemoteItems()
+    if (account !== localStorage.getItem(AppConfig.KEY_TOKEN)) { return }
     const locals = await this.getLocalItems()
     const uploads: T[] = []
     for (const remote of remotes) {
+      if (account !== localStorage.getItem(AppConfig.KEY_TOKEN)) { return }
       const local = locals.find(item => this.matches(item, remote))
-      if (!local || this.timestamp(remote.update_time) > this.timestamp(local.updateTime)) {
+      if (!local || this.timestamp(remote.updateTime ?? (remote as R & { update_time?: string }).update_time) > this.timestamp(local.updateTime)) {
         const current = (await this.getLocalItems()).find(item => this.matches(item, remote))
         if (JSON.stringify(current) !== JSON.stringify(local)) { continue }
         const downloaded = this.mapRemoteToLocal([remote])[0]
@@ -90,13 +94,15 @@ export abstract class BaseSync<T extends BaseData, R extends BaseRemoteData> {
     for (const local of locals) {
       if (local.needSync === false) { continue }
       const remote = remotes.find(item => this.matches(local, item))
-      if (!remote || this.timestamp(local.updateTime) >= this.timestamp(remote.update_time)) {
+      if (!remote || this.timestamp(local.updateTime) >= this.timestamp(remote.updateTime ?? (remote as R & { update_time?: string }).update_time)) {
         // Recover identity after an insert succeeded but its response was lost.
         uploads.push({ ...local, uuid: remote?.uuid ?? local.uuid })
       }
     }
+    if (account !== localStorage.getItem(AppConfig.KEY_TOKEN)) { return }
     const pushed = uploads.length ? await this.pushToRemote(this.mapLocalToRemote(uploads)) : []
     for (const remote of pushed) {
+      if (account !== localStorage.getItem(AppConfig.KEY_TOKEN)) { return }
       const uploaded = uploads.find(item => this.matches(item, remote))
       if (!uploaded) { continue }
       const original = locals.find(item => this.matches(item, uploaded))

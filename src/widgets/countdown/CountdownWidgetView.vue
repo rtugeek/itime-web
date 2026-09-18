@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import '@/common/dayjs-extend'
 import { Lunar } from 'lunar-typescript'
@@ -9,45 +9,40 @@ import { BrowserWindowApi, DefaultWidgetTheme, MenuApi, type WidgetMenuItem } fr
 import { useStorage } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import type { CountdownEvent } from '@/data/CountdownEvent'
-import { CountdownEventRepository } from '@/data/repository/CountdownEventRepository'
 import { useCountdownEventStore } from '@/stores/useCountdownEventStore'
 import { Button } from '@/components/ui/button'
 
 const {
   widgetParams,
-} = useWidget({ defaultTheme: DefaultWidgetTheme.copy({
-  useGlobalTheme: false,
-  fontSize: '72px',
-  primaryColor: 'rgb(0,149,255)',
-  backgroundColor: 'white',
-}) })
+  widgetTheme,
+} = useWidget({
+  immediate: false,
+  defaultTheme: DefaultWidgetTheme.copy({
+    useGlobalTheme: false,
+    fontSize: '14px',
+    primaryColor: 'rgb(0,149,255)',
+    backgroundColor: 'white',
+    borderRadius: '8px',
+  }),
+})
 const { t } = useI18n()
 const event = ref<CountdownEvent | null>(null)
 const countdownEventStore = useCountdownEventStore()
 const countdownEventId = useStorage<string>(`countdownEventId-${widgetParams.id}`, '')
-onMounted(async () => {
-  await nextTick()
-  if (countdownEventId.value) {
-    event.value = await CountdownEventRepository.get(countdownEventId.value)
-  }
-  else {
-    if (countdownEventId.value == '') {
-      const events = await CountdownEventRepository.all()
-      if (events.length > 0) {
-        countdownEventId.value = events[0].id
-        event.value = events[0]
-      }
-    }
-  }
-})
-
+watch([() => countdownEventStore.events, countdownEventId], ([events, id]) => {
+  const selected = id
+    ? events.find(it => it.id === id)
+    : events[0]
+  event.value = selected ?? null
+  if (selected) { countdownEventId.value = String(selected.id) }
+}, { immediate: true })
 function onSetCountdownClick() {
   const menus = countdownEventStore.events.map((it) => {
     const menu: WidgetMenuItem = {
-      id: it.id!,
+      id: String(it.id),
       label: `${it.name}`,
       type: 'radio',
-      checked: countdownEventId.value == it.id,
+      checked: countdownEventId.value === (String(it.id)),
     }
     return menu
   })
@@ -67,20 +62,18 @@ useMenuListener((type, menu) => {
     BrowserWindowApi.openUrl('/countdown/add?width=400&height=700&frame=true&transparent=false')
   }
   else {
-    CountdownEventRepository.get(menu.id).then((res) => {
-      event.value = res
-      countdownEventId.value = res?.id
-    })
+    countdownEventId.value = menu.id
   }
 })
 
+const today = ref(Date.now())
 const days = computed(() => {
   if (!event.value) { return 0 }
-  const now = dayjs()
+  const now = dayjs(today.value)
   return Math.ceil(dayjs(event.value.dateTime).diff(now, 'day', true))
 })
 useAppBroadcast([SystemApi.EVENT_DATE_CHANGED], () => {
-  days.effect.run()
+  today.value = Date.now()
 })
 
 const dateStr = computed(() => {
@@ -92,12 +85,20 @@ const dateStr = computed(() => {
   }
   return targetDate.format('YYYY/MM/DD')
 })
+
+const titleGradientStyle = computed(() => {
+  const primary = widgetTheme.value.primaryColor || 'rgb(0,149,255)'
+  const endColor = `color-mix(in srgb, ${primary} 100%, #000 20%)`
+  return {
+    background: `linear-gradient(180deg, ${primary} 0%, ${endColor} 100%)`,
+  }
+})
 </script>
 
 <template>
   <WidgetWrapper>
     <div v-if="event" class="countdown-widget">
-      <div class="title">
+      <div class="title" :style="titleGradientStyle">
         <span class="cursor-pointer" @click="onSetCountdownClick">{{ event.name }}{{ days < 0 ? '已经' : '还有' }}</span>
       </div>
       <div class="stack">
@@ -128,10 +129,9 @@ const dateStr = computed(() => {
   background-color: var(--widget-background-color);
 
   .title {
-    --widget-primary-color-end: color-mix(in srgb, var(--widget-primary-color) 100%, #000 20%);
+    flex-shrink: 0;
     width: 100%;
     padding: 10px 0;
-    background: linear-gradient(180deg,var(--widget-primary-color) 0%, var(--widget-primary-color-end) 100%);
     font-size: 16px;
     color: white;
     font-weight: bold;
@@ -142,6 +142,7 @@ const dateStr = computed(() => {
   .stack {
     width: 100%;
     flex-grow: 1;
+    min-height: 0;
     position: relative;
 
     .card {
@@ -149,7 +150,7 @@ const dateStr = computed(() => {
       width: 100%;
       position: absolute;
       height: 100%;
-      background-color: var(--widget-background-color);
+      background-color: white;
 
       &:nth-child(2) {
         z-index: 0;
@@ -166,29 +167,26 @@ const dateStr = computed(() => {
 
     .info {
       position: absolute;
-      width: 100%;
-      height: calc(100vh - 20px);
-      justify-content: center;
-      align-items: center;
-      justify-items: center;
-      display: flex;
-      flex-direction: column;
+      inset: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      padding: 0 8px 8px;
 
       .days {
-        font-size: var(--widget-font-size);
-        color: #222222;
         display: flex;
         align-items: center;
+        justify-content: center;
+        min-height: 0;
+        font-size: 72px;
+        line-height: 1;
+        color: #222222;
         font-weight: bold;
-        flex-grow: 1;
-        text-align: center;
-        vertical-align: center;
       }
 
       .date {
+        width: 100%;
         color: #5d626c;
         font-size: 14px;
-        margin-bottom: 0.8rem;
         text-align: center;
       }
     }

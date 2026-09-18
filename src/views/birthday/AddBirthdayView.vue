@@ -5,8 +5,7 @@ import { toast } from 'vue-sonner'
 import { Calendar, Loader2, Save, Trash2, User } from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
 import { useBirthdayStore } from '@/stores/useBirthdayStore'
-import { BirthdayUtils } from '@/utils/BirthdayUtils'
-import { BirthdayWrapper } from '@/data/BirthdayWrapper'
+import { Birthday } from '@/data/Birthday'
 import DateInput from '@/components/DateInput.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,43 +30,40 @@ const isSaving = ref(false)
 const isDeleting = ref(false)
 
 const birthdayStore = useBirthdayStore()
-const birthday = reactive(BirthdayUtils.new())
-const birthdayWrapper = reactive(new BirthdayWrapper(birthday))
+const birthdayModel = reactive(Birthday.create())
 
 if (id > 0) {
   birthdayStore.find(id.toString()).then((res) => {
     if (res) {
-      Object.assign(birthday, res)
-      Object.assign(birthdayWrapper, new BirthdayWrapper(birthday))
+      Object.assign(birthdayModel, new Birthday(res))
     }
   })
 }
 
 const sourceSolarDate = computed<Date>({
-  get: () => birthdayWrapper.getSourceSolarDate(),
+  get: () => birthdayModel.getSourceSolarDate(),
   set: (val: Date) => {
-    birthdayWrapper.setDate(val)
+    birthdayModel.setDate(val)
   },
 })
 
 const dateTypeModel = computed({
-  get: () => birthday.dateType,
+  get: () => birthdayModel.dateType,
   set: (val) => {
-    birthday.dateType = val
-    birthdayWrapper.setDateType(val)
+    birthdayModel.setDateType(val)
   },
 })
 
 async function save() {
   if (isSaving.value || isDeleting.value) { return }
-  if (!birthday.name.trim()) {
+  if (!birthdayModel.name.trim()) {
     toast.error(t('birthday.placeholder.contact'))
     return
   }
   isSaving.value = true
   const loadingId = toast.loading(t('saving'))
   try {
-    await birthdayStore.save(toRaw(birthday))
+    await birthdayStore.save(toRaw(birthdayModel))
     toast.success(t('saving'), { id: loadingId })
     router.push({ name: 'Birthday' })
   }
@@ -79,15 +75,11 @@ async function save() {
   }
 }
 
-function deleteBirthday() {
-  showDeleteDialog.value = true
-}
-
 async function handleDeleteConfirm() {
   if (isDeleting.value || isSaving.value) { return }
   isDeleting.value = true
   try {
-    await birthdayStore.removeById(String(birthday.id))
+    await birthdayStore.removeById(String(birthdayModel.id))
     toast.success(t('delete'))
     router.push({ name: 'Birthday' })
   }
@@ -97,6 +89,10 @@ async function handleDeleteConfirm() {
   finally {
     isDeleting.value = false
   }
+}
+
+function deleteBirthday() {
+  showDeleteDialog.value = true
 }
 </script>
 
@@ -111,7 +107,7 @@ async function handleDeleteConfirm() {
               {{ t('birthday.placeholder.contact') }} <span class="required-mark" aria-hidden="true">*</span>
             </Label>
           </div>
-          <Input id="birthday-name" v-model="birthday.name" :placeholder="t('birthday.placeholder.contact')" required />
+          <Input id="birthday-name" v-model="birthdayModel.name" :placeholder="t('birthday.placeholder.contact')" required />
         </div>
         <div class="editor-field" role="group" aria-labelledby="birthday-date-label">
           <div class="field-label">
@@ -143,7 +139,7 @@ async function handleDeleteConfirm() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>删除生日？</AlertDialogTitle>
-          <AlertDialogDescription>{{ birthday.name }}</AlertDialogDescription>
+          <AlertDialogDescription>{{ birthdayModel.name }}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{{ t('cancel') }}</AlertDialogCancel>

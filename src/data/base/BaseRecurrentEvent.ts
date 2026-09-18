@@ -1,18 +1,27 @@
 import dayjs from 'dayjs'
 import type { Lunar } from 'lunar-typescript'
 import { RRule } from 'rrule'
-import { BaseData } from '@/data/base/BaseData'
 import { LunarUtils } from '@/utils/LunarUtils'
 import { RRuleUtils } from '@/utils/RRuleUtils'
 
-export abstract class BaseRecurrentEvent extends BaseData {
+export abstract class BaseRecurrentEvent {
+  /**
+   * 客户端与服务器共用的记录 ID
+   */
+  id?: string
+  userId?: number | string
+  createTime?: Date
+  updateTime?: Date
+  deleteTime?: Date
+  needSync?: boolean
+  /** 已确认的服务器版本；用于区分远端删除和本地新建。 */
+  lastSyncedAt?: Date
   /**
    * 0-公历
    * 1-农历
    */
   dateType: number
   constructor(dateType: number) {
-    super()
     this.dateType = dateType
   }
 

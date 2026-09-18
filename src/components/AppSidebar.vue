@@ -1,17 +1,28 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Cake, Clock, Hourglass, ListTodo, Settings, Timer } from '@lucide/vue'
+import { useDark } from '@vueuse/core'
+import { Cake, Hourglass, ListTodo, Settings, Timer } from '@lucide/vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
+import pkg from '../../package.json'
+import logo from '@/assets/logo.png'
 import type { SidebarProps } from '@/components/ui/sidebar'
+import TodoListWidget from '@/widgets/todo-list/TodoList.widget'
+import DeadlineWidget from '@/widgets/deadline/Deadline.widget'
+import CalendarWidget from '@/widgets/calendar/Calendar.widget'
+import BirthdayListWidget from '@/widgets/birthday-list/BirthdayList.widget'
+import CalendarLargeWidget from '@/widgets/calendar-large/CalendarLarge.widget'
+import CountdownListWidget from '@/widgets/countdown-list/CountdownList.widget'
 import NavMain from '@/components/NavMain.vue'
 import NavUser from '@/components/NavUser.vue'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from '@/components/ui/sidebar'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import WindowControls from '@/components/window/WindowControls.vue'
+import { Toaster } from '@/components/ui/sonner'
 
 const props = withDefaults(defineProps<SidebarProps>(), { collapsible: 'icon' })
 const route = useRoute()
+const isDark = useDark({ storageKey: null })
 const navItems = [
   { title: '代办事项', url: '/todo', icon: ListTodo },
   { title: '倒计时', url: '/countdown', icon: Hourglass },
@@ -20,18 +31,25 @@ const navItems = [
   { title: '设置', url: '/settings', icon: Settings },
 ]
 const noInsetBgRoutes = new Set([
+  'UserProfile',
   'Settings',
   'Countdown',
   'CountdownAdd',
   'Todo',
   'TodoAdd',
+  `${TodoListWidget.name}.config`,
   'TodoHistory',
   'Birthday',
   'BirthdayAdd',
+  `${BirthdayListWidget.name}.config`,
   'Pomodoro',
   'PomodoroSceneAdd',
   'PomodoroDetail',
   'PomodoroHistory',
+  `${CountdownListWidget.name}.config`,
+  `${DeadlineWidget.name}.config`,
+  `${CalendarWidget.name}.config`,
+  `${CalendarLargeWidget.name}.config`,
 ])
 const editRouteTitles: Record<string, string> = {
   CountdownAdd: '编辑倒计时',
@@ -60,13 +78,13 @@ const breadcrumbs = computed(() => route.matched
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" as-child>
-              <RouterLink to="/todo">
-                <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Clock class="size-4" />
+              <RouterLink to="/todo" class="group-data-[collapsible=icon]:justify-center">
+                <div class="flex shrink-0 aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
+                  <img :src="logo" alt="iTime" class="size-full object-cover">
                 </div>
-                <div class="grid flex-1 text-left text-sm leading-tight">
+                <div class="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                   <span class="truncate font-semibold">iTime</span>
-                  <span class="truncate text-xs text-muted-foreground">时间管理</span>
+                  <span class="truncate text-xs text-muted-foreground">v{{ pkg.version }}</span>
                 </div>
               </RouterLink>
             </SidebarMenuButton>
@@ -113,6 +131,7 @@ const breadcrumbs = computed(() => route.matched
         </div>
       </div>
     </SidebarInset>
+    <Toaster :theme="isDark ? 'dark' : 'light'" />
   </SidebarProvider>
 </template>
 

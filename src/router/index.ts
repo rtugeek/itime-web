@@ -1,9 +1,16 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import WidgetRouter from '../widgets/widget-router'
-import SignIn from '@/views/user/SignIn.vue'
-import SignUp from '@/views/user/SignUp.vue'
-import AppSidebar from '@/components/AppSidebar.vue'
-import BaseLayout from '@/components/layout/BaseLayout.vue'
+import TodoListWidget from '@/widgets/todo-list/TodoList.widget'
+import DeadlineWidget from '@/widgets/deadline/Deadline.widget'
+import CalendarWidget from '@/widgets/calendar/Calendar.widget'
+import BirthdayListWidget from '@/widgets/birthday-list/BirthdayList.widget'
+import CalendarLargeWidget from '@/widgets/calendar-large/CalendarLarge.widget'
+import CountdownListWidget from '@/widgets/countdown-list/CountdownList.widget'
+import CountdownWidget from '@/widgets/countdown/Countdown.widget'
+import { normalizeWechatCallback } from '@/common/wechatAuth'
+import { useUserStore } from '@/stores/useUserStore'
+
+normalizeWechatCallback()
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -14,8 +21,14 @@ const router = createRouter({
       meta: {
         title: '时间管理',
       },
-      component: AppSidebar,
+      component: () => import('@/components/AppSidebar.vue'),
       children: [
+        {
+          path: 'user/profile',
+          name: 'UserProfile',
+          meta: { title: '账户信息', requiresAuth: true },
+          component: () => import('@/views/user/Profile.vue'),
+        },
         {
           path: '',
           redirect: '/countdown',
@@ -34,6 +47,12 @@ const router = createRouter({
               name: 'TodoAdd',
               meta: { title: '新增待办' },
               component: () => import('@/views/todo/AddTodoView.vue'),
+            },
+            {
+              path: TodoListWidget.configPagePath!.split('?')[0],
+              name: `${TodoListWidget.name}.config`,
+              meta: { title: '组件设置' },
+              component: () => import('@/widgets/todo-list/TodoListConfigView.vue'),
             },
             {
               path: 'history',
@@ -58,6 +77,12 @@ const router = createRouter({
               meta: { title: '新增生日' },
               component: () => import('@/views/birthday/AddBirthdayView.vue'),
             },
+            {
+              path: BirthdayListWidget.configPagePath!.split('?')[0],
+              name: `${BirthdayListWidget.name}.config`,
+              meta: { title: '组件设置' },
+              component: () => import('@/widgets/birthday-list/BirthdayListConfigView.vue'),
+            },
           ],
         },
         {
@@ -74,6 +99,24 @@ const router = createRouter({
               name: 'CountdownAdd',
               meta: { title: '新增倒计时' },
               component: () => import('@/views/countdown/AddCountdownView.vue'),
+            },
+            {
+              path: CountdownListWidget.configPagePath!.split('?')[0],
+              name: `${CountdownListWidget.name}.config`,
+              meta: { title: '组件设置' },
+              component: () => import('@/widgets/countdown-list/CountdownListConfigView.vue'),
+            },
+            {
+              path: CountdownWidget.configPagePath!.split('?')[0],
+              name: `${CountdownWidget.name}.config`,
+              meta: { title: '组件设置' },
+              component: () => import('@/widgets/countdown/CountdownConfigView.vue'),
+            },
+            {
+              path: DeadlineWidget.configPagePath!.split('?')[0],
+              name: `${DeadlineWidget.name}.config`,
+              meta: { title: '组件设置' },
+              component: () => import('@/widgets/deadline/DeadlineConfigView.vue'),
             },
           ],
         },
@@ -107,6 +150,24 @@ const router = createRouter({
           ],
         },
         {
+          path: 'calendar',
+          meta: { title: '日历' },
+          children: [
+            {
+              path: CalendarWidget.configPagePath!.split('?')[0],
+              name: `${CalendarWidget.name}.config`,
+              meta: { title: '组件设置' },
+              component: () => import('@/widgets/calendar/CalendarConfigView.vue'),
+            },
+            {
+              path: CalendarLargeWidget.configPagePath!.split('?')[0],
+              name: `${CalendarLargeWidget.name}.config`,
+              meta: { title: '组件设置' },
+              component: () => import('@/widgets/calendar-large/CalendarLargeConfigView.vue'),
+            },
+          ],
+        },
+        {
           name: 'Settings',
           path: 'settings',
           meta: { title: '设置' },
@@ -118,15 +179,17 @@ const router = createRouter({
     {
       path: '/user',
       name: 'User',
-      component: BaseLayout,
+      component: () => import('@/components/layout/BaseLayout.vue'),
       children: [
+        { path: 'password/reset', component: () => import('@/views/user/ResetPassword.vue'), meta: { title: '找回密码' } },
+        { path: 'wechat/callback', component: () => import('@/views/user/WechatCallback.vue'), meta: { title: '微信登录' } },
         {
           path: 'sign/in',
           meta: {
             title: '登录',
           },
           name: 'UserSignIn',
-          component: SignIn,
+          component: () => import('@/views/user/SignIn.vue'),
         },
         {
           path: 'sign/in/sms',
@@ -142,7 +205,7 @@ const router = createRouter({
           },
           path: 'sign/up',
           name: 'UserSignUp',
-          component: SignUp,
+          component: () => import('@/views/user/SignUp.vue'),
         },
       ],
     },
@@ -172,6 +235,12 @@ const router = createRouter({
       component: () => import('../widgets/WebWidgetGallery.vue'),
     },
   ],
+})
+
+router.beforeEach((to) => {
+  if (to.meta.requiresAuth && !useUserStore().isLogin) {
+    return { path: '/user/sign/in', query: { redirect: to.fullPath } }
+  }
 })
 
 export default router

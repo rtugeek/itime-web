@@ -1,5 +1,5 @@
-import { useIntervalFn, useStorage } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { useEventListener, useIntervalFn, useStorage } from '@vueuse/core'
+import { computed, ref, toRaw, watch } from 'vue'
 import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 import { NotificationApi } from '@widget-js/core'
@@ -11,9 +11,10 @@ import { PomodoroSceneRepository } from '@/data/repository/PomodoroSceneReposito
 import { PomodoroHistoryRepository } from '@/data/repository/PomodoroHistoryRepository'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 import { PomodoroHistorySync } from '@/data/sync/PomodoroHistorySync'
-import type { PomodoroScene } from '@/data/PomodoroScene'
-import { PomodoroSceneSync } from '@/data/sync/PomodoroSceneSync'
-import { useSupabaseStore } from '@/stores/useSupabaseStore'
+import type { IPomodoroScene } from '@/data/PomodoroScene'
+import { UserDataSync } from '@/data/sync/UserDataSync'
+import { useUserStore } from '@/stores/useUserStore'
+import { pomodoroSyncRevision } from '@/data/sync/PomodoroSnapshotSync'
 import { usePomodoroBroadcast } from '@/common/broadcast/usePomodoroBroadcast'
 
 export const usePomodoroStore = defineStore('pomodoroStore', () => {
@@ -28,12 +29,12 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
     restDuration: 0,
   })
 
-  const settings = useStorage<PomodoroSettings>(AppConfig.KEY_POMODORO_SETTINGS, getDefaultPomodoroSettings())
-  const currentSceneId = useStorage(AppConfig.KEY_POMODORO_USING_SCENE, 1)
+  const settings = useStorage<PomodoroSettings>(AppConfig.KEY_POMODORO_SETTINGS, getDefaultPomodoroSettings(), undefined, { mergeDefaults: true })
+  const currentSceneId = useStorage<string>(AppConfig.KEY_POMODORO_USING_SCENE, '')
   const status = computed(() => model.value.status)
   const duration = computed(() => model.value.duration)
   const shortBreakDuration = computed(() => settings.value.shortBreakTime * 60)
-  const supabaseStore = useSupabaseStore()
+  const userStore = useUserStore()
   const historySyncing = ref(false)
   const sceneSyncing = ref(false)
 
@@ -98,6 +99,8 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   }, 1000, { immediate: false })
 
   function start() {
+    pomodoroInterval.pause()
+    resetInterval.pause()
     if (model.value.status != 'pause') {
       const now = new Date()
       model.value.duration = 0
@@ -124,15 +127,15 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
       const nowISO = now.toISOString()
       model.value.createAt = nowISO
       const startAtStr = typeof model.value.startAt! == 'string' ? model.value.startAt! : (model.value.startAt! as unknown as Date).toISOString()
-      saveHistory({
-        sceneId: currentSceneId.value,
-        duration: model.value.duration,
-        finishTime: nowISO,
-        startTime: startAtStr,
-        id: time,
-      })
       PomodoroSceneRepository.get(currentSceneId.value).then((scene) => {
         if (scene) {
+          saveHistory({
+            sceneId: scene.id!,
+            duration: model.value.duration,
+            finishTime: nowISO,
+            startTime: startAtStr,
+            id: time,
+          })
           if (!scene.duration) {
             scene.duration = 0
           }
@@ -150,39 +153,61 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   function pause() {
     model.value.status = 'pause'
     pomodoroInterval.pause()
+    resetInterval.pause()
   }
 
   if (isRunning.value) {
+    pomodoroInterval.pause()
+    resetInterval.pause()
     pomodoroInterval.resume()
   }
-
-  if (status.value == 'resting') {
+  else if (status.value == 'resting') {
+    pomodoroInterval.pause()
+    resetInterval.pause()
     resetInterval.resume()
   }
   // #endregion
 
   // #region Scenes Management
-  const scenes = ref<PomodoroScene[]>([])
+  const scenes = ref<IPomodoroScene[]>([])
+  const dataRevision = ref(0)
+  let loadScenesPromise: Promise<void> | undefined
   const currentScene = computed(() => {
     const scene = scenes.value.find(it => it.id == currentSceneId.value)!
     if (scene) {
       return scene
     }
     else if (scenes.value.length > 0) {
-      currentSceneId.value = scenes.value[0].id
+      currentSceneId.value = String(scenes.value[0].id)
       return scenes.value[0]
     }
   })
 
   async function loadScenes() {
-    scenes.value = await PomodoroSceneRepository.all()
+    if (loadScenesPromise) { return loadScenesPromise }
+    loadScenesPromise = (async () => {
+      try {
+        const list = (await PomodoroSceneRepository.all())
+          .filter(item => !item.deleteTime && (!item.userId || Number(item.userId) === 0 || Number(item.userId) === userStore.userId))
+        list.sort((a, b) => {
+          const orderDiff = (a.sortOrder ?? 0) - (b.sortOrder ?? 0)
+          if (orderDiff !== 0) { return orderDiff }
+          return (a.createTime?.getTime() ?? 0) - (b.createTime?.getTime() ?? 0)
+        })
+        scenes.value = list
+      }
+      finally {
+        loadScenesPromise = undefined
+      }
+    })()
+    return loadScenesPromise
   }
 
   async function syncScenes() {
-    if (supabaseStore.isLogin) {
+    if (userStore.isLogin) {
       sceneSyncing.value = true
       try {
-        await PomodoroSceneSync.sync()
+        await UserDataSync.sync()
         await loadScenes()
       }
       finally {
@@ -191,30 +216,47 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
     }
   }
 
-  async function findSceneById(sceneId: number): Promise<PomodoroScene | null> {
+  async function findSceneById(sceneId: string | number): Promise<IPomodoroScene | null> {
     return PomodoroSceneRepository.get(sceneId)
   }
 
-  const saveScene = async function save(scene: PomodoroScene) {
+  const saveScene = async function save(scene: IPomodoroScene) {
     scene.needSync = true
-    await PomodoroSceneRepository.save(scene)
+    await PomodoroSceneRepository.save(toRaw(scene))
+    await loadScenes()
+    dataRevision.value++
+    postEvent({ type: 'save', id: scene.id! })
     await syncScenes()
   }
 
-  async function deleteScene(id: number) {
+  const saveAllScenes = async (scenesToSave: IPomodoroScene[]) => {
+    for (let i = 0; i < scenesToSave.length; i++) {
+      scenesToSave[i].sortOrder = i
+    }
+    const saved = await PomodoroSceneRepository.saveAll(scenesToSave.map(toRaw))
+    scenes.value = saved
+    dataRevision.value++
+    postEvent({ type: 'save-all', time: Date.now() })
+    UserDataSync.sync()
+    return saved
+  }
+
+  async function deleteScene(id: string | number) {
     const scene = await PomodoroSceneRepository.get(id)
     if (scene) {
       await PomodoroSceneRepository.softRemove(scene)
+      if (scene.id) {
+        await PomodoroHistoryRepository.removeBySceneId(scene.id)
+      }
     }
-    await PomodoroHistoryRepository.removeBySceneId(id)
 
     await loadScenes()
     if (currentSceneId.value == id) {
       if (scenes.value.length > 0) {
-        currentSceneId.value = scenes.value[0].id
+        currentSceneId.value = String(scenes.value[0].id)
       }
       else {
-        currentSceneId.value = 0
+        currentSceneId.value = ''
       }
     }
     postEvent({ type: 'delete', id })
@@ -222,13 +264,13 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   }
 
   const { postEvent } = usePomodoroBroadcast({
-    onChanged: () => { loadScenes() },
+    onChanged: () => { void loadScenes() },
   })
   // #endregion
 
   // #region History Management
   async function syncHistory() {
-    if (supabaseStore.isLogin) {
+    if (userStore.isLogin) {
       historySyncing.value = true
       try {
         await PomodoroHistorySync.sync()
@@ -242,31 +284,44 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
   async function saveHistory(history: PomodoroHistory) {
     history.needSync = true
     await PomodoroHistoryRepository.save(history)
+    dataRevision.value++
+    postEvent({ type: 'save', id: history.sceneId })
     await syncHistory()
   }
 
   async function deleteHistory(history: PomodoroHistory) {
     await PomodoroHistoryRepository.softRemove(history)
+    dataRevision.value++
+    postEvent({ type: 'save', id: history.sceneId })
     await syncHistory()
   }
 
-  async function findHistoryBySceneId(sceneId: number): Promise<PomodoroHistory[]> {
-    return await PomodoroHistoryRepository.findBySceneId(sceneId)
+  async function findHistoryBySceneId(sceneId: number | string): Promise<PomodoroHistory[]> {
+    return PomodoroHistoryRepository.findBySceneId(sceneId, userStore.userId)
   }
   // #endregion
 
   // #region Global Sync & Init
-  const syncing = computed(() => historySyncing.value || sceneSyncing.value)
+  const syncing = computed(() => historySyncing.value || sceneSyncing.value || UserDataSync.busy.value || PomodoroHistorySync.busy.value)
 
   async function sync() {
-    await Promise.all([
-      syncHistory(),
-      syncScenes(),
-    ])
+    await syncHistory()
+    await loadScenes()
   }
 
-  // Initial load
-  loadScenes()
+  watch([pomodoroSyncRevision, UserDataSync.revision], () => {
+    void loadScenes()
+    dataRevision.value++
+    postEvent({ type: 'sync', id: '' })
+  })
+  watch(() => userStore.userId, () => {
+    scenes.value = []
+    void loadScenes()
+    dataRevision.value++
+  }, { flush: 'sync' })
+  useIntervalFn(() => { void sync() }, 5 * 60 * 1000)
+  useEventListener(window, 'online', () => { void sync() })
+  void loadScenes().then(sync)
   // #endregion
 
   return {
@@ -288,6 +343,8 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
     // Sync
     syncing,
     sync,
+    dataRevision,
+    syncError: computed(() => UserDataSync.error.value || PomodoroHistorySync.error.value),
 
     // Scenes
     scenes,
@@ -295,6 +352,7 @@ export const usePomodoroStore = defineStore('pomodoroStore', () => {
     loadScenes,
     findSceneById,
     saveScene,
+    saveAllScenes,
     deleteScene,
 
     // History

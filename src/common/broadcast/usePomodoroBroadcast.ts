@@ -3,8 +3,9 @@ import { getCurrentScope, onScopeDispose, watch } from 'vue'
 import consola from 'consola'
 
 export interface PomodoroEvent {
-  type: 'save' | 'delete'
-  id: number
+  type: 'save' | 'delete' | 'sync' | 'save-all'
+  id?: string | number
+  time?: number
   nonce?: number
 }
 

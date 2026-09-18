@@ -36,7 +36,6 @@ const event = reactive<CountdownEvent>(new CountdownEvent('', new Date()))
 
 if (id) {
   CountdownEventRepository.get(id).then((res) => {
-    event.id = id
     if (res) {
       Object.assign(event, res)
     }
@@ -71,14 +70,14 @@ const dateTimeModel = computed<Date>({
 
 <template>
   <section class="countdown-editor">
-    <div class="editor-card">
+    <form class="editor-card" @submit.prevent="save">
       <div class="editor-section">
         <div class="editor-field">
           <div class="field-label">
             <label for="countdown-name">倒计时名称 <span class="required-mark" aria-hidden="true">*</span></label>
             <span class="field-hint tabular-nums">{{ event.name.length }}/15</span>
           </div>
-          <Input id="countdown-name" v-model="event.name" aria-required="true" :placeholder="t('countdown.namePlaceholder')" :maxlength="15" class="editor-input" />
+          <Input id="countdown-name" v-model="event.name" aria-required="true" :placeholder="t('countdown.namePlaceholder')" :maxlength="15" class="editor-input" required />
         </div>
         <div class="editor-field">
           <div class="field-label">
@@ -102,12 +101,12 @@ const dateTimeModel = computed<Date>({
         <Button type="button" variant="outline" @click="router.push({ name: 'Countdown' })">
           {{ t('cancel') }}
         </Button>
-        <Button type="button" @click="save">
+        <Button type="submit">
           <Save class="size-4" aria-hidden="true" />
           {{ t('save') }}
         </Button>
       </footer>
-    </div>
+    </form>
     <AlertDialog v-model:open="showDeleteDialog">
       <AlertDialogContent>
         <AlertDialogHeader>

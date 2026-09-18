@@ -4,9 +4,10 @@ import type { RemoteUserData, UserData, UserDataOptions, UserDataType } from '@/
 
 export class UserDataDatabase extends Dexie {
   userDatas!: Table<UserData>
+  migrations!: Table<{ id: string, json: string }>
 
   constructor() {
-    // A new database is required when changing the primary key; no legacy data migration.
+    // Legacy stores are imported during application startup.
     super('userdata-v2')
 
     this.version(1).stores({
@@ -21,6 +22,7 @@ export class UserDataDatabase extends Dexie {
         item.deleteTime = item.deleteTime ? new Date(item.deleteTime) : null
       })
     })
+    this.version(3).stores({ migrations: '&id' })
   }
 }
 
@@ -32,6 +34,25 @@ function ensureId(userData: UserData): string {
 }
 
 export class UserDataRepository {
+  static async hasMigration(id: string): Promise<boolean> {
+    return !!await db.migrations.get(id)
+  }
+
+  /** Commit records and the backup/completion marker together, including across tabs. */
+  static async importLegacy(id: string, json: string, records: UserData[]): Promise<void> {
+    await db.transaction('rw', db.userDatas, db.migrations, async () => {
+      if (await db.migrations.get(id)) { return }
+      for (const record of records) {
+        const existing = await db.userDatas.get(record.id)
+        if (existing) {
+          throw new Error(`Legacy data ID collision: ${record.id}`)
+        }
+        await db.userDatas.add(record)
+      }
+      await db.migrations.add({ id, json })
+    })
+  }
+
   static async findOne<T = unknown>(options: { id: string }): Promise<UserData<T> | undefined> {
     if (options.id) {
       return db.userDatas.get(options.id) as Promise<UserData<T> | undefined>

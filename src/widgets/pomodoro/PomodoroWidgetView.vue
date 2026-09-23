@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { BrowserWindowApi, Channel, MenuApi, TrayApi, type WidgetMenuItem } from '@widget-js/core'
 import { useIpcListener, useMenuListener, useWidget } from '@widget-js/vue3'
-import { nextTick, onMounted, onUnmounted } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Check, ChevronRight, Grip, Pause, Play, Plus } from '@lucide/vue'
 
 import { storeToRefs } from 'pinia'
@@ -19,7 +19,31 @@ const { t } = useI18n()
 const pomodoroStore = usePomodoroStore()
 
 const { stickScreenEdge } = usePomodoroWindowStateStore()
+const manuallyHidden = ref(false)
 let positionReady = false
+
+function updateTrayMenu() {
+  TrayApi.setContextMenu([
+    {
+      label: '主页',
+      id: 'home',
+    },
+    {
+      label: '隐藏',
+      id: 'hide',
+      type: 'checkbox',
+      checked: manuallyHidden.value,
+    },
+    {
+      label: '退出',
+      id: 'exit',
+    },
+    {
+      label: '添加场景',
+      id: 'addScene',
+    },
+  ])
+}
 
 useIpcListener(Channel.BROWSER_WINDOW, (event) => {
   if (positionReady && event === BrowserWindowApi.EVENT_MOVED) {
@@ -88,6 +112,19 @@ useMenuListener((type, menu) => {
   else if (menu.id == 'home') {
     BrowserWindowApi.openUrl('/pomodoro?frame=true&transparent=false&width=1200&height=800')
   }
+  else if (menu.id == 'hide') {
+    manuallyHidden.value = !manuallyHidden.value
+    if (manuallyHidden.value) {
+      stickScreenEdge.cancelHide()
+      void BrowserWindowApi.hide()
+    }
+    else {
+      void BrowserWindowApi.show().then(() => {
+        void stickScreenEdge.showWindow()
+      })
+    }
+    updateTrayMenu()
+  }
   else {
     const scene = scenes.value.find(it => it.id?.toString() == menu.id)
     if (scene) {
@@ -121,30 +158,32 @@ onMounted(async () => {
 
 useTray({
   image: '/pomodoro.ico',
-  onClick: onWindowEnter,
+  onClick: () => {
+    if (manuallyHidden.value) {
+      manuallyHidden.value = false
+      void BrowserWindowApi.show().then(() => {
+        void stickScreenEdge.showWindow()
+      })
+      updateTrayMenu()
+    }
+    else {
+      onWindowEnter()
+    }
+  },
   onMouseEnter: () => {
-    BrowserWindowApi.setAlwaysOnTop(true)
-    stickScreenEdge.showWindow()
+    if (!manuallyHidden.value) {
+      BrowserWindowApi.setAlwaysOnTop(true)
+      stickScreenEdge.showWindow()
+    }
   },
   onMouseLeave: () => {
-    stickScreenEdge.startHideWindow()
+    if (!manuallyHidden.value) {
+      stickScreenEdge.startHideWindow()
+    }
   },
 })
 
-TrayApi.setContextMenu([
-  {
-    label: '主页',
-    id: 'home',
-  },
-  {
-    label: '退出',
-    id: 'exit',
-  },
-  {
-    label: '添加场景',
-    id: 'addScene',
-  },
-])
+updateTrayMenu()
 </script>
 
 <template>

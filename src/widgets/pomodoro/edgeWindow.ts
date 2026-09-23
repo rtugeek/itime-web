@@ -121,6 +121,10 @@ export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize
     cancelHide()
     return move(true)
   }
+  function hideWindow() {
+    cancelHide()
+    return move(false)
+  }
   function stickToEdge(edge: Edge) {
     cancelHide()
     return move(true, edge)
@@ -146,5 +150,5 @@ export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize
     disposed = true
     cancelHide()
   }
-  return { stickEdge, isShowed, showWindow, stickToEdge, startHideWindow, cancelHide, resetPosition, onMoved, dispose }
+  return { stickEdge, isShowed, showWindow, hideWindow, stickToEdge, startHideWindow, cancelHide, resetPosition, onMoved, dispose }
 }

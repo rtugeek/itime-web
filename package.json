@@ -1,6 +1,6 @@
 {
   "name": "itime-web",
-  "version": "26.9.19",
+  "version": "26.9.24",
   "private": true,
   "type": "module",
   "scripts": {

@@ -24,6 +24,38 @@ const router = createRouter({
       component: () => import('@/components/AppSidebar.vue'),
       children: [
         {
+          path: 'user',
+          name: 'User',
+          children: [
+            { path: 'password/reset', name: 'UserPasswordReset', component: () => import('@/views/user/ResetPassword.vue'), meta: { title: '找回密码' } },
+            { path: 'wechat/callback', name: 'UserWechatCallback', component: () => import('@/views/user/WechatCallback.vue'), meta: { title: '微信登录' } },
+            {
+              path: 'sign/in',
+              meta: {
+                title: '登录',
+              },
+              name: 'UserSignIn',
+              component: () => import('@/views/user/SignIn.vue'),
+            },
+            {
+              path: 'sign/in/sms',
+              meta: {
+                title: '登录',
+              },
+              name: 'SmsSignIn',
+              component: () => import('@/views/user/SmsSignIn.vue'),
+            },
+            {
+              meta: {
+                title: '注册',
+              },
+              path: 'sign/up',
+              name: 'UserSignUp',
+              component: () => import('@/views/user/SignUp.vue'),
+            },
+          ],
+        },
+        {
           path: 'user/profile',
           name: 'UserProfile',
           meta: { title: '账户信息', requiresAuth: true },
@@ -173,39 +205,6 @@ const router = createRouter({
           meta: { title: '设置' },
           children: [],
           component: () => import('@/views/settings/Settings.vue'),
-        },
-      ],
-    },
-    {
-      path: '/user',
-      name: 'User',
-      component: () => import('@/components/layout/BaseLayout.vue'),
-      children: [
-        { path: 'password/reset', component: () => import('@/views/user/ResetPassword.vue'), meta: { title: '找回密码' } },
-        { path: 'wechat/callback', component: () => import('@/views/user/WechatCallback.vue'), meta: { title: '微信登录' } },
-        {
-          path: 'sign/in',
-          meta: {
-            title: '登录',
-          },
-          name: 'UserSignIn',
-          component: () => import('@/views/user/SignIn.vue'),
-        },
-        {
-          path: 'sign/in/sms',
-          meta: {
-            title: '登录',
-          },
-          name: 'SmsSignIn',
-          component: () => import('@/views/user/SmsSignIn.vue'),
-        },
-        {
-          meta: {
-            title: '注册',
-          },
-          path: 'sign/up',
-          name: 'UserSignUp',
-          component: () => import('@/views/user/SignUp.vue'),
         },
       ],
     },

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { BrowserWindowApi } from '@widget-js/core'
-import { Close, Left } from '@icon-park/vue-next'
+import { ChevronLeft, X } from '@lucide/vue'
 import { useRouter } from 'vue-router'
 import { AppUtils } from '@/utils/AppUtils'
 import { Button } from '@/components/ui/button'
@@ -36,7 +36,7 @@ function close() {
     <div class="navbar flex items-center justify-between h-14 px-3 widget-drag-region select-none" @mousedown="mouseDown" @mouseup="mouseUp">
       <div class="flex items-center widget-no-drag-region">
         <Button v-if="leftShow" variant="ghost" size="icon" class="w-9 h-9" @click="goBack">
-          <Left size="20" />
+          <ChevronLeft :size="20" />
         </Button>
       </div>
       <div class="flex-1 text-center font-semibold text-lg truncate px-2">
@@ -45,7 +45,7 @@ function close() {
       <div class="flex gap-1 widget-no-drag-region">
         <slot name="actions" />
         <Button v-electron variant="ghost" size="icon" class="w-9 h-9" @click="close">
-          <Close size="20" />
+          <X :size="20" />
         </Button>
       </div>
     </div>

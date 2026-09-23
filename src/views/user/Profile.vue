@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
-import { Camera, Loader2, UserRound } from '@lucide/vue'
+import { Camera, Copy, Loader2, UserRound } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/useUserStore'
 import { UserApi } from '@/api/UserApi'
@@ -13,6 +13,21 @@ import AvatarCropper from '@/components/AvatarCropper.vue'
 
 const store = useUserStore()
 const displayName = computed(() => store.user?.nick || 'iTime 用户')
+const userId = computed(() => store.user?.id ?? store.user?.userId ?? store.user?.uuid)
+const copyingId = ref(false)
+
+async function copyUserId() {
+  if (userId.value == null || userId.value === '' || copyingId.value) { return }
+  copyingId.value = true
+  try {
+    await navigator.clipboard.writeText(String(userId.value))
+    toast.success('用户 ID 已复制')
+  }
+  catch {
+    toast.error('复制失败，请手动选择用户 ID 复制')
+  }
+  finally { copyingId.value = false }
+}
 const editingNick = ref(false)
 const editingAvatar = ref(false)
 const cropper = ref<InstanceType<typeof AvatarCropper>>()
@@ -139,6 +154,16 @@ async function saveAvatar() {
         </Button>
       </div>
       <div class="px-5 sm:px-6">
+        <div class="grid gap-3 border-b py-5 sm:grid-cols-[6rem_minmax(0,1fr)] sm:items-start">
+          <span class="text-sm text-muted-foreground sm:pt-2">用户 ID</span>
+          <div class="flex min-w-0 items-center justify-between gap-3">
+            <span class="select-text break-all text-sm">{{ userId ?? '暂无' }}</span>
+            <Button type="button" size="sm" variant="ghost" class="shrink-0" aria-label="复制用户 ID" :disabled="userId == null || userId === '' || copyingId" @click="copyUserId">
+              <Copy class="size-4" aria-hidden="true" />
+              复制
+            </Button>
+          </div>
+        </div>
         <div class="grid gap-3 py-5 sm:grid-cols-[6rem_minmax(0,1fr)] sm:items-start">
           <span id="profile-nick-label" class="text-sm text-muted-foreground sm:pt-2">昵称</span>
           <div class="flex min-w-0 items-center justify-between gap-3">

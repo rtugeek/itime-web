@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { type PropType, computed } from 'vue'
 import {
-  Delete,
-  Edit,
-  PlayCycle,
-  Time,
-} from '@icon-park/vue-next'
+  Clock,
+  Pencil,
+  Repeat,
+  Trash2,
+} from '@lucide/vue'
 import dayjs from 'dayjs'
 import { RRuleUtils } from '@/utils/RRuleUtils'
 import { WindowUtils } from '@/utils/WindowUtils'
@@ -48,10 +48,10 @@ const isCompleted = computed(() => {
         </p>
         <div v-if="todo.dueDateTime || todo.recurrence" class="flex text-xs items-center gap-3" style="font-weight: normal">
           <div v-if="todo.dueDateTime" class="items-center justify-center flex gap-1">
-            <Time class="icon" size="12" /> {{ dayjs(todo.dueDateTime).format('YYYY-MM-DD') }}
+            <Clock class="icon" :size="12" /> {{ dayjs(todo.dueDateTime).format('YYYY-MM-DD') }}
           </div>
           <div v-if="todo.recurrence" class="items-center flex gap-1">
-            <PlayCycle size="12" /> {{ RRuleUtils.toString(todo.recurrence) }}
+            <Repeat :size="12" /> {{ RRuleUtils.toString(todo.recurrence) }}
           </div>
         </div>
       </div>
@@ -62,10 +62,10 @@ const isCompleted = computed(() => {
           style="height: 100%; width: 24px"
           @click.stop="edit"
         >
-          <Edit class="edit" />
+          <Pencil class="edit" />
         </div>
         <div class="icon delete" @click.stop="deleteTodo">
-          <Delete />
+          <Trash2 />
         </div>
       </div>
     </div>

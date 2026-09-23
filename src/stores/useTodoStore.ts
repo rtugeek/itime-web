@@ -19,7 +19,7 @@ function sameId(a: Todo, b: Todo): boolean {
 
 export const useTodoStore = defineStore('todo-store', () => {
   const userStore = useUserStore()
-  const visible = (item: Todo) => !item.deleteTime && (!item.userId || Number(item.userId) === userStore.userId)
+  const visible = (item: Todo) => !item.deleteTime
 
   const todos = ref<Todo[]>([])
   const completedTodos = ref<Todo[]>([])

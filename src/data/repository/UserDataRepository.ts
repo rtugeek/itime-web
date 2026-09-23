@@ -185,6 +185,19 @@ export class UserDataRepository {
     }
   }
 
+  static async reassignAllToUser(newUserId: number): Promise<void> {
+    const all = await db.userDatas.toArray()
+    for (const item of all) {
+      const updated: UserData = {
+        ...item,
+        userId: newUserId,
+        lastSyncedAt: undefined,
+        needSync: true,
+      }
+      await db.userDatas.put(updated)
+    }
+  }
+
   static async clear(): Promise<void> {
     return db.userDatas.clear()
   }

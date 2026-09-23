@@ -42,8 +42,8 @@ export const useUserStore = defineStore('userStore', () => {
 
     const newUserId = userId.value
     if (newUserId != null) {
-      await UserDataRepository.claimUnownedToUser(newUserId)
-      await PomodoroHistoryRepository.claimUnownedToUser(newUserId)
+      await UserDataRepository.reassignAllToUser(newUserId)
+      await PomodoroHistoryRepository.reassignAllToUser(newUserId)
       // 先等待场景同步完成，再让历史记录上传，避免 beforeUpload 判定「场景未同步」。
       await UserDataSync.sync()
       void PomodoroHistorySync.sync()

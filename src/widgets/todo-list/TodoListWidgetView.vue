@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useElementSize, useStorage } from '@vueuse/core'
-import { AddOne, ArrowCircleLeft, History } from '@icon-park/vue-next'
+import { CircleChevronLeft, History, Plus } from '@lucide/vue'
 import { useContextMenu, useWidget } from '@widget-js/vue3'
 import { DefaultWidgetTheme, type WidgetMenuItem } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
@@ -40,9 +40,9 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
         </div>
         <div class="actions flex gap-4 pr-2">
           <UserIcon />
-          <ArrowCircleLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
+          <CircleChevronLeft v-if="viewType !== 'default'" class="icon" @click="viewType = 'default'" />
           <History v-if="viewType !== 'history'" class="icon" @click="viewType = 'history'" />
-          <AddOne class="icon" @click="openAddPage" />
+          <Plus class="icon" @click="openAddPage" />
         </div>
       </div>
       <div class="list-body">

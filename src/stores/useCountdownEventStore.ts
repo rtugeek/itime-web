@@ -28,9 +28,8 @@ export const useCountdownEventStore = defineStore('countdownEventStore', () => {
     try {
       const rows = await CountdownEventRepository.all()
       if (!isCurrent()) { return }
-      const visible = rows.filter(item => !item.userId || Number(item.userId) === account)
-      hiddenByAccountCount.value = rows.length - visible.length
-      const newEvents = visible.map(it => CountdownEvent.fromObject(it))
+      hiddenByAccountCount.value = 0
+      const newEvents = rows.map(it => CountdownEvent.fromObject(it))
       // 先展示已读取的数据，单条重复规则或写入错误不应阻止整批展示。
       events.value = newEvents
       let failed = 0

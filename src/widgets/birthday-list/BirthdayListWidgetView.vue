@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useSortable } from '@vueuse/integrations/useSortable'
 import { useContextMenu, useMenuListener, useWidget } from '@widget-js/vue3'
-import { AddOne } from '@icon-park/vue-next'
+import { Plus } from '@lucide/vue'
 import { useWindowSize } from '@vueuse/core'
 import { MenuApiEvent, type WidgetMenuItem } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
@@ -60,7 +60,7 @@ useContextMenu({ menus: [{ label: t('appSettings'), id: 'app-settings' }], onMen
       <img class="image" src="./images/balloon.png">
       <div class="title">
         <span v-t="'birthday.list'" />
-        <AddOne class="add cursor-pointer" @click="add" />
+        <Plus class="add cursor-pointer" @click="add" />
       </div>
       <div
         class="scroll-wrapper"

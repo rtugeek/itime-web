@@ -4,7 +4,7 @@ export const pomodoroMessage: DefaultLocaleMessageSchema = {
   zh: {
     pomodoro: {
       resting: '休息中',
-      emptyTip: '请到设置页面添加专注场景',
+      addScene: '添加场景',
       settings: '番茄钟设置',
       dragWindow: '拖动窗口',
       time: '番茄时长（{time}m）',
@@ -33,7 +33,7 @@ export const pomodoroMessage: DefaultLocaleMessageSchema = {
     pomodoro: {
       title: 'Pomodoro',
       resting: 'Resting',
-      emptyTip: 'Please add a focus scene first',
+      addScene: 'Add Scene',
       settings: 'Pomodoro',
       dragWindow: 'Drag window',
       time: 'Time ({time}m)',

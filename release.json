@@ -1,11 +1,16 @@
 {
-  "fileMap": [
+  "host": ["mine"],
+  "steps": [
     {
-      "src": "./dist/",
-      "dest": "/www/wwwroot/itime.fun/web"
+      "type": "upload",
+      "local": "./dist",
+      "remote": "/www/wwwroot/itime.fun/web",
+      "pattern": "**/*",
+      "ignore": ["**/*.map", "node_modules/**"]
+    },
+    {
+      "type": "command",
+      "command": "ls -la /www/wwwroot/itime.fun/web"
     }
-  ],
-  "ftpConfig": {
-    "host": ["mine"]
-  }
+  ]
 }

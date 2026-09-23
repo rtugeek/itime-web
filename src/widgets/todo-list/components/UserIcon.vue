@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Refresh, RightUser, User } from '@icon-park/vue-next'
+import { RefreshCw, User, UserCheck } from '@lucide/vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useTodoStore } from '@/stores/useTodoStore'
@@ -17,9 +17,9 @@ const { isLogin } = storeToRefs(userStore)
 </script>
 
 <template>
-  <Refresh v-if="syncing" class="icon spin" />
+  <RefreshCw v-if="syncing" class="icon spin" />
   <template v-if="!syncing">
-    <RightUser v-if="isLogin" class="icon" @click="click" />
+    <UserCheck v-if="isLogin" class="icon" @click="click" />
     <User v-else class="icon" @click="click" />
   </template>
 </template>

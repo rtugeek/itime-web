@@ -1,9 +1,10 @@
 {
   "name": "itime-web",
-  "version": "0.8.4",
+  "version": "26.9.19",
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "release --date-version",
     "dev": "vite --host",
     "build": "vite build",
     "build:offline": "vite build --mode offline",
@@ -23,9 +24,10 @@
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/rrule": "^6.1.17",
     "@fullcalendar/vue3": "^6.1.17",
-    "@icon-park/vue-next": "^1.4.2",
     "@internationalized/date": "^3.12.4",
     "@lucide/vue": "^1.43.0",
+    "@unovis/ts": "^1.7.0",
+    "@unovis/vue": "^1.7.0",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^13.9.0",
     "@vueuse/integrations": "^10.9.0",

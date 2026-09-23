@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'
 import { nextTick, ref } from 'vue'
 import { useSortable } from '@vueuse/integrations/useSortable'
 import { useMenuListener, useWidget } from '@widget-js/vue3'
-import { AddOne, SortAmountDown } from '@icon-park/vue-next'
+import { ArrowDownWideNarrow, Plus } from '@lucide/vue'
 import { useWindowSize } from '@vueuse/core'
 import { DefaultWidgetTheme, MenuApiEvent } from '@widget-js/core'
 import { WindowUtils } from '@/utils/WindowUtils'
@@ -55,8 +55,8 @@ useMenuListener((eventType, menu) => {
       <div class="title">
         <div v-t="'countdown.list'" />
         <div class="actions flex gap-3 ml-auto">
-          <AddOne size="22" class="add cursor-pointer" @click="add" />
-          <SortAmountDown size="22" class="add cursor-pointer mr-2" @click="countdownStore.toggleSort" />
+          <Plus :size="22" class="add cursor-pointer" @click="add" />
+          <ArrowDownWideNarrow :size="22" class="add cursor-pointer mr-2" @click="countdownStore.toggleSort" />
         </div>
       </div>
       <div

@@ -2,8 +2,8 @@
 import { BrowserWindowApi, Channel, MenuApi, TrayApi, type WidgetMenuItem } from '@widget-js/core'
 import { useIpcListener, useMenuListener, useWidget } from '@widget-js/vue3'
 import { nextTick, onMounted, onUnmounted } from 'vue'
-import { Check, Pause, PlayOne, Right } from '@icon-park/vue-next'
-import { Grip } from '@lucide/vue'
+import { Check, ChevronRight, Grip, Pause, Play, Plus } from '@lucide/vue'
+
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { AppConfig } from '@/common/AppConfig'
@@ -71,6 +71,10 @@ function onSceneClick() {
   })
 }
 
+function onAddSceneClick() {
+  BrowserWindowApi.openUrl('/pomodoro/scene/add?frame=true&transparent=false&width=900&height=700')
+}
+
 useMenuListener((type, menu) => {
   if (menu.id == 'exit') {
     BrowserWindowApi.close()
@@ -79,7 +83,10 @@ useMenuListener((type, menu) => {
     stickScreenEdge.resetPosition()
   }
   else if (menu.id == 'addScene') {
-    BrowserWindowApi.openUrl('/pomodoro/scene/add?frame=true&transparent=false&width=400&height=700')
+    onAddSceneClick()
+  }
+  else if (menu.id == 'home') {
+    BrowserWindowApi.openUrl('/pomodoro?frame=true&transparent=false&width=1200&height=800')
   }
   else {
     const scene = scenes.value.find(it => it.id?.toString() == menu.id)
@@ -126,6 +133,10 @@ useTray({
 
 TrayApi.setContextMenu([
   {
+    label: '主页',
+    id: 'home',
+  },
+  {
     label: '退出',
     id: 'exit',
   },
@@ -149,7 +160,7 @@ TrayApi.setContextMenu([
           <div class="flex gap-1 items-center cursor-pointer" @click="onSceneClick">
             <div>{{ currentScene.icon }}</div>
             <div>{{ status === 'resting' ? t('pomodoro.resting') : currentScene.name }}</div>
-            <Right v-show="status === 'stop'" />
+            <ChevronRight v-show="status === 'stop'" />
           </div>
         </div>
         <div class="text-5xl font-bold time rubik-regular">
@@ -157,7 +168,7 @@ TrayApi.setContextMenu([
         </div>
         <div class="flex gap-4 buttons">
           <div v-if="!isRunning && status !== 'waiting'" class="btn start" @click="pomodoroStore.start()">
-            <PlayOne />
+            <Play />
           </div>
           <div v-if="isRunning && status !== 'waiting'" class="btn small" @click="pomodoroStore.pause()">
             <Pause />
@@ -167,8 +178,17 @@ TrayApi.setContextMenu([
           </div>
         </div>
       </template>
-      <div v-else class="flex text-center p-4">
-        {{ t('pomodoro.emptyTip') }}
+      <div v-else class="flex flex-col items-center text-center p-4">
+        <button
+          type="button"
+          class="add-scene-btn"
+          :title="t('pomodoro.addScene')"
+          :aria-label="t('pomodoro.addScene')"
+          @click="onAddSceneClick"
+        >
+          <Plus :size="20" aria-hidden="true" />
+          <span>{{ t('pomodoro.addScene') }}</span>
+        </button>
       </div>
     </div>
     <PomodoroProgressBar />
@@ -300,6 +320,32 @@ body {
     width: 2rem;
     height: 2rem;
     font-size: 1.2rem;
+  }
+}
+
+.add-scene-btn {
+  cursor: pointer;
+  background-color: var(--widget-primary-color);
+  color: white;
+  border: none;  border-radius: 9999px;
+  padding: 0.55rem 1.1rem;
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, filter 0.15s ease-out;
+
+  &:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
   }
 }
 

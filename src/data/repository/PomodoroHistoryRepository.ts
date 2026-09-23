@@ -1,4 +1,5 @@
 import localforage from 'localforage'
+import { toRaw } from 'vue'
 import type { PomodoroHistory } from '@/data/PomodoroHistory'
 
 const pomodoroHistoryStorage = localforage.createInstance({ name: 'pomodoro' })
@@ -16,7 +17,7 @@ class PomodoroHistoryRepositoryClass {
       value.createTime = new Date()
     }
     if (!preserveTime) { value.updateTime = new Date() }
-    return pomodoroHistoryStorage.setItem(value.id.toString(), value)
+    return pomodoroHistoryStorage.setItem(value.id.toString(), toRaw(value))
   }
 
   async remove(key: number) {
@@ -24,9 +25,7 @@ class PomodoroHistoryRepositoryClass {
   }
 
   async softRemove(history: PomodoroHistory) {
-    history.deleteTime = new Date()
-    history.needSync = true
-    await this.save(history)
+    await this.save({ ...toRaw(history), deleteTime: new Date(), needSync: true })
   }
 
   async removeBySceneId(sceneId: number | string) {
@@ -56,7 +55,7 @@ class PomodoroHistoryRepositoryClass {
     return pomodoroHistoryStorage.clear()
   }
 
-  async findBySceneId(sceneId: number | string, userId?: number): Promise<PomodoroHistory[]> {
+  async findBySceneId(sceneId: number | string): Promise<PomodoroHistory[]> {
     const targetSceneId = String(sceneId)
     const histories: PomodoroHistory[] = []
     const keys = await pomodoroHistoryStorage.keys()
@@ -66,7 +65,6 @@ class PomodoroHistoryRepositoryClass {
         history
         && String(history.sceneId) === targetSceneId
         && !history.deleteTime
-        && (!userId || !history.userId || Number(history.userId) === 0 || Number(history.userId) === userId)
       ) {
         histories.push(history)
       }
@@ -79,6 +77,20 @@ class PomodoroHistoryRepositoryClass {
     for (const oldKey of keys) {
       const history = await pomodoroHistoryStorage.getItem<PomodoroHistory>(oldKey)
       if (history && !history.userId) {
+        history.userId = newUserId
+        history.needSync = true
+        history.syncVersion = undefined
+        history.lastSyncedAt = undefined
+        await pomodoroHistoryStorage.setItem(oldKey, history)
+      }
+    }
+  }
+
+  async reassignAllToUser(newUserId: number): Promise<void> {
+    const keys = await pomodoroHistoryStorage.keys()
+    for (const oldKey of keys) {
+      const history = await pomodoroHistoryStorage.getItem<PomodoroHistory>(oldKey)
+      if (history) {
         history.userId = newUserId
         history.needSync = true
         history.syncVersion = undefined

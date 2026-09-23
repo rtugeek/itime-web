@@ -3,7 +3,7 @@ import { type Solar, SolarMonth } from 'lunar-typescript'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 import { useAppBroadcast, useWidget } from '@widget-js/vue3'
-import { Left, Right } from '@icon-park/vue-next'
+import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { SystemApi } from '@widget-js/core'
 import { useI18n } from 'vue-i18n'
 import { useStorage } from '@vueuse/core'
@@ -108,10 +108,10 @@ function show(solar: Solar) {
         </div>
         <div class="flex gap-1 btn-group text-center">
           <div class="btn btn-next flex items-center rounded-full cursor-pointer justify-center" @click="previous">
-            <Left :size="20" />
+            <ChevronLeft :size="20" />
           </div>
           <div class="btn btn-previous flex items-center rounded-full cursor-pointer justify-center" @click="next">
-            <Right :size="20" />
+            <ChevronRight :size="20" />
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Close } from '@icon-park/vue-next'
+import { X } from '@lucide/vue'
 import { type PropType, computed } from 'vue'
 import type { Solar } from 'lunar-typescript'
 import type { HuangLi } from '@/api/PublicEventApi'
@@ -29,7 +29,7 @@ const lunar = computed(() => {
   <div v-if="solar" v-show="show" class="almanac flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-xl p-4 relative wrapper">
       <div class="cursor-pointer absolute top-4 right-4 text-gray-500 hover:text-gray-700 !rounded-button" @click="closeWindow">
-        <Close />
+        <X />
       </div>
       <div class="text-center text-gray-600 flex items-center flex-col gap-2">
         <div class="text-xl  font-bold">

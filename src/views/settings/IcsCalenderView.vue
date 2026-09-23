@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { Copy, Refresh } from '@icon-park/vue-next'
+import { Copy, RefreshCw } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
@@ -68,7 +68,7 @@ function copy() {
             <Copy class="size-4" />
           </Button>
           <Button size="icon" variant="outline" @click="refreshToken">
-            <Refresh class="size-4" />
+            <RefreshCw class="size-4" />
           </Button>
         </div>
       </div>

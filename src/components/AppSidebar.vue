@@ -32,6 +32,11 @@ const navItems = [
 ]
 const noInsetBgRoutes = new Set([
   'UserProfile',
+  'UserSignIn',
+  'UserSignUp',
+  'SmsSignIn',
+  'UserWechatCallback',
+  'UserPasswordReset',
   'Settings',
   'Countdown',
   'CountdownAdd',
@@ -127,7 +132,7 @@ const breadcrumbs = computed(() => route.matched
       </header>
       <div class="relative min-h-0 flex-1 overflow-auto p-4 pt-0">
         <div class="relative min-h-full p-4" :class="{ 'rounded-xl bg-muted/50': route.name && !noInsetBgRoutes.has(String(route.name)) }">
-          <RouterView :key="route.fullPath" />
+          <RouterView :key="route.name === 'UserWechatCallback' ? route.path : route.fullPath" />
         </div>
       </div>
     </SidebarInset>

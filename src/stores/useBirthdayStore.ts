@@ -10,7 +10,7 @@ import { UserDataSync } from '@/data/sync/UserDataSync'
 
 export const useBirthdayStore = defineStore('birthday-store', () => {
   const userStore = useUserStore()
-  const visible = (item: IBirthday) => !item.deleteTime && (!item.userId || Number(item.userId) === userStore.userId)
+  const visible = (item: IBirthday) => !item.deleteTime
   const birthdayList = ref<IBirthday[]>([])
   let loadPromise: Promise<void> | undefined
 

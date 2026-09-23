@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Loader2, Mail, MessageCircle } from '@lucide/vue'
+import { Eye, EyeOff, Loader2, MessageCircle } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,14 +10,44 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useUserStore } from '@/stores/useUserStore'
 import { UserApi } from '@/api/UserApi'
 import { safeRedirect, startWechatLogin } from '@/common/wechatAuth'
+import logo from '@/assets/logo.png'
 
 const props = defineProps<{ mode: 'login' | 'register' | 'reset' }>()
+const showWechatLogin = false
 const store = useUserStore()
 const router = useRouter()
 const route = useRoute()
 const email = ref(store.latestUsername.includes('@') ? store.latestUsername : '')
+const emailDomains = [
+  'qq.com',
+  '163.com',
+  '126.com',
+  'gmail.com',
+  'outlook.com',
+  'hotmail.com',
+  'foxmail.com',
+  'yeah.net',
+  'sina.com',
+  'sohu.com',
+  '139.com',
+  '189.cn',
+  'aliyun.com',
+  'icloud.com',
+  'yahoo.com',
+  'proton.me',
+]
+const emailSuggestions = computed(() => {
+  const parts = email.value.trim().split('@')
+  if (parts.length !== 2 || !parts[0] || /\s/.test(parts[0])) { return [] }
+  const [username, domain] = parts
+  return emailDomains
+    .filter(candidate => candidate.startsWith(domain.toLowerCase()) && candidate !== domain.toLowerCase())
+    .map(candidate => `${username}@${candidate}`)
+})
 const password = ref('')
 const confirmation = ref('')
+const showPassword = ref(false)
+const showConfirmation = ref(false)
 const code = ref('')
 const error = ref('')
 const busy = ref(false)
@@ -92,21 +122,25 @@ function wechat() {
   <div class="auth-page">
     <Card class="auth-card">
       <CardHeader class="auth-header">
-        <div class="auth-icon bg-primary/10 text-primary">
-          <Mail class="size-6" />
+        <div class="auth-icon overflow-hidden">
+          <img :src="logo" alt="iTime" class="size-full object-cover">
         </div>
         <CardTitle class="auth-title">
           {{ title }}
         </CardTitle>
-        <CardDescription class="auth-description">
-          {{ mode === 'reset' ? '通过邮箱验证码设置新的登录密码' : '用一个账户，记录每一份值得珍惜的时间' }}
+        <CardDescription v-if="mode === 'reset'" class="auth-description">
+          通过邮箱验证码设置新的登录密码
         </CardDescription>
       </CardHeader>
       <CardContent class="auth-content">
         <form @submit.prevent="submit">
           <fieldset :disabled="busy" class="auth-fields">
             <div class="auth-field">
-              <Label for="email">邮箱</Label><Input id="email" v-model="email" type="email" autocomplete="email" placeholder="name@example.com" required />
+              <Label for="email">邮箱</Label>
+              <Input id="email" v-model="email" type="email" autocomplete="email" list="email-suggestions" placeholder="name@example.com" required />
+              <datalist id="email-suggestions">
+                <option v-for="suggestion in emailSuggestions" :key="suggestion" :value="suggestion" />
+              </datalist>
             </div>
             <div v-if="mode !== 'login'" class="auth-field">
               <Label for="code">邮箱验证码</Label>
@@ -123,10 +157,23 @@ function wechat() {
                   忘记密码？
                 </RouterLink>
               </div>
-              <Input id="password" v-model="password" type="password" :autocomplete="mode === 'login' ? 'current-password' : 'new-password'" required :placeholder="mode === 'login' ? '输入密码' : '8–16 位英文字母或数字'" />
+              <div class="auth-password">
+                <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" :autocomplete="mode === 'login' ? 'current-password' : 'new-password'" required :placeholder="mode === 'login' ? '输入密码' : '8–16 位英文字母或数字'" />
+                <Button type="button" variant="ghost" size="icon" class="auth-password-toggle text-muted-foreground" :aria-label="showPassword ? '隐藏密码' : '显示密码'" :aria-pressed="showPassword" aria-controls="password" @click="showPassword = !showPassword">
+                  <EyeOff v-if="showPassword" class="size-4" aria-hidden="true" />
+                  <Eye v-else class="size-4" aria-hidden="true" />
+                </Button>
+              </div>
             </div>
             <div v-if="mode !== 'login'" class="auth-field">
-              <Label for="confirmation">确认密码</Label><Input id="confirmation" v-model="confirmation" type="password" autocomplete="new-password" required placeholder="再次输入密码" />
+              <Label for="confirmation">确认密码</Label>
+              <div class="auth-password">
+                <Input id="confirmation" v-model="confirmation" :type="showConfirmation ? 'text' : 'password'" autocomplete="new-password" required placeholder="再次输入密码" />
+                <Button type="button" variant="ghost" size="icon" class="auth-password-toggle text-muted-foreground" :aria-label="showConfirmation ? '隐藏确认密码' : '显示确认密码'" :aria-pressed="showConfirmation" aria-controls="confirmation" @click="showConfirmation = !showConfirmation">
+                  <EyeOff v-if="showConfirmation" class="size-4" aria-hidden="true" />
+                  <Eye v-else class="size-4" aria-hidden="true" />
+                </Button>
+              </div>
             </div>
             <p v-if="error" role="alert" class="text-sm text-destructive">
               {{ error }}
@@ -136,7 +183,7 @@ function wechat() {
             </Button>
           </fieldset>
         </form>
-        <template v-if="mode === 'login'">
+        <template v-if="mode === 'login' && showWechatLogin">
           <div class="auth-divider text-muted-foreground">
             <span class="bg-border" />其他登录方式<span class="bg-border" />
           </div>
@@ -231,6 +278,22 @@ function wechat() {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.auth-password {
+  position: relative;
+}
+
+.auth-password :deep(input) {
+  padding-right: 3rem;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.75rem;
+  height: 100%;
 }
 
 .auth-link {

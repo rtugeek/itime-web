@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { BrowserWindowApi, Channel, MenuApi, TrayApi, type WidgetMenuItem } from '@widget-js/core'
 import { useIpcListener, useMenuListener, useWidget } from '@widget-js/vue3'
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Check, ChevronRight, Grip, Pause, Play, Plus } from '@lucide/vue'
 
 import { storeToRefs } from 'pinia'
@@ -74,6 +74,13 @@ function onWindowLeave() {
 }
 
 const { scenes, currentScene, remindText, isRunning, status, currentSceneId } = storeToRefs(pomodoroStore)
+
+watch(status, (value, oldValue) => {
+  if (value === 'waiting' || (oldValue === 'resting' && (value === 'stop' || value === 'running'))) {
+    manuallyHidden.value = false
+    updateTrayMenu()
+  }
+})
 
 pomodoroStore.loadScenes()
 

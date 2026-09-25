@@ -8,6 +8,7 @@
 TODO、生日、倒计时、跟时间相关的组件
 </p>
 
+
 <p align="center">
   <img src="https://img.shields.io/github/license/widget-js/widgets" alt="">
   <img src="https://img.shields.io/badge/Q%E7%BE%A4-701784679-EB1923?logo=tencentqq&logoColor=white&sanitize=true" alt="Chat">
@@ -16,6 +17,8 @@ TODO、生日、倒计时、跟时间相关的组件
   <a href="https://txc.qq.com/products/450189"><img src="https://img.shields.io/badge/-功能建议-2378ff?logo=vowpalwabbit&logoColor=white&sanitize=true" alt="Feedback"></a>
   <a href="https://discord.gg/vwSAaRR8cT"><img src="https://img.shields.io/badge/-Discord-5865F2?logo=discord&logoColor=white" alt="discord"></a>
 </p>
+
+<img src="/docs/prd.png">
 
 ### 说明
 

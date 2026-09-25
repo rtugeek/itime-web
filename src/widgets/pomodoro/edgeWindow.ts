@@ -12,7 +12,7 @@ interface EdgeWindowApi {
 }
 
 // 所有位置写入串行执行；显示始终恢复隐藏前的边缘，不重新猜测边缘。
-export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize = 6) {
+export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize = 6, canAutoHide = () => true) {
   const stickEdge = ref<Edge>(initialEdge)
   const isShowed = ref(true)
   let disposed = false
@@ -55,7 +55,7 @@ export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize
   function move(visible: boolean, edge?: Edge | 'nearest' | 'bottom-center') {
     const request = generation
     queue = queue.then(async () => {
-      if (disposed || (!visible && request !== generation)) { return }
+      if (disposed || (!visible && (request !== generation || !canAutoHide()))) { return }
       if (await api.isDraggingWindow?.()) {
         cancelHide()
         return
@@ -94,7 +94,7 @@ export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize
         if (targetEdge === 'top') { position.y = area.y - bounds.height + peakSize }
         if (targetEdge === 'bottom') { position.y = area.y + area.height - peakSize }
       }
-      if (disposed || (!visible && request !== generation)) { return }
+      if (disposed || (!visible && (request !== generation || !canAutoHide()))) { return }
       visibleBounds = restored
       stickEdge.value = targetEdge
       // 隐藏开始就切换状态，鼠标返回时可以立即从动画中途弹出。
@@ -103,7 +103,7 @@ export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize
         await api.show()
         if (!disposed) { await api.setAlwaysOnTop(true) }
       }
-      const cancelled = () => disposed || (!visible && request !== generation)
+      const cancelled = () => disposed || (!visible && (request !== generation || !canAutoHide()))
       if (cancelled()) { return }
       if (edge !== 'bottom-center' && (bounds.x !== position.x || bounds.y !== position.y)) {
         await animatePosition(bounds, position, cancelled)
@@ -131,6 +131,7 @@ export function createEdgeWindow(api: EdgeWindowApi, initialEdge: Edge, peakSize
   }
   function startHideWindow() {
     cancelHide()
+    if (!canAutoHide()) { return }
     timer = setTimeout(() => { void move(false) }, 2000)
   }
   function resetPosition() {

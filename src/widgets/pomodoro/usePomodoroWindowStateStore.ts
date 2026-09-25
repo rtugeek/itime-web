@@ -15,20 +15,22 @@ export const usePomodoroWindowStateStore = defineStore('pomodoroWindowStateStore
     show: () => BrowserWindowApi.show(),
     setAlwaysOnTop: value => BrowserWindowApi.setAlwaysOnTop(value),
     isDraggingWindow: () => BrowserWindowApi.isDraggingWindow(),
-  }, 'bottom')
+  }, 'bottom', 6, () => status.value !== 'waiting')
   watch(status, (value, oldValue) => {
     if (value == 'waiting') {
       stickScreenEdge.showWindow().then(() => {
         BrowserWindowApi.setAlwaysOnTop(true)
       })
     }
-    if (oldValue == 'resting' && value == 'running') {
+    if (oldValue == 'resting' && (value == 'running' || value == 'stop')) {
       stickScreenEdge.showWindow().then(() => {
         BrowserWindowApi.setAlwaysOnTop(true)
-        stickScreenEdge.startHideWindow()
+        if (value == 'running') {
+          stickScreenEdge.startHideWindow()
+        }
       })
     }
-  })
+  }, { immediate: true })
 
   return {
     stickScreenEdge,

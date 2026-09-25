@@ -13,7 +13,7 @@ const color = computed(() => {
   if (status.value == 'running') {
     return 'rgb(255, 170, 0)'
   }
-  else if (status.value == 'waiting') {
+  else if (status.value == 'waiting' || status.value == 'stop') {
     return 'rgb(0, 119, 255)'
   }
   else if (status.value == 'pause') {
@@ -44,13 +44,13 @@ const isVertical = computed(() => {
 })
 
 const isShow = computed(() => {
-  return !isShowed.value && (status.value == 'running' || status.value == 'pause' || status.value == 'waiting' || status.value == 'resting')
+  return !isShowed.value
 })
 </script>
 
 <template>
   <div v-show="isShow" class="progress" :class="{ [position]: true }">
-    <ProgressBar :progress="pomodoro.progress" :color="color" :vertical="isVertical" />
+    <ProgressBar :progress="status === 'stop' ? 100 : pomodoro.progress" :color="color" :vertical="isVertical" />
   </div>
 </template>
 
